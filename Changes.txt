@@ -1,0 +1,11 @@
+Some Screens do not show battery status
+
+Profile Pic does not update in Chef Profile for some profiles (showing white)
+
+Forget Password
+
+AuthContext apply
+
+On Update on Some Button it should be a loader
+
+Dashboard swap to refresh should work for all things refreshings

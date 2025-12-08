@@ -1,0 +1,50 @@
+<?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
+
+include '../config.php'; // DB connection
+
+$response = array();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChefID'])) {
+    $chefId = $_POST['ChefID'];
+
+    $query = "SELECT 
+                b.BookingID,
+                b.BookingDate,
+                b.EventDate,
+                b.Status,
+                u.Name AS UserName
+              FROM Bookings b
+              JOIN Users u ON b.UserID = u.UserID
+              WHERE b.ChefID = ?
+              ORDER BY b.BookingDate DESC";
+
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param("s", $chefId);
+
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        $bookings = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $bookings[] = $row;
+        }
+
+        $response['success'] = true;
+        $response['data'] = $bookings;
+    } else {
+        $response['success'] = false;
+        $response['message'] = "Failed to fetch bookings.";
+    }
+
+    $stmt->close();
+} else {
+    $response['success'] = false;
+    $response['message'] = "Invalid request or missing ChefID.";
+}
+
+echo json_encode($response);
+$connection->close();
+?>

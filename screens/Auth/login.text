@@ -1,0 +1,88 @@
+
+<?php
+header('Access-Control-Allow-Origin:*');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization');
+
+include_once "config.php"; 
+
+function encrypt($password, $key)
+{
+    $encrypted = "";
+    for ($i = 0; $i < strlen($password); $i++) {
+        $encrypted .= chr(ord($password[$i]) ^ ord($key[$i % strlen($key)]));
+    }
+    return base64_encode($encrypted); 
+}
+
+$inputData = json_decode(file_get_contents('php://input'), true);
+error_log('Received JSON: ' . print_r($inputData, true));
+
+$email = isset($inputData['email']) ? $inputData['email'] : '';
+$password = isset($inputData['password']) ? $inputData['password'] : '';
+
+if (empty($email) || empty($password)) {
+    echo json_encode(array('status' => 'error', 'message' => 'Email or Password is missing.'));
+    exit();
+}
+
+$key = "MySecretKey";  
+$encryptedPassword = encrypt($password, $key);
+
+// Step 1: Get user basic info and role
+$query = "
+    SELECT 
+        au.*, urm.RoleId
+    FROM 
+        AppUsers au
+    INNER JOIN 
+        UserRolesManagers urm ON au.Id = urm.UserId
+    WHERE 
+        au.Email = '$email'
+    LIMIT 1
+";
+
+$result = $connection->query($query);
+
+if ($result && $result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+
+    if ($encryptedPassword !== $user['Password']) {
+        echo json_encode(array('status' => 'error', 'message' => 'Incorrect password.'));
+        exit();
+    }
+
+    $roleId = $user['RoleId'];
+    $userId = $user['Id'];
+    $details = [];
+
+    // Step 2: Fetch role-specific data
+    if ($roleId == 2) {
+        $detailsQuery = "SELECT * FROM Users WHERE UserId = '$userId' LIMIT 1";
+    } elseif ($roleId == 3) {
+        $detailsQuery = "SELECT * FROM Chefs WHERE UserId = '$userId' LIMIT 1";
+    } else {
+        echo json_encode(array('status' => 'error', 'message' => 'Unsupported role.'));
+        exit();
+    }
+
+    $detailsResult = $connection->query($detailsQuery);
+
+    if ($detailsResult && $detailsResult->num_rows > 0) {
+        $details = $detailsResult->fetch_assoc();
+    }
+
+    // Final response
+    echo json_encode(array(
+        'status' => 'success',
+        'message' => 'Login successful',
+        'role_id' => $roleId,
+        'app_user' => $user,
+        'profile' => $details
+    ));
+} else {
+    echo json_encode(array('status' => 'error', 'message' => 'User not found.'));
+}
+
+$connection->close();
+?>

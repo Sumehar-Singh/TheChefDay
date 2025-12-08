@@ -1,0 +1,6 @@
+user_id= response.data.user_id (String ID)
+userid=response.data.userid  (Integer ID) (conditional chefs or users table)
+
+userCoords= for lat and lon
+
+chefIds= on ChefDetail to add it to the recents if not added already

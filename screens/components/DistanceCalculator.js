@@ -1,0 +1,23 @@
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+  const toRad = (value) => (value * Math.PI) / 180;
+
+  const R = 3958.8; // Radius of Earth in miles
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.asin(Math.sqrt(a));
+
+  return R * c; // Distance in miles
+};
+
+// Function to calculate distance, passing lat1, lon1, lat2, lon2
+const getDistanceInMiles = (lat1, lon1, lat2, lon2) => {
+  return haversineDistance(lat1, lon1, lat2, lon2);
+};
+
+export default getDistanceInMiles;
