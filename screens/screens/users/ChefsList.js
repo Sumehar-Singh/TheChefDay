@@ -1,5 +1,16 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, Image, ScrollView, StyleSheet, Dimensions, RefreshControl } from "react-native";
+import React, { useState, useCallback, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Dimensions,
+  RefreshControl,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomStatusBar from '../../components/CustomStatusBar';
@@ -7,49 +18,35 @@ import CenterLoading from '../../components/CenterLoading';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import  getDistanceInMiles  from '../../components/DistanceCalculator';
-import {getUserCoords } from '../../components/utils';
-import { useAuth } from "../../../components/contexts/AuthContext";
+import getDistanceInMiles from '../../components/DistanceCalculator';
+import { getUserCoords } from '../../components/utils';
+import { useAuth } from '../../../components/contexts/AuthContext';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
-const radiusMiles=2500;
+const radiusMiles = 2500;
 
-const ChefsList = ({navigation}) => {
-  const [chefs,setChefs]=useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+const ChefsList = ({ navigation }) => {
+  const [chefs, setChefs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filteredChefs, setFilteredChefs] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const[coords,setCoords]=useState(null);
-const {profile}=useAuth();
-
-
+  const [coords, setCoords] = useState(null);
+  const { profile } = useAuth();
 
   useEffect(() => {
-   
- const getUserId = async () => {
-      
-     
-      
+    const getUserId = async () => {
       fetchChefs(profile.Id);
-      const dimensions=await getUserCoords();
+      const dimensions = await getUserCoords();
       setCoords(dimensions);
     };
 
-if(profile)
-    getUserId();
-   else
-    fetchChefsForGuest();
-
-
-  
-
+    if (profile) getUserId();
+    else fetchChefsForGuest();
   }, []);
   const navigateToChefDetail = (chefId) => {
-   
     navigation.navigate('ChefDetail', {
-      ChefId: chefId,  // Pass the ChefId as a param (INT)
-     
+      ChefId: chefId, // Pass the ChefId as a param (INT)
 
       // Passed these two because ChefId will be stored in Recent
       // UserId will get the chef data in ChefDetail screen
@@ -60,10 +57,10 @@ if(profile)
       const response = await axios.get(
         `${BASE_URL}chefs/get_chefs_list_with_booked.php`,
         {
-          params: { UserID: userId }
+          params: { UserID: userId },
         }
       );
-  
+
       if (response.data.status === 'success') {
         setChefs(response.data.data);
         setFilteredChefs(response.data.data);
@@ -73,11 +70,10 @@ if(profile)
     }
   };
 
-    const fetchChefsForGuest = async () => {
+  const fetchChefsForGuest = async () => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}guest/get_chefs_list.php`);
-  
+      const response = await axios.get(`${BASE_URL}guest/get_chefs_list.php`);
+
       if (response.data.status === 'success') {
         setChefs(response.data.data);
         setFilteredChefs(response.data.data);
@@ -88,9 +84,9 @@ if(profile)
   };
 
   const handleSearch = () => {
-    const filtered = chefs.filter((chef) =>
-      chef.FirstName.toLowerCase().includes(searchQuery.toLowerCase()) 
-    //||
+    const filtered = chefs.filter(
+      (chef) => chef.FirstName.toLowerCase().includes(searchQuery.toLowerCase())
+      //||
       // chef.cuisine.toLowerCase().includes(searchQuery.toLowerCase()) ||
       // chef.location.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -111,25 +107,42 @@ if(profile)
   }, []);
 
   return (
-    <LinearGradient colors={['white', '#f2f2f2', '#e6e6e6']} style={styles.container}>
+    <LinearGradient
+      colors={['white', '#f2f2f2', '#e6e6e6']}
+      style={styles.container}
+    >
       <CustomStatusBar title="Chefs List" />
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <MaterialCommunityIcons name="magnify" size={24} color="#ff0000" style={styles.searchIcon} />
+          <MaterialCommunityIcons
+            name="magnify"
+            size={24}
+            color="#ff0000"
+            style={styles.searchIcon}
+          />
           <TextInput
             style={styles.searchInput}
-            placeholder={isTablet?"Search by name, cuisine, location...":"Search by anything..."}
+            placeholder={
+              isTablet
+                ? 'Search by name, cuisine, location...'
+                : 'Search by anything...'
+            }
             placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
         </View>
         <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-        <MaterialCommunityIcons name="magnify" size={24} color="white" style={styles.searchIcon} />
+          <MaterialCommunityIcons
+            name="magnify"
+            size={24}
+            color="white"
+            style={styles.searchIcon}
+          />
         </TouchableOpacity>
       </View>
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.contentContainer}
         refreshControl={
           <RefreshControl
@@ -140,78 +153,107 @@ if(profile)
           />
         }
       >
-        {filteredChefs.filter((chef) => chef.Booked).length>0 &&  <Text style={styles.sectionTitle}>Booked Chefs</Text>}
-       {profile && 
-       <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={filteredChefs.filter((chef) => chef.Booked)}
-          keyExtractor={(item) => item.ChefID}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.bookedChefItem} onPress={() => navigateToChefDetail(item.ChefID)}>
-              <Image source={{ uri: item.Image }} style={styles.chefImage} />
-              <Text style={styles.chefName}>
-              {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim().length > 13
-    ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim().slice(0, 13)}...`
-    : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
-              </Text>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={styles.bookedChefsList}
-        />
-       }
-        
-        
+        {filteredChefs.filter((chef) => chef.Booked).length > 0 && (
+          <Text style={styles.sectionTitle}>Booked Chefs</Text>
+        )}
+        {profile && (
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={filteredChefs.filter((chef) => chef.Booked)}
+            keyExtractor={(item) => item.ChefID}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.bookedChefItem}
+                onPress={() => navigateToChefDetail(item.ChefID)}
+              >
+                <Image source={{ uri: item.Image }} style={styles.chefImage} />
+                <Text style={styles.chefName}>
+                  {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()
+                    .length > 13
+                    ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`
+                        .trim()
+                        .slice(0, 13)}...`
+                    : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
+                </Text>
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={styles.bookedChefsList}
+          />
+        )}
+
         <Text style={styles.sectionTitle}>All Chefs</Text>
         <FlatList
           data={filteredChefs}
-          keyExtractor={(item) => item.ChefID}
+          keyExtractor={(item) =>
+            item.ChefID
+              ? item.ChefID.toString()
+              : `${item.id || 'chef'}-${Math.random()}`
+          }
+          scrollEnabled={false}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.chefCard} onPress={() => navigateToChefDetail(item.ChefID)}>
-              <Image 
-              source={item.Image ? { uri: item.Image } : require('../../../assets/userImage.jpg')}  
-              style={styles.chefCardImage} 
-            />
+            <TouchableOpacity
+              style={styles.chefCard}
+              onPress={() => navigateToChefDetail(item.ChefID)}
+            >
+              <Image
+                source={
+                  item.Image
+                    ? { uri: item.Image }
+                    : require('../../../assets/userImage.jpg')
+                }
+                style={styles.chefCardImage}
+              />
               <View style={styles.chefInfo}>
-              <Text style={styles.chefCardName}>
-  {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim().length > 25
-    ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim().slice(0, 25)}...`
-    : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
-</Text>
+                <Text style={styles.chefCardName}>
+                  {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()
+                    .length > 25
+                    ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`
+                        .trim()
+                        .slice(0, 25)}...`
+                    : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
+                </Text>
 
-                <Text style={styles.chefDetails}>Exp -{item.ExperienceYears} Years</Text>
+                <Text style={styles.chefDetails}>
+                  Exp -{item.ExperienceYears} Years
+                </Text>
                 {/* <Text style={styles.chefRating}>⭐ {item.rating} | 📍 {item.location}</Text> */}
                 <Text style={styles.chefRating}>
-                {coords &&
-                  getDistanceInMiles(coords.lat, coords.lon, item.Lat, item.Lon) <
-                    radiusMiles &&
-                  "~" +
+                  {coords &&
                     getDistanceInMiles(
                       coords.lat,
                       coords.lon,
                       item.Lat,
                       item.Lon
-                    ).toFixed(2) +
-                    " mi"}
-              </Text>
-             {(item.HourlyRate || item.DayRate) ?
-              <View style={styles.hourDayRateContainer}>
-  <View style={[styles.rateBadge, styles.hourRateBadge]}>
-    <Text style={styles.rateText}>H: ${item.HourlyRate}</Text>
-  </View>
-  <View style={[styles.rateBadge, styles.dayRateBadge]}>
-    <Text style={styles.rateText}>D: ${item.DayRate}</Text>
-  </View>
-</View>:
- <View style={styles.hourDayRateContainer}>
- <View style={[styles.rateBadge, styles.dayRateBadge]}>
-    <Text style={styles.rateText}>Rates are not mentioned</Text>
-  </View>
-  </View>
-             }
-
+                    ) < radiusMiles &&
+                    '~' +
+                      getDistanceInMiles(
+                        coords.lat,
+                        coords.lon,
+                        item.Lat,
+                        item.Lon
+                      ).toFixed(2) +
+                      ' mi'}
+                </Text>
+                {item.HourlyRate || item.DayRate ? (
+                  <View style={styles.hourDayRateContainer}>
+                    <View style={[styles.rateBadge, styles.hourRateBadge]}>
+                      <Text style={styles.rateText}>H: ${item.HourlyRate}</Text>
+                    </View>
+                    <View style={[styles.rateBadge, styles.dayRateBadge]}>
+                      <Text style={styles.rateText}>D: ${item.DayRate}</Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={styles.hourDayRateContainer}>
+                    <View style={[styles.rateBadge, styles.dayRateBadge]}>
+                      <Text style={styles.rateText}>
+                        Rates are not mentioned
+                      </Text>
+                    </View>
+                  </View>
+                )}
               </View>
-             
             </TouchableOpacity>
           )}
           contentContainerStyle={styles.allChefsList}
@@ -225,7 +267,7 @@ if(profile)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: '#f8f9fa',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -252,30 +294,28 @@ const styles = StyleSheet.create({
     marginTop: 6,
     gap: 8, // optional if you're using React Native 0.71+
   },
-  
+
   rateBadge: {
     backgroundColor: '#f0f0f0',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
   },
-  
+
   hourRateBadge: {
     backgroundColor: '#e0f7fa', // light cyan for hourly
   },
-  
+
   dayRateBadge: {
     backgroundColor: '#ffe0b2', // light orange for daily
   },
-  
+
   rateText: {
     fontSize: 13,
     color: '#333',
     fontWeight: '600',
   },
-  
-  
-  
+
   searchIcon: {
     marginRight: 10,
   },
@@ -291,13 +331,11 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    
   },
   searchButtonText: {
     color: 'white',
     fontSize: isTablet ? 16 : 14,
     fontWeight: '600',
-    
   },
   contentContainer: {
     flex: 1,

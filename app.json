@@ -2,7 +2,7 @@
   "expo": {
     "name": "The Chef Day",
     "slug": "thechefdayapp",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,9 +14,13 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ruffengineers.thechefdayapp",
+      "bundleIdentifier": "com.coder.chefday",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "android": {
@@ -25,15 +29,22 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ruffengineers.thechefdayapp"
+      "package": "com.ruffengineers.thechefdayapp",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "cbd6a150-7685-4035-ac18-fd1f592bca3d"
+        "projectId": "ac33e2c4-979e-40e2-a817-e69e79ff467a"
       }
+    },
+    "plugins": [
+      "react-native-iap"
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/ac33e2c4-979e-40e2-a817-e69e79ff467a"
     }
   }
 }

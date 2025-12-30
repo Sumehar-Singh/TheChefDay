@@ -1,12 +1,23 @@
-import React, { useState,useEffect,useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, FlatList, ScrollView ,ImageBackground,Alert} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  FlatList,
+  ScrollView,
+  ImageBackground,
+  Alert,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
-import { formatDate,getEventDayLabel } from './utils';
+import { formatDate, getEventDayLabel } from './utils';
 
 const ChefBookingList = ({ navigation, userId, limit }) => {
   const [bookings, setBookings] = useState([]);
@@ -14,15 +25,19 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
 
   const fetchChefBookings = useCallback(async () => {
     if (!userId) return;
-    
+
     const form = new FormData();
     form.append('ChefID', userId);
     form.append('Limit', limit);
 
     try {
-      const response = await axios.post(`${BASE_URL}chefs/get_chef_bookings.php`, form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await axios.post(
+        `${BASE_URL}chefs/get_chef_bookings.php`,
+        form,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
 
       if (response.data.success) {
         setBookings(response.data.data || []);
@@ -42,17 +57,22 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
     setIsLoading(true);
     fetchChefBookings();
   }, [fetchChefBookings]);
-  
+
   const handleBookingsList = () => {
     navigation.navigate('Bookings');
-  }
+  };
 
   const EmptyBookings = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="calendar-clock" size={isTablet ? 80 : 60} color="#ff0000" />
+      <MaterialCommunityIcons
+        name="calendar-clock"
+        size={isTablet ? 80 : 60}
+        color="#ff0000"
+      />
       <Text style={styles.emptyTitle}>No Booking Requests Yet</Text>
       <Text style={styles.emptyText}>
-      You haven't received any booking requests yet. We'll let you know as soon as someone reaches out.
+        You haven't received any booking requests yet. We'll let you know as
+        soon as someone reaches out.
       </Text>
       {/* <TouchableOpacity 
         style={styles.emptyButton}
@@ -64,11 +84,15 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
   );
 
   const getStatusColor = (status) => {
-    switch(status) {
-      case 'Confirmed': return '#4CAF50';
-      case 'Declined': return '#F44336';
-      case 'Canceled': return '#FF9800';
-      default: return '#ff0000';
+    switch (status) {
+      case 'Confirmed':
+        return '#4CAF50';
+      case 'Declined':
+        return '#F44336';
+      case 'Canceled':
+        return '#FF9800';
+      default:
+        return '#ff0000';
     }
   };
 
@@ -76,16 +100,24 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleContainer}>
-          <MaterialCommunityIcons name="calendar-check" size={isTablet ? 28 : 24} color="#ff0000" />
+          <MaterialCommunityIcons
+            name="calendar-check"
+            size={isTablet ? 28 : 24}
+            color="#ff0000"
+          />
           <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
         </View>
         {bookings.length > 0 && limit && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.seeAllButton}
             onPress={handleBookingsList}
           >
             <Text style={styles.seeAllText}>View All</Text>
-            <MaterialCommunityIcons name="chevron-right" size={isTablet ? 24 : 20} color="#ff0000" />
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={isTablet ? 24 : 20}
+              color="#ff0000"
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -98,32 +130,62 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
         <EmptyBookings />
       ) : (
         <FlatList
+          scrollEnabled={false}
           data={bookings}
           keyExtractor={(item) => item.BookingID}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.bookingItem}
-              onPress={() => navigation.navigate('ChefBookingDetail', { BookingID: item.BookingID })}
+              onPress={() =>
+                navigation.navigate('ChefBookingDetail', {
+                  BookingID: item.BookingID,
+                })
+              }
             >
               <View style={styles.bookingItemLeft}>
                 <View style={styles.bookingHeader}>
-                  <Text style={styles.bookingTextCustomer}>{item.UserName} </Text>
-                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.Status) }]}>
+                  <Text style={styles.bookingTextCustomer}>
+                    {item.UserName}{' '}
+                  </Text>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: getStatusColor(item.Status) },
+                    ]}
+                  >
                     <Text style={styles.statusText}>{item.Status}</Text>
                   </View>
                 </View>
                 <View style={styles.bookingDetails}>
                   <View style={styles.detailRow}>
-                    <MaterialCommunityIcons name="calendar" size={isTablet ? 20 : 16} color="#ff0000" />
-                    <Text style={styles.bookingTextEvent}>Event: {formatDate(item.EventDate)}</Text>
+                    <MaterialCommunityIcons
+                      name="calendar"
+                      size={isTablet ? 20 : 16}
+                      color="#ff0000"
+                    />
+                    <Text style={styles.bookingTextEvent}>
+                      Event: {formatDate(item.EventDate)}
+                    </Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <MaterialCommunityIcons name="clock-outline" size={isTablet ? 20 : 16} color="#ff0000" />
-                    <Text style={styles.bookingText}>Booked: {formatDate(item.BookingDate)}</Text>
+                    <MaterialCommunityIcons
+                      name="clock-outline"
+                      size={isTablet ? 20 : 16}
+                      color="#ff0000"
+                    />
+                    <Text style={styles.bookingText}>
+                      Booked: {formatDate(item.BookingDate)}
+                    </Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <MaterialCommunityIcons name="calendar-clock" size={isTablet ? 20 : 16} color="#ff0000" />
-                    <Text style={styles.bookingTextDays}>{getEventDayLabel(item.EventDate)}</Text>
+                    <MaterialCommunityIcons
+                      name="calendar-clock"
+                      size={isTablet ? 20 : 16}
+                      color="#ff0000"
+                    />
+                    <Text style={styles.bookingTextDays}>
+                      {getEventDayLabel(item.EventDate)}
+                    </Text>
                   </View>
                 </View>
               </View>

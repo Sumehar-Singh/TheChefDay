@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Alert } from 'react-native';
+import SubscriptionService from './services/SubscriptionService';
+import * as RNIap from 'react-native-iap';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StripeProvider } from '@stripe/stripe-react-native';
 import PopUpScreen from './screens/screens/PopUpScreen';
 import Home from './screens/screens/guests/Home';
 
@@ -41,67 +43,147 @@ import AnimatedSplash from './screens/Auth/AnimatedSplash';
 import AllBookings from './screens/screens/users/AllBookings';
 import DeleteUserAccount from './screens/screens/users/DeleteUserAccount';
 import PaymentScreen from './screens/screens/chefs/PaymentScreen';
+
 const Stack = createStackNavigator();
 
+// Wrap StripeProvider with a dynamic import to avoid bundling native modules at startup
+function StripeProviderWrapper({ children }) {
+  try {
+    const { StripeProvider: SP } = require('@stripe/stripe-react-native');
+    return (
+      <SP publishableKey="pk_test_51S8esf2UcXOB5Q4qU8qNzYRVfy2cxgKPrgyJ3vsJMPPqwwifju9sf8ZYbpWrT4syqAs6K1MZTHD2EjblBT88fEhR006Hiafxc2">
+        {children}
+      </SP>
+    );
+  } catch (e) {
+    console.warn('Stripe not available:', e?.message);
+    // Fallback: just render children without Stripe wrapper
+    return children;
+  }
+}
+
 export default function App() {
+  useEffect(() => {
+    let purchaseUpdateSubscription = null;
+    let purchaseErrorSubscription = null;
+
+    const initIAP = async () => {
+      await SubscriptionService.init();
+
+      purchaseUpdateSubscription = RNIap.purchaseUpdatedListener(async (purchase) => {
+        console.log('Purchase Updated:', purchase);
+        const receipt = purchase.transactionReceipt;
+        if (receipt) {
+          try {
+            await SubscriptionService.finishTransaction(purchase);
+            Alert.alert('Success', 'Your purchase was successful!');
+          } catch (ackErr) {
+            console.warn('ackErr', ackErr);
+          }
+        }
+      });
+
+      purchaseErrorSubscription = RNIap.purchaseErrorListener((error) => {
+        console.warn('Purchase Error:', error);
+        if (error.responseCode !== 'E_USER_CANCELLED') {
+          Alert.alert('Purchase Error', error.message);
+        }
+      });
+    };
+
+    initIAP();
+
+    return () => {
+      if (purchaseUpdateSubscription) {
+        purchaseUpdateSubscription.remove();
+        purchaseUpdateSubscription = null;
+      }
+      if (purchaseErrorSubscription) {
+        purchaseErrorSubscription.remove();
+        purchaseErrorSubscription = null;
+      }
+      SubscriptionService.disconnect();
+    };
+  }, []);
+
   return (
     <AuthProvider>
-        <StripeProvider
-      publishableKey="pk_test_51S8esf2UcXOB5Q4qU8qNzYRVfy2cxgKPrgyJ3vsJMPPqwwifju9sf8ZYbpWrT4syqAs6K1MZTHD2EjblBT88fEhR006Hiafxc2"
-    >
+      <StripeProviderWrapper>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+            initialRouteName="AnimatedSplash"
+          >
+            <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} />
+            <Stack.Screen name="SignupScreen" component={SignupScreen} />
+            <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
 
+            <Stack.Screen name="ChefDashboard" component={ChefDashboard} />
+            <Stack.Screen name="ChefSettings" component={ChefSettings} />
+            <Stack.Screen
+              name="UpdateChefPricing"
+              component={UpdateChefPricing}
+            />
 
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName="AnimatedSplash"
-      >
-        <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        <Stack.Screen name="SignupScreen" component={SignupScreen} />
-        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+            <Stack.Screen
+              name="ChefBookingDetail"
+              component={ChefBookingDetail}
+            />
+            <Stack.Screen
+              name="BookingAcceptedScreen"
+              component={BookingAcceptedScreen}
+            />
+            <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
+            <Stack.Screen
+              name="ManageSubscriptionPlans"
+              component={ManageSubscriptionPlans}
+            />
 
-         <Stack.Screen name="ChefDashboard" component={ChefDashboard} />
-         <Stack.Screen name="ChefSettings" component={ChefSettings} />
-         <Stack.Screen name="UpdateChefPricing" component={UpdateChefPricing} />
-        
-         <Stack.Screen name="ChefBookingDetail" component={ChefBookingDetail} />
-         <Stack.Screen name="BookingAcceptedScreen" component={BookingAcceptedScreen} />
-         <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
-         <Stack.Screen name="ManageSubscriptionPlans" component={ManageSubscriptionPlans} />
-      
-       
-        <Stack.Screen name="ChefEditProfile" component={ChefEditProfile} />
-        <Stack.Screen name="SubscriptionPlans" component={SubscriptionPlans} />
-        <Stack.Screen name="SubscriptionDetail" component={SubscriptionDetail} />
-        <Stack.Screen name="ChefProfileStatus" component={ChefProfileStatus} />
-        <Stack.Screen name="ChefTermsScreen" component={ChefTermsScreen} />
-        <Stack.Screen name="Bookings" component={Bookings} />
-        <Stack.Screen name="UploadDocuments" component={UploadDocuments} />
-        <Stack.Screen name="DeleteChefAccount" component={DeleteChefAccount} />
+            <Stack.Screen name="ChefEditProfile" component={ChefEditProfile} />
+            <Stack.Screen
+              name="SubscriptionPlans"
+              component={SubscriptionPlans}
+            />
+            <Stack.Screen
+              name="SubscriptionDetail"
+              component={SubscriptionDetail}
+            />
+            <Stack.Screen
+              name="ChefProfileStatus"
+              component={ChefProfileStatus}
+            />
+            <Stack.Screen name="ChefTermsScreen" component={ChefTermsScreen} />
+            <Stack.Screen name="Bookings" component={Bookings} />
+            <Stack.Screen name="UploadDocuments" component={UploadDocuments} />
+            <Stack.Screen
+              name="DeleteChefAccount"
+              component={DeleteChefAccount}
+            />
 
-        <Stack.Screen name="ChefReviews" component={ChefReviews} />
-        <Stack.Screen name="UserDashboard" component={UserDashboard} />
-        <Stack.Screen name="ChefDetail" component={ChefDetail} />
-        <Stack.Screen name="ChefsList" component={ChefsList} />
-        <Stack.Screen name="UserSettings" component={UserSettings} />
-        <Stack.Screen name="UserEditProfile" component={UserEditProfile} />
-        <Stack.Screen name="AddBooking" component={AddBooking} />
-        <Stack.Screen name="BookingDetail" component={BookingDetail} />
-        <Stack.Screen name="UserTermsScreen" component={UserTermsScreen} />
-        <Stack.Screen name="AllBookings" component={AllBookings} />
-        <Stack.Screen name="DeleteUserAccount" component={DeleteUserAccount} />
-        <Stack.Screen name="PopUpScreen" component={PopUpScreen} />
+            <Stack.Screen name="ChefReviews" component={ChefReviews} />
+            <Stack.Screen name="UserDashboard" component={UserDashboard} />
+            <Stack.Screen name="ChefDetail" component={ChefDetail} />
+            <Stack.Screen name="ChefsList" component={ChefsList} />
+            <Stack.Screen name="UserSettings" component={UserSettings} />
+            <Stack.Screen name="UserEditProfile" component={UserEditProfile} />
+            <Stack.Screen name="AddBooking" component={AddBooking} />
+            <Stack.Screen name="BookingDetail" component={BookingDetail} />
+            <Stack.Screen name="UserTermsScreen" component={UserTermsScreen} />
+            <Stack.Screen name="AllBookings" component={AllBookings} />
+            <Stack.Screen
+              name="DeleteUserAccount"
+              component={DeleteUserAccount}
+            />
+            <Stack.Screen name="PopUpScreen" component={PopUpScreen} />
 
-        {/* You can add more screens here for your app, e.g., RegisterScreen, HomeScreen */}
-      </Stack.Navigator>
-    </NavigationContainer>
-
-
-   </StripeProvider>
+            {/* You can add more screens here for your app, e.g., RegisterScreen, HomeScreen */}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </StripeProviderWrapper>
     </AuthProvider>
   );
 }

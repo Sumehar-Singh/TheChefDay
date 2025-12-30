@@ -1,10 +1,18 @@
-import React, { useState,useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
-import { 
-  View, Text, StyleSheet, FlatList, 
-  Image, TouchableOpacity, TextInput, ScrollView ,Dimensions,
-  RefreshControl,SafeAreaView
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  Dimensions,
+  RefreshControl,
+  SafeAreaView,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,27 +22,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CenterLoading from '../../components/CenterLoading';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
-import {getStoredChefIds,getUserCoords } from '../../components/utils';
+import { getStoredChefIds, getUserCoords } from '../../components/utils';
 import UserFullName from '../../components/strings/users/UserFullName';
 import UserProfileImage from '../../components/strings/users/UserProfileImage';
 import BookingsList from '../../components/BookingsList';
-import  getDistanceInMiles  from '../../components/DistanceCalculator';
+import getDistanceInMiles from '../../components/DistanceCalculator';
 import { useAuth } from '../../../components/contexts/AuthContext';
-
-
 
 const UserDashboard = ({ navigation }) => {
   const [allChefs, setAllChefs] = useState([]);
   const [recentChefIds, setRecentChefIds] = useState([]);
-  const [userId,setUserId]=useState('');
+  const [userId, setUserId] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const {profile}=useAuth();
+  const { profile } = useAuth();
 
-const[coords,setCoords]=useState(null);
-const nearByMiles=50;
-const radiusMiles=200;
-
+  const [coords, setCoords] = useState(null);
+  const nearByMiles = 50;
+  const radiusMiles = 200;
 
   const removeItemFromStorage = async (key) => {
     try {
@@ -46,42 +51,30 @@ const radiusMiles=200;
   };
 
   const fetchRecentChefIds = async () => {
-    const storedIds = await getStoredChefIds();  // Call the utility function to fetch ChefIds
-    console.log("all Stored",storedIds);
+    const storedIds = await getStoredChefIds(); // Call the utility function to fetch ChefIds
+    console.log('all Stored', storedIds);
 
     setRecentChefIds(storedIds);
-
   };
   useFocusEffect(
     React.useCallback(() => {
-      
-  
       fetchRecentChefIds();
-    },[]));
+    }, [])
+  );
   useEffect(() => {
     const removeAndFetch = async () => {
-      await removeItemFromStorage("userCoords"); // Clear stored chefIds
-      
+      await removeItemFromStorage('userCoords'); // Clear stored chefIds
     };
     //removeAndFetch();
 
- const getUserId = async () => {
-    
-      const dimensions=await getUserCoords();
-      console.log("My Corr",dimensions)
+    const getUserId = async () => {
+      const dimensions = await getUserCoords();
+      console.log('My Corr', dimensions);
       setCoords(dimensions);
-     
     };
-   getUserId();
+    getUserId();
     fetchAllChefs();
-
-
-  
-
   }, []);
-
-
-
 
   const fetchAllChefs = async () => {
     try {
@@ -89,7 +82,6 @@ const radiusMiles=200;
       console.log(response.data.status);
       if (response.data.status === 'success') {
         setAllChefs(response.data.data);
-        
       } else {
         console.log('No chefs found');
       }
@@ -98,81 +90,69 @@ const radiusMiles=200;
     }
   };
 
-
   const navigateToChefDetail = (chefId) => {
-   
     navigation.navigate('ChefDetail', {
-      ChefId: chefId,  // Pass the ChefId as a param (INT)
-     
+      ChefId: chefId, // Pass the ChefId as a param (INT)
 
       // Passed these two because ChefId will be stored in Recent
       // UserId will get the chef data in ChefDetail screen
     });
   };
- 
-
-
 
   // const getRandomChefs = (count) => allChefs.sort(() => 0.5 - Math.random()).slice(0, count);
   const getRecentChefs = (count) => {
-    const filteredChefs = allChefs.filter(chef => recentChefIds.includes(chef.ChefID));
-     
+    const filteredChefs = allChefs.filter((chef) =>
+      recentChefIds.includes(chef.ChefID)
+    );
+
     return filteredChefs.slice(0, count);
   };
   function getPopularChefs(count) {
-   
-    return allChefs
-        .sort((a, b) => b.Popularity - a.Popularity) 
-        .slice(0, count);
-}
-
-
-
-const shuffleArray = (array) => {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    return allChefs.sort((a, b) => b.Popularity - a.Popularity).slice(0, count);
   }
-  return shuffled;
-};
+
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
   const recentChefs = getRecentChefs(5);
   const popularChefs = getPopularChefs(2);
 
   const sections = [
     {
-      title: "Recently Viewed",
-      data: recentChefs
+      title: 'Recently Viewed',
+      data: recentChefs,
     },
     {
-      title: "Random Picks",
-      data: shuffleArray(allChefs).slice(0, 8)
+      title: 'Random Picks',
+      data: shuffleArray(allChefs).slice(0, 8),
     },
     {
-      title: "Nearby Chefs",
+      title: 'Nearby Chefs',
       data: allChefs.filter(
-        chef =>
+        (chef) =>
           coords &&
-          getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= nearByMiles
-      )
+          getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <=
+            nearByMiles
+      ),
     },
     {
-      title: "Popular Chefs",
-      data: popularChefs
-    }
+      title: 'Popular Chefs',
+      data: popularChefs,
+    },
   ];
-  
 
   // const nearbyChefs = getRandomChefs(5);
-
-  
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setIsLoading(true);
     try {
       await Promise.all([
-      
         fetchAllChefs(),
         fetchRecentChefIds(),
         //fetchBookings()
@@ -192,8 +172,8 @@ const shuffleArray = (array) => {
 
   return (
     <View style={styles.superContainer}>
-      <ScrollView 
-        style={styles.container} 
+      <ScrollView
+        style={styles.container}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -208,52 +188,76 @@ const shuffleArray = (array) => {
           colors={['#ff0000', '#c90000']}
           style={styles.headerGradient}
         >
-          <TouchableOpacity 
-            style={styles.headerContainer} 
+          <TouchableOpacity
+            style={styles.headerContainer}
             onPress={() => navigation.navigate('UserSettings')}
           >
             <View style={styles.profileContainer}>
-              <UserProfileImage userId={profile.Id} height={70} width={70} mr={15} style={styles.profileImage}/>
+              <UserProfileImage
+                userId={profile.Id}
+                height={70}
+                width={70}
+                mr={15}
+                style={styles.profileImage}
+              />
               <View style={styles.profileInfo}>
-                <Text style={styles.headerTitle}><UserFullName userId={profile.Id}/></Text>
+                <Text style={styles.headerTitle}>
+                  <UserFullName userId={profile.Id} />
+                </Text>
                 <Text style={styles.headDesc}>🙋‍♂️ User Dashboard</Text>
               </View>
             </View>
             <View style={styles.editButton}>
-              <MaterialCommunityIcons name="cog-outline" size={isTablet ? 40 : 25} color="#fff" />
+              <MaterialCommunityIcons
+                name="cog-outline"
+                size={isTablet ? 40 : 25}
+                color="#fff"
+              />
             </View>
           </TouchableOpacity>
         </LinearGradient>
 
         {sections.map((section, index) => (
-          <View key={index} style={styles.sectionContainer}>
+          <View
+            key={`section-${section.title}-${index}`}
+            style={styles.sectionContainer}
+          >
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleContainer}>
-                <MaterialCommunityIcons 
+                <MaterialCommunityIcons
                   name={
-                    section.title.includes("Recently") ? "clock-outline" :
-                    section.title.includes("Random") ? "dice-multiple" :
-                    section.title.includes("Nearby") ? "map-marker" :
-                    "fire"
-                  } 
-                  size={isTablet ? 28 : 24} 
-                  color="#ff0000" 
+                    section.title.includes('Recently')
+                      ? 'clock-outline'
+                      : section.title.includes('Random')
+                      ? 'dice-multiple'
+                      : section.title.includes('Nearby')
+                      ? 'map-marker'
+                      : 'fire'
+                  }
+                  size={isTablet ? 28 : 24}
+                  color="#ff0000"
                 />
                 <Text style={styles.sectionTitle}>{section.title}</Text>
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.seeAllButton}
-                onPress={() => navigation.navigate("ChefsList")}
+                onPress={() => navigation.navigate('ChefsList')}
               >
                 <Text style={styles.seeAllText}>View All</Text>
-                <MaterialCommunityIcons name="chevron-right" size={isTablet ? 24 : 20} color="#209E00" />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={isTablet ? 24 : 20}
+                  color="#209E00"
+                />
               </TouchableOpacity>
             </View>
 
             <FlatList
               horizontal
               data={[...section.data, { id: 'seeAll' }]}
-              keyExtractor={(item, idx) => item.ChefID ?? `seeAll-${index}-${idx}`}
+              keyExtractor={(item, idx) =>
+                item.ChefID ?? `seeAll-${index}-${idx}`
+              }
               renderItem={({ item }) =>
                 item.id !== 'seeAll' ? (
                   <TouchableOpacity
@@ -273,24 +277,27 @@ const shuffleArray = (array) => {
                       {item.ExperienceYears} yrs
                     </Text>
                     <Text style={styles.chefDistance}>
-                     
                       {coords &&
-                        getDistanceInMiles(coords.lat, coords.lon, item.Lat, item.Lon) <
-                          radiusMiles &&
-                        "~" +
+                        getDistanceInMiles(
+                          coords.lat,
+                          coords.lon,
+                          item.Lat,
+                          item.Lon
+                        ) < radiusMiles &&
+                        '~' +
                           getDistanceInMiles(
                             coords.lat,
                             coords.lon,
                             item.Lat,
                             item.Lon
                           ).toFixed(2) +
-                          " mi"}
+                          ' mi'}
                     </Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
                     style={[styles.chefCard, styles.seeAllCard]}
-                    onPress={() => navigation.navigate("ChefsList")}
+                    onPress={() => navigation.navigate('ChefsList')}
                   >
                     <Text style={styles.seeAllCardText}>View All</Text>
                   </TouchableOpacity>
@@ -311,10 +318,18 @@ const shuffleArray = (array) => {
               activeOpacity={0.8}
             >
               <View style={styles.bookingsCtaLeft}>
-                <MaterialCommunityIcons name="calendar-multiple-check" size={22} color="#cc0000" />
+                <MaterialCommunityIcons
+                  name="calendar-multiple-check"
+                  size={22}
+                  color="#cc0000"
+                />
                 <Text style={styles.bookingsCtaText}>View All Bookings</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#cc0000" />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={24}
+                color="#cc0000"
+              />
             </TouchableOpacity>
           </View>
         )}
@@ -339,7 +354,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   headerContainer: {
-    paddingTop:25,
+    paddingTop: 25,
     padding: isTablet ? 20 : 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -502,7 +517,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
-    marginBottom:50
+    marginBottom: 50,
   },
   bookingsCtaLeft: {
     flexDirection: 'row',

@@ -14,7 +14,10 @@ const { width } = Dimensions.get('window');
 const isTablet = width > 600;
 
 const DashboardCard = ({ title, value, icon, color, onPress }) => (
-  <TouchableOpacity style={[styles.card, { borderLeftColor: color }]} onPress={onPress}>
+  <TouchableOpacity
+    style={[styles.card, { borderLeftColor: color }]}
+    onPress={onPress}
+  >
     <View style={styles.cardContent}>
       <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
         <Ionicons name={icon} size={isTablet ? 32 : 24} color={color} />
@@ -78,7 +81,11 @@ const AdminDashboard = ({ navigation }) => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Admin Dashboard</Text>
         <TouchableOpacity style={styles.settingsButton}>
-          <Ionicons name="settings-outline" size={isTablet ? 28 : 24} color="#805500" />
+          <Ionicons
+            name="settings-outline"
+            size={isTablet ? 28 : 24}
+            color="#805500"
+          />
         </TouchableOpacity>
       </View>
 
@@ -86,7 +93,7 @@ const AdminDashboard = ({ navigation }) => {
         <View style={styles.statsGrid}>
           {stats.map((stat, index) => (
             <DashboardCard
-              key={index}
+              key={`stat-${stat.title}-${index}`}
               title={stat.title}
               value={stat.value}
               icon={stat.icon}
@@ -100,7 +107,9 @@ const AdminDashboard = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Recent Activity</Text>
           <View style={styles.activityCard}>
             <View style={styles.activityItem}>
-              <View style={[styles.activityIcon, { backgroundColor: '#80550020' }]}>
+              <View
+                style={[styles.activityIcon, { backgroundColor: '#80550020' }]}
+              >
                 <Ionicons name="person-add-outline" size={20} color="#805500" />
               </View>
               <View style={styles.activityContent}>
@@ -109,7 +118,9 @@ const AdminDashboard = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.activityItem}>
-              <View style={[styles.activityIcon, { backgroundColor: '#4CAF5020' }]}>
+              <View
+                style={[styles.activityIcon, { backgroundColor: '#4CAF5020' }]}
+              >
                 <Ionicons name="restaurant-outline" size={20} color="#4CAF50" />
               </View>
               <View style={styles.activityContent}>
@@ -118,8 +129,14 @@ const AdminDashboard = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.activityItem}>
-              <View style={[styles.activityIcon, { backgroundColor: '#FF4F4F20' }]}>
-                <Ionicons name="alert-circle-outline" size={20} color="#FF4F4F" />
+              <View
+                style={[styles.activityIcon, { backgroundColor: '#FF4F4F20' }]}
+              >
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={20}
+                  color="#FF4F4F"
+                />
               </View>
               <View style={styles.activityContent}>
                 <Text style={styles.activityTitle}>Booking Cancellation</Text>
@@ -142,13 +159,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-   
+
     paddingHorizontal: isTablet ? 30 : 20,
     paddingVertical: isTablet ? 20 : 15,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
-    marginTop:25,
+    marginTop: 25,
   },
   headerTitle: {
     fontSize: isTablet ? 28 : 22,

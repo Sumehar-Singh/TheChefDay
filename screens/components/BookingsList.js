@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Alert, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { formatDate, getEventDayLabel } from './utils';
@@ -15,7 +25,9 @@ const BookingsList = ({ UserID, navigation }) => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/users/get_bookings.php?UserId=${UserID}&limit=5`);
+        const response = await axios.get(
+          `${BASE_URL}/users/get_bookings.php?UserId=${UserID}&limit=5`
+        );
         if (response.data.status === 'success') {
           setBookings(response.data.data);
         } else {
@@ -30,27 +42,36 @@ const BookingsList = ({ UserID, navigation }) => {
     fetchBookings();
   }, []);
 
-  
-
   const getStatusColor = (status) => {
-    switch(status) {
-      case 'Confirmed': return '#4CAF50';
-      case 'Declined': return '#F44336';
-      case 'Canceled': return 'red';
-      case 'Pending': return '#FF9800';
-      case 'Service Completed': return 'gray';
-      default: return '#805500';
+    switch (status) {
+      case 'Confirmed':
+        return '#4CAF50';
+      case 'Declined':
+        return '#F44336';
+      case 'Canceled':
+        return 'red';
+      case 'Pending':
+        return '#FF9800';
+      case 'Service Completed':
+        return 'gray';
+      default:
+        return '#805500';
     }
   };
 
   const EmptyBookings = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="calendar-clock" size={isTablet ? 80 : 60} color="#805500" />
+      <MaterialCommunityIcons
+        name="calendar-clock"
+        size={isTablet ? 80 : 60}
+        color="#805500"
+      />
       <Text style={styles.emptyTitle}>No Bookings Yet</Text>
       <Text style={styles.emptyText}>
-        Start exploring chefs and book their services for your special occasions.
+        Start exploring chefs and book their services for your special
+        occasions.
       </Text>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.emptyButton}
         onPress={() => navigation.navigate('ChefsList')}
       >
@@ -67,62 +88,95 @@ const BookingsList = ({ UserID, navigation }) => {
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleContainer}>
-          <MaterialCommunityIcons name="calendar-check" size={isTablet ? 28 : 24} color="#ff0000" />
+          <MaterialCommunityIcons
+            name="calendar-check"
+            size={isTablet ? 28 : 24}
+            color="#ff0000"
+          />
           <Text style={styles.sectionTitle}>Your Bookings</Text>
         </View>
         {bookings && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.seeAllButton}
             onPress={() => navigation.navigate('AllBookings')}
           >
             <Text style={styles.seeAllText}>View All</Text>
-            <MaterialCommunityIcons name="chevron-right" size={isTablet ? 24 : 20} color="#209E00" />
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={isTablet ? 24 : 20}
+              color="#209E00"
+            />
           </TouchableOpacity>
         )}
       </View>
 
-      {!bookings? (
+      {!bookings ? (
         <EmptyBookings />
       ) : (
-        <FlatList
-          data={[...bookings.slice(0, 5), { id: 'seeAll' }]}
-          keyExtractor={(item) => item.BookingId?.toString() ?? 'seeAll'}
-          renderItem={({ item }) =>
-            item.id !== 'seeAll' ? (
-              <TouchableOpacity 
-                style={styles.bookingItem}
-                onPress={() => navigation.navigate('BookingDetail', { BookingID: item.BookingId })}
-              >
-                <View style={styles.bookingItemLeft}>
-                  <View style={styles.bookingHeader}>
-                    <Text style={styles.bookingTextCustomer}>{item.ChefName}</Text>
-                    
+        <>
+          {bookings.slice(0, 5).map((item) => (
+            <TouchableOpacity
+              key={
+                item.BookingId?.toString() ??
+                `booking-${item.ChefName}-${Math.random()}`
+              }
+              style={styles.bookingItem}
+              onPress={() =>
+                navigation.navigate('BookingDetail', {
+                  BookingID: item.BookingId,
+                })
+              }
+            >
+              <View style={styles.bookingItemLeft}>
+                <View style={styles.bookingHeader}>
+                  <Text style={styles.bookingTextCustomer}>
+                    {item.ChefName}
+                  </Text>
+                </View>
+                <View style={styles.bookingDetails}>
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons
+                      name="calendar"
+                      size={isTablet ? 20 : 16}
+                      color="#ff0000"
+                    />
+                    <Text style={styles.bookingTextEvent}>
+                      Event: {formatDate(item.EventDate)}
+                    </Text>
                   </View>
-                  <View style={styles.bookingDetails}>
-                    <View style={styles.detailRow}>
-                      <MaterialCommunityIcons name="calendar" size={isTablet ? 20 : 16} color="#ff0000" />
-                      <Text style={styles.bookingTextEvent}>Event: {formatDate(item.EventDate)}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <MaterialCommunityIcons name="clock-outline" size={isTablet ? 20 : 16} color="#ff0000" />
-                      <Text style={styles.bookingText}>Booked: {formatDate(item.BookingDate)}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <MaterialCommunityIcons name="food" size={isTablet ? 20 : 16} color="#ff0000" />
-                      <Text style={styles.bookingTextService}>{item.ServiceType}</Text>
-                      
-                    </View>
-                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.Status) }]}>
-                      <Text style={styles.statusText}>{item.Status}</Text>
-                    </View>
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons
+                      name="clock-outline"
+                      size={isTablet ? 20 : 16}
+                      color="#ff0000"
+                    />
+                    <Text style={styles.bookingText}>
+                      Booked: {formatDate(item.BookingDate)}
+                    </Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons
+                      name="food"
+                      size={isTablet ? 20 : 16}
+                      color="#ff0000"
+                    />
+                    <Text style={styles.bookingTextService}>
+                      {item.ServiceType}
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: getStatusColor(item.Status) },
+                    ]}
+                  >
+                    <Text style={styles.statusText}>{item.Status}</Text>
                   </View>
                 </View>
-              </TouchableOpacity>
-            ) : (
-            <></>
-            )
-          }
-        />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </>
       )}
     </View>
   );

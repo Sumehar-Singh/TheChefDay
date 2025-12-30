@@ -1,46 +1,64 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, FlatList, ScrollView, Alert, Dimensions, RefreshControl, ActivityIndicator, Animated, Easing, Modal } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+  Alert,
+  Dimensions,
+  RefreshControl,
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Modal,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomStatusBar from '../../components/CustomStatusBar';
-import { useRoute } from '@react-navigation/native';  
-import {storeChefId} from '../../components/utils';
+import { useRoute } from '@react-navigation/native';
+import { storeChefId } from '../../components/utils';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
 import StarRating from '../../components/StarRating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CenterLoading from '../../components/CenterLoading';
 import getDistanceInMiles from '../../components/DistanceCalculator';
-import {getUserCoords } from '../../components/utils';
+import { getUserCoords } from '../../components/utils';
 import { useAuth } from '../../../components/contexts/AuthContext';
 import { ChefPropertiesForProfile } from '../../components/ChefPropertiesForProfile';
 const { width } = Dimensions.get('window');
 const isTablet = width >= 768;
 
-const ChefDetail = ({navigation}) => {
-
+const ChefDetail = ({ navigation }) => {
   const [reviews, setReviews] = useState([]);
   const [review, setReview] = useState('');
   const [rating, setRating] = useState(0);
-const [fullName, setFullName] = useState('');
-const [address, setAddress] = useState('');
-const [distance,setDistance]=useState(0);
+  const [fullName, setFullName] = useState('');
+  const [address, setAddress] = useState('');
+  const [distance, setDistance] = useState(0);
   const [bio, setBio] = useState('');
   const [experience, setExperience] = useState(0);
-  const [phone,setPhone]=useState('');
+  const [phone, setPhone] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const route = useRoute();
-  const { ChefId } = route.params; //this is int chef Id 
-  const {profile}=useAuth();
+  const { ChefId } = route.params; //this is int chef Id
+  const { profile } = useAuth();
 
-const [HourlyRate, setHourlyRate] = useState('');
+  const [HourlyRate, setHourlyRate] = useState('');
   const [DayRate, setDayRate] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [ratesLoading, setRatesLoading] = useState(true);
-  const [chefProperties,setChefProperties]=useState([]);
+  const [chefProperties, setChefProperties] = useState([]);
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const [selectedReview, setSelectedReview] = useState(null);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
@@ -48,21 +66,23 @@ const [HourlyRate, setHourlyRate] = useState('');
   const [editRating, setEditRating] = useState(0);
   const [editReview, setEditReview] = useState('');
   const [modalLoading, setModalLoading] = useState(false);
-  
 
   const fetchPricing = async (ChefID) => {
     try {
       const form = new FormData();
       form.append('ChefID', ChefID);
 
-      const response = await axios.post(`${BASE_URL}/chefs/get_chef_pricing.php`, form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/chefs/get_chef_pricing.php`,
+        form,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
 
       if (response.data.success && response.data.data) {
         setHourlyRate(response.data.data.HourlyRate.toString());
         setDayRate(response.data.data.DayRate.toString());
-
       }
     } catch (error) {
       console.error('Error fetching pricing:', error);
@@ -73,70 +93,65 @@ const [HourlyRate, setHourlyRate] = useState('');
   const getChefData = async (chefId) => {
     setRatesLoading(true);
 
-    const fetchCoords = async (cLat,cLon) => {
+    const fetchCoords = async (cLat, cLon) => {
       const dimensions = await getUserCoords();
-      
-      setDistance(getDistanceInMiles(dimensions.lat,dimensions.lon,cLat,cLon));
+
+      setDistance(
+        getDistanceInMiles(dimensions.lat, dimensions.lon, cLat, cLon)
+      );
     };
-   
+
     try {
-        const response = await axios.get(`${BASE_URL}chefs/get_chef_data.php`, {
-            params: { ChefID: chefId }  
+      const response = await axios.get(`${BASE_URL}chefs/get_chef_data.php`, {
+        params: { ChefID: chefId },
 
-            // it is passing the Int chef Id to get the data from Chefs table
-        });
+        // it is passing the Int chef Id to get the data from Chefs table
+      });
 
-        if (response.data.status === "success") {
-           
-          fetchPricing(chefId);
-            const chef = response.data.data;  
-           
-            setFullName(chef[0].FirstName+" " + chef[0].MiddleName+" " + chef[0].LastName);
-            setBio(chef[0].Bio);
-            setAddress(chef[0].Address);
-            setExperience(chef[0].ExperienceYears); // Convert number to string for TextInput
-            setPhone(chef[0].Phone);
-            setProfileImage(chef[0].Image);
-            if(profile!=null)
-            fetchCoords(chef[0].Lat,chef[0].Lon);
-     const cProperties=await ChefPropertiesForProfile(chefId);
+      if (response.data.status === 'success') {
+        fetchPricing(chefId);
+        const chef = response.data.data;
+
+        setFullName(
+          chef[0].FirstName + ' ' + chef[0].MiddleName + ' ' + chef[0].LastName
+        );
+        setBio(chef[0].Bio);
+        setAddress(chef[0].Address);
+        setExperience(chef[0].ExperienceYears); // Convert number to string for TextInput
+        setPhone(chef[0].Phone);
+        setProfileImage(chef[0].Image);
+        if (profile != null) fetchCoords(chef[0].Lat, chef[0].Lon);
+        const cProperties = await ChefPropertiesForProfile(chefId);
         setChefProperties(cProperties);
-        console.log("Chef Properties",cProperties);
-        } else {
-            console.log("Error:", response.data.message);
-            setRatesLoading(false);
-        }
-    } catch (error) {
-        console.error("Error fetching chef data:", error);
+        console.log('Chef Properties', cProperties);
+      } else {
+        console.log('Error:', response.data.message);
         setRatesLoading(false);
+      }
+    } catch (error) {
+      console.error('Error fetching chef data:', error);
+      setRatesLoading(false);
     }
-};
+  };
 
+  const navigateToAddBooking = () => {
+    if (!profile) {
+      navigation.navigate('LoginScreen');
+      return;
+    }
 
-const navigateToAddBooking = () => {
-  if(!profile)
-{
-    navigation.navigate('LoginScreen');
-    return;
-}
- 
-  navigation.navigate('AddBooking', {
-  
-    ChefId:ChefId
-  });
-  
- 
-
-};
+    navigation.navigate('AddBooking', {
+      ChefId: ChefId,
+    });
+  };
 
   useEffect(() => {
     if (ChefId && profile) {
-      storeChefId(ChefId);  // Store the ChefId in local storage if it's passed (integers)
+      storeChefId(ChefId); // Store the ChefId in local storage if it's passed (integers)
     }
 
-
     getChefData(ChefId);
-    
+
     // Start flip animation when component mounts
     Animated.timing(flipAnim, {
       toValue: 1,
@@ -146,38 +161,40 @@ const navigateToAddBooking = () => {
     }).start();
   }, [ChefId]);
 
-
   const chef = {
     name: fullName,
     experience: experience,
     cuisine: 'Italian, French, Indian',
     location: address,
-    
+
     image: profileImage,
   };
   const handleSubmitReview = async () => {
-  if(!profile)
-{
-    navigation.navigate('LoginScreen');
-    return;
-}
+    if (!profile) {
+      navigation.navigate('LoginScreen');
+      return;
+    }
 
     if (!review.trim()) {
       Alert.alert('Error', 'Please write your review.');
       return;
     }
-  
+
     const formData = new FormData();
     formData.append('ChefID', ChefId); // This is the chef's ID (int)
     formData.append('UserID', profile.Id); // This is the logged-in user's ID (int)
     formData.append('Rating', rating);
     formData.append('ReviewText', review);
- 
+
     try {
-      const response = await axios.post(`${BASE_URL}users/add_review.php`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-  
+      const response = await axios.post(
+        `${BASE_URL}users/add_review.php`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+
       if (response.data.success) {
         Alert.alert('Success', 'Review submitted successfully.');
         setReview('');
@@ -185,46 +202,60 @@ const navigateToAddBooking = () => {
         fetchChefReviews(); // Refresh reviews
       } else {
         // Check for duplicate review message
-        if (response.data.message === "You have already submitted a review for this chef.") {
-          Alert.alert('Alert', 'You have already submitted a review for this chef.');
+        if (
+          response.data.message ===
+          'You have already submitted a review for this chef.'
+        ) {
+          Alert.alert(
+            'Alert',
+            'You have already submitted a review for this chef.'
+          );
         } else {
-          Alert.alert('Error', response.data.message || 'Failed to submit review.');
+          Alert.alert(
+            'Error',
+            response.data.message || 'Failed to submit review.'
+          );
         }
       }
     } catch (error) {
       console.error('Review submit error:', error);
-      Alert.alert('Error', 'Something went wrong while submitting your review.');
+      Alert.alert(
+        'Error',
+        'Something went wrong while submitting your review.'
+      );
     }
   };
-  
 
-
-const fetchChefReviews = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}users/get_chef_reviews.php`, {
-      params: { ChefID: ChefId, Limit: 8 }
-    });
-    if (response.data.success) {
-     
-      setReviews(response.data.data);
-    } else {
-      console.log('Review fetch error:', response.data.message);
+  const fetchChefReviews = async () => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}users/get_chef_reviews.php`,
+        {
+          params: { ChefID: ChefId, Limit: 8 },
+        }
+      );
+      if (response.data.success) {
+        setReviews(response.data.data);
+      } else {
+        console.log('Review fetch error:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
     }
-  } catch (error) {
-    console.error('Error fetching reviews:', error);
-  }
-};
+  };
 
-useEffect(() => {
-  if (ChefId) {
-    fetchChefReviews();
-  }
-}, [ChefId]);
+  useEffect(() => {
+    if (ChefId) {
+      fetchChefReviews();
+    }
+  }, [ChefId]);
 
-
-const averageRating = reviews 
-  ? (reviews.reduce((sum, item) => sum + parseInt(item.Rating), 0) / reviews.length).toFixed(1)
-  : '0.0';
+  const averageRating = reviews
+    ? (
+        reviews.reduce((sum, item) => sum + parseInt(item.Rating), 0) /
+        reviews.length
+      ).toFixed(1)
+    : '0.0';
 
   const formatDate = (dateString) => {
     try {
@@ -241,12 +272,11 @@ const averageRating = reviews
   };
 
   const handleLongPress = (item, pageX, pageY) => {
-    
     if (!profile || !profile.Id) return;
     if (item.UserID != profile.Id) return; // Only own review gets menu
-    console.log("Profile ID",profile.Id);
-    console.log("User ID",item.UserID);
-    console.log("PageX:", pageX, "PageY:", pageY);
+    console.log('Profile ID', profile.Id);
+    console.log('User ID', item.UserID);
+    console.log('PageX:', pageX, 'PageY:', pageY);
     const MENU_WIDTH = 200;
     const MENU_HEIGHT = 160;
     const PADDING = 8;
@@ -254,7 +284,7 @@ const averageRating = reviews
     let top = pageY;
     const screenWidth = Dimensions.get('window').width;
     const screenHeight = Dimensions.get('window').height;
-    
+
     if (left + MENU_WIDTH + PADDING > screenWidth) {
       left = screenWidth - MENU_WIDTH - PADDING;
     }
@@ -262,7 +292,7 @@ const averageRating = reviews
       top = screenHeight - MENU_HEIGHT - PADDING;
     }
 
-    console.log("Final position - left:", left, "top:", top);
+    console.log('Final position - left:', left, 'top:', top);
     setSelectedReview(item);
     setContextMenuPosition({ x: left, y: top });
     setContextMenuVisible(true);
@@ -277,9 +307,12 @@ const averageRating = reviews
     try {
       setModalLoading(true);
       // Optional: fetch full review details
-      const response = await axios.get(`${BASE_URL}users/view_chef_review.php`, {
-        params: { ReviewID: selectedReview.ReviewID }
-      });
+      const response = await axios.get(
+        `${BASE_URL}users/view_chef_review.php`,
+        {
+          params: { ReviewID: selectedReview.ReviewID },
+        }
+      );
       if (response.data && response.data.success && response.data.data) {
         const data = response.data.data;
         setSelectedReview((prev) => ({ ...prev, ...data }));
@@ -320,15 +353,22 @@ const averageRating = reviews
       formData.append('ChefID', ChefId);
       formData.append('Rating', editRating);
       formData.append('ReviewText', editReview);
-      const response = await axios.post(`${BASE_URL}users/update_chef_review.php`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await axios.post(
+        `${BASE_URL}users/update_chef_review.php`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
       if (response.data && response.data.success) {
         Alert.alert('Success', 'Review updated.');
         setUpdateModalVisible(false);
         await fetchChefReviews();
       } else {
-        Alert.alert('Error', response.data?.message || 'Failed to update review.');
+        Alert.alert(
+          'Error',
+          response.data?.message || 'Failed to update review.'
+        );
       }
     } catch (e) {
       console.error('Update review error:', e);
@@ -345,16 +385,23 @@ const averageRating = reviews
       const formData = new FormData();
       formData.append('ReviewID', selectedReview.ReviewID);
       formData.append('UserID', profile.Id);
-      const response = await axios.post(`${BASE_URL}users/delete_chef_review.php`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await axios.post(
+        `${BASE_URL}users/delete_chef_review.php`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
       if (response.data && response.data.success) {
         Alert.alert('Deleted', 'Your review has been deleted.');
         setDeleteModalVisible(false);
         setSelectedReview(null);
         await fetchChefReviews();
       } else {
-        Alert.alert('Error', response.data?.message || 'Failed to delete review.');
+        Alert.alert(
+          'Error',
+          response.data?.message || 'Failed to delete review.'
+        );
       }
     } catch (e) {
       console.error('Delete review error:', e);
@@ -369,10 +416,7 @@ const averageRating = reviews
     setIsLoading(true);
     try {
       setRatesLoading(true);
-      await Promise.all([
-        getChefData(ChefId),
-        fetchChefReviews()
-      ]);
+      await Promise.all([getChefData(ChefId), fetchChefReviews()]);
     } catch (error) {
       console.error('Error refreshing data:', error);
     } finally {
@@ -385,26 +429,36 @@ const averageRating = reviews
     <LinearGradient colors={['#f8f8f8', '#eaeaea']} style={styles.container}>
       <CustomStatusBar title="Chef Details" />
       {contextMenuVisible && (
-        <TouchableOpacity 
-          style={styles.menuOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.menuOverlay}
+          activeOpacity={1}
           onPress={closeContextMenu}
         >
-          <View style={[styles.contextMenu, { left: contextMenuPosition.x, top: contextMenuPosition.y }]}>
+          <View
+            style={[
+              styles.contextMenu,
+              { left: contextMenuPosition.x, top: contextMenuPosition.y },
+            ]}
+          >
             <TouchableOpacity style={styles.menuItem} onPress={openViewModal}>
               <Text style={styles.menuItemText}>View</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem} onPress={openUpdateModal}>
               <Text style={styles.menuItemText}>Update Review</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.menuItem, styles.menuItemDanger]} onPress={confirmDelete}>
-              <Text style={[styles.menuItemText, styles.menuItemDangerText]}>Delete</Text>
+            <TouchableOpacity
+              style={[styles.menuItem, styles.menuItemDanger]}
+              onPress={confirmDelete}
+            >
+              <Text style={[styles.menuItemText, styles.menuItemDangerText]}>
+                Delete
+              </Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
       )}
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl
@@ -418,32 +472,38 @@ const averageRating = reviews
         {/* Chef Profile */}
         <View style={styles.profileContainer}>
           <View style={styles.profileHeader}>
-            <Animated.View style={[
-              styles.imageContainer,
-              {
-                transform: [
-                  {
-                    rotateY: flipAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['180deg', '0deg']
-                    })
-                  },
-                  { perspective: 1000 } // This is important for 3D effect
-                ],
-                opacity: flipAnim.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: [0, 0.5, 1]
-                })
-              }
-            ]}>
-              <Image 
-                source={chef.image ? { uri: chef.image } : require('../../../assets/userImage.jpg')}  
-                style={[styles.chefImage, { backfaceVisibility: 'hidden' }]} 
+            <Animated.View
+              style={[
+                styles.imageContainer,
+                {
+                  transform: [
+                    {
+                      rotateY: flipAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['180deg', '0deg'],
+                      }),
+                    },
+                    { perspective: 1000 }, // This is important for 3D effect
+                  ],
+                  opacity: flipAnim.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [0, 0.5, 1],
+                  }),
+                },
+              ]}
+            >
+              <Image
+                source={
+                  chef.image
+                    ? { uri: chef.image }
+                    : require('../../../assets/userImage.jpg')
+                }
+                style={[styles.chefImage, { backfaceVisibility: 'hidden' }]}
               />
             </Animated.View>
             <View style={styles.profileInfo}>
               <Text style={styles.chefName}>{chef.name}</Text>
-              {averageRating !== "0.0" && (
+              {averageRating !== '0.0' && (
                 <View style={styles.ratingContainer}>
                   <StarRating
                     rating={parseFloat(averageRating)}
@@ -456,41 +516,50 @@ const averageRating = reviews
                   <Text style={styles.ratingValue}>{averageRating}</Text>
                 </View>
               )}
-             
-
-            
             </View>
           </View>
           {ratesLoading ? (
             <View style={styles.bookButtonLoading}>
-              <ActivityIndicator color="#805500" size={isTablet ? 'large' : 'small'} />
-              <Text style={styles.bookButtonLoadingText}>Checking availability...</Text>
+              <ActivityIndicator
+                color="#805500"
+                size={isTablet ? 'large' : 'small'}
+              />
+              <Text style={styles.bookButtonLoadingText}>
+                Checking availability...
+              </Text>
             </View>
-          ) : (HourlyRate && DayRate) ? (
-            <TouchableOpacity 
-              style={styles.bookButton} 
-              onPress={()=>navigateToAddBooking()}
+          ) : HourlyRate && DayRate ? (
+            <TouchableOpacity
+              style={styles.bookButton}
+              onPress={() => navigateToAddBooking()}
               activeOpacity={0.8}
             >
               <Text style={styles.bookButtonText}>
-                 {profile ? 'Book Now' : 'Login to book this chef'}
-
+                {profile ? 'Book Now' : 'Login to book this chef'}
               </Text>
             </TouchableOpacity>
           ) : (
-            <Text style={styles.bookingError}>Booking is unavailable as this chef has not yet set their hourly and daily rates. Please check back later.</Text>
+            <Text style={styles.bookingError}>
+              Booking is unavailable as this chef has not yet set their hourly
+              and daily rates. Please check back later.
+            </Text>
           )}
-      
+
           <View style={styles.detailsContainer}>
-           
             <View style={styles.detailsRow}>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Hourly Rate</Text>
-                <Text style={styles.detailValue}> {HourlyRate ? "$"+HourlyRate : "Not set"}</Text>
+                <Text style={styles.detailValue}>
+                  {' '}
+                  {HourlyRate ? '$' + HourlyRate : 'Not set'}
+                </Text>
               </View>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Day Rate</Text>
-                <Text style={styles.detailValue}> {DayRate ? "$"+DayRate : "Not set"}</Text>
+                <Text style={styles.detailValue}>
+                  {' '}
+                  {DayRate ? '$' + DayRate : 'Not set'}
+                </Text>
               </View>
             </View>
             <View style={styles.detailsRow}>
@@ -498,29 +567,41 @@ const averageRating = reviews
                 <Text style={styles.detailLabel}>Location</Text>
                 <Text style={styles.detailValue}>📍 {address}</Text>
               </View>
-              
-              
-                <View style={styles.detailItem}>
+
+              <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Distance from you</Text>
-               {profile ?  <Text style={styles.detailValue}>~ {distance.toFixed(2)} miles</Text> : <Text style={styles.detailValueRed}>Login Required</Text>}
+                {profile ? (
+                  <Text style={styles.detailValue}>
+                    ~ {distance.toFixed(2)} miles
+                  </Text>
+                ) : (
+                  <Text style={styles.detailValueRed}>Login Required</Text>
+                )}
               </View>
-             
-            
             </View>
 
             {/* Chef Properties Section */}
             <View style={styles.propertiesContainer}>
               {chefProperties && chefProperties.length > 0 ? (
                 chefProperties.map((property, index) => (
-                  <View key={index} style={styles.propertyItem}>
-                    <Text style={styles.detailLabel}>{property.PropertyName}</Text>
-                    <Text style={styles.detailValue}>{property.Specialties}</Text>
+                  <View
+                    key={`property-${property.PropertyName}-${index}`}
+                    style={styles.propertyItem}
+                  >
+                    <Text style={styles.detailLabel}>
+                      {property.PropertyName}
+                    </Text>
+                    <Text style={styles.detailValue}>
+                      {property.Specialties}
+                    </Text>
                   </View>
                 ))
               ) : (
                 <View style={styles.propertyItem}>
                   <Text style={styles.detailLabel}>Properties</Text>
-                  <Text style={styles.detailValue}>No additional properties available</Text>
+                  <Text style={styles.detailValue}>
+                    No additional properties available
+                  </Text>
                 </View>
               )}
             </View>
@@ -530,22 +611,25 @@ const averageRating = reviews
                 <Text style={styles.detailLabel}>Experience</Text>
                 <Text style={styles.detailValue}>{chef.experience} Years</Text>
               </View>
-             
             </View>
           </View>
         </View>
 
         {/* Book Now Button */}
-        
-         {/* Add Review Section - Modern Design */}
+
+        {/* Add Review Section - Modern Design */}
         <View style={styles.modernReviewSection}>
           <View style={styles.reviewSectionHeader}>
             <View style={styles.reviewHeaderIcon}>
               <Text style={styles.reviewHeaderEmoji}>⭐</Text>
             </View>
             <View style={styles.reviewHeaderText}>
-              <Text style={styles.reviewSectionTitle}>Share Your Experience</Text>
-              <Text style={styles.reviewSectionSubtitle}>Help others by sharing your thoughts</Text>
+              <Text style={styles.reviewSectionTitle}>
+                Share Your Experience
+              </Text>
+              <Text style={styles.reviewSectionSubtitle}>
+                Help others by sharing your thoughts
+              </Text>
             </View>
           </View>
 
@@ -564,10 +648,15 @@ const averageRating = reviews
                 />
                 {rating > 0 && (
                   <Text style={styles.ratingText}>
-                    {rating === 1 ? 'Poor' : 
-                     rating === 2 ? 'Fair' : 
-                     rating === 3 ? 'Good' : 
-                     rating === 4 ? 'Very Good' : 'Excellent'}
+                    {rating === 1
+                      ? 'Poor'
+                      : rating === 2
+                      ? 'Fair'
+                      : rating === 3
+                      ? 'Good'
+                      : rating === 4
+                      ? 'Very Good'
+                      : 'Excellent'}
                   </Text>
                 )}
               </View>
@@ -575,12 +664,13 @@ const averageRating = reviews
 
             {/* Review Text Section */}
             <View style={styles.textSection}>
-              <Text style={styles.textLabel}>Tell us more about your experience</Text>
+              <Text style={styles.textLabel}>
+                Tell us more about your experience
+              </Text>
               <View style={styles.modernTextInputContainer}>
                 <TextInput
                   style={styles.modernTextInput}
-                  placeholder={`Share details for ${chef.name} about the food quality, service, cleanliness, or anything else that stood out...`} 
-
+                  placeholder={`Share details for ${chef.name} about the food quality, service, cleanliness, or anything else that stood out...`}
                   value={review}
                   onChangeText={(text) => {
                     if (text.length <= 500) {
@@ -594,17 +684,19 @@ const averageRating = reviews
                   maxLength={500}
                 />
                 <View style={styles.characterCount}>
-                  <Text style={styles.characterCountText}>{review.length}/500</Text>
+                  <Text style={styles.characterCountText}>
+                    {review.length}/500
+                  </Text>
                 </View>
               </View>
             </View>
 
             {/* Submit Button */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
                 styles.modernSubmitButton,
-                (!review.trim() || rating === 0) && styles.submitButtonDisabled
-              ]} 
+                (!review.trim() || rating === 0) && styles.submitButtonDisabled,
+              ]}
               onPress={handleSubmitReview}
               activeOpacity={0.8}
               disabled={!review.trim() || rating === 0}
@@ -613,9 +705,7 @@ const averageRating = reviews
                 <Text style={styles.submitButtonIcon}>📝</Text>
                 <Text style={styles.modernSubmitButtonText}>
                   {profile ? 'Submit Review' : 'Login to Submit Review'}
-                  
-                  
-                  </Text>
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -632,13 +722,21 @@ const averageRating = reviews
               renderItem={({ item }) => (
                 <TouchableOpacity
                   activeOpacity={0.9}
-                  onLongPress={(e) => handleLongPress(item, e.nativeEvent.pageX || 0, e.nativeEvent.pageY || 0)}
+                  onLongPress={(e) =>
+                    handleLongPress(
+                      item,
+                      e.nativeEvent.pageX || 0,
+                      e.nativeEvent.pageY || 0
+                    )
+                  }
                 >
                   <View style={styles.reviewCard}>
                     <View style={styles.reviewHeader}>
                       <View style={{ flex: 1 }}>
                         <Text style={styles.reviewUser}>{item.UserName}</Text>
-                        <Text style={styles.reviewDate}>{formatDate(item.CreatedAt)}</Text>
+                        <Text style={styles.reviewDate}>
+                          {formatDate(item.CreatedAt)}
+                        </Text>
                       </View>
                       <View style={styles.reviewRating}>
                         {[...Array(5)].map((_, index) => (
@@ -648,9 +746,13 @@ const averageRating = reviews
                         ))}
                       </View>
                     </View>
-                    <Text style={styles.reviewText}>{truncateText(item.ReviewText)}</Text>
+                    <Text style={styles.reviewText}>
+                      {truncateText(item.ReviewText)}
+                    </Text>
                     {profile?.Id === item.UserID && (
-                      <Text style={styles.ownReviewHint}>Long-press to manage your review</Text>
+                      <Text style={styles.ownReviewHint}>
+                        Long-press to manage your review
+                      </Text>
                     )}
                   </View>
                 </TouchableOpacity>
@@ -685,12 +787,19 @@ const averageRating = reviews
                     </Text>
                   ))}
                 </View>
-                <Text style={styles.modalDate}>{selectedReview ? formatDate(selectedReview.CreatedAt) : ''}</Text>
-                <Text style={styles.modalBody}>{selectedReview?.ReviewText}</Text>
+                <Text style={styles.modalDate}>
+                  {selectedReview ? formatDate(selectedReview.CreatedAt) : ''}
+                </Text>
+                <Text style={styles.modalBody}>
+                  {selectedReview?.ReviewText}
+                </Text>
               </View>
             )}
             <View style={styles.modalActionsRow}>
-              <TouchableOpacity style={styles.modalPrimaryBtn} onPress={() => setViewModalVisible(false)}>
+              <TouchableOpacity
+                style={styles.modalPrimaryBtn}
+                onPress={() => setViewModalVisible(false)}
+              >
                 <Text style={styles.modalPrimaryText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -738,16 +847,27 @@ const averageRating = reviews
                   maxLength={500}
                 />
                 <View style={styles.characterCount}>
-                  <Text style={styles.characterCountText}>{editReview.length}/500</Text>
+                  <Text style={styles.characterCountText}>
+                    {editReview.length}/500
+                  </Text>
                 </View>
               </View>
             </View>
             <View style={styles.modalActionsSpread}>
-              <TouchableOpacity style={styles.modalSecondaryBtn} onPress={() => setUpdateModalVisible(false)}>
+              <TouchableOpacity
+                style={styles.modalSecondaryBtn}
+                onPress={() => setUpdateModalVisible(false)}
+              >
                 <Text style={styles.modalSecondaryText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalPrimaryBtn} onPress={handleUpdateReview} disabled={modalLoading}>
-                <Text style={styles.modalPrimaryText}>{modalLoading ? 'Updating...' : 'Update'}</Text>
+              <TouchableOpacity
+                style={styles.modalPrimaryBtn}
+                onPress={handleUpdateReview}
+                disabled={modalLoading}
+              >
+                <Text style={styles.modalPrimaryText}>
+                  {modalLoading ? 'Updating...' : 'Update'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -764,13 +884,24 @@ const averageRating = reviews
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Delete Review</Text>
-            <Text style={styles.modalBody}>Are you sure you want to delete this review?</Text>
+            <Text style={styles.modalBody}>
+              Are you sure you want to delete this review?
+            </Text>
             <View style={styles.modalActionsSpread}>
-              <TouchableOpacity style={styles.modalSecondaryBtn} onPress={() => setDeleteModalVisible(false)}>
+              <TouchableOpacity
+                style={styles.modalSecondaryBtn}
+                onPress={() => setDeleteModalVisible(false)}
+              >
                 <Text style={styles.modalSecondaryText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalDangerBtn} onPress={handleDeleteReview} disabled={modalLoading}>
-                <Text style={styles.modalDangerText}>{modalLoading ? 'Deleting...' : 'Delete'}</Text>
+              <TouchableOpacity
+                style={styles.modalDangerBtn}
+                onPress={handleDeleteReview}
+                disabled={modalLoading}
+              >
+                <Text style={styles.modalDangerText}>
+                  {modalLoading ? 'Deleting...' : 'Delete'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1160,7 +1291,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.3,
   },
-  bookingError:{
+  bookingError: {
     backgroundColor: 'white',
     borderRadius: 20,
     padding: isTablet ? 25 : 20,
@@ -1170,7 +1301,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
-    color:"red",
+    color: 'red',
     fontSize: isTablet ? 18 : 15,
     fontWeight: 'bold',
     width: '100%',

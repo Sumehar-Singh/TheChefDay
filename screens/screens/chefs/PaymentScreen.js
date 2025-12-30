@@ -1,25 +1,47 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { CardField, useStripe } from '@stripe/stripe-react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Platform,
+} from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
 
 const PaymentScreen = () => {
-  const { confirmPayment } = useStripe();
+  // Dynamically require Stripe only on native platforms to avoid web bundling errors
+  let confirmPayment = null;
+  let StripeCardField = null;
+  if (Platform.OS !== 'web') {  
+    try {
+      const stripe = require('@stripe/stripe-react-native');
+      const stripeHook = stripe.useStripe();
+      confirmPayment = stripeHook.confirmPayment;
+      StripeCardField = stripe.CardField;
+    } catch (e) {
+      console.warn('Stripe native module not available:', e?.message);
+    }
+  }
+
   const [loading, setLoading] = useState(false);
 
- const fetchPaymentIntent = async () => {
-  try {
-    const res = await axios.post(`${BASE_URL}stripe/create-payment-intent.php`, {
-      amount: 50000
-    });
+  const fetchPaymentIntent = async () => {
+    try {
+      const res = await axios.post(
+        `${BASE_URL}stripe/create-payment-intent.php`,
+        {
+          amount: 50000,
+        }
+      );
 
-    return res.data;
-  } catch (error) {
-    console.log("Backend error:", error.response?.data || error.message);
-    return { error: "Server error" };
-  }
-};
+      return res.data;
+    } catch (error) {
+      console.log('Backend error:', error.response?.data || error.message);
+      return { error: 'Server error' };
+    }
+  };
 
   const handlePay = async () => {
     setLoading(true);
@@ -27,38 +49,48 @@ const PaymentScreen = () => {
 
     if (intentError || !clientSecret) {
       setLoading(false);
-      return Alert.alert("Error", intentError || "Invalid response");
+      return Alert.alert('Error', intentError || 'Invalid response');
+    }
+
+    if (!confirmPayment) {
+      setLoading(false);
+      return Alert.alert(
+        'Error',
+        'Stripe native module not available on this platform'
+      );
     }
 
     const { error, paymentIntent } = await confirmPayment(clientSecret, {
-      paymentMethodType: "Card"
+      paymentMethodType: 'Card',
     });
 
     setLoading(false);
 
     if (error) {
-      return Alert.alert("Payment Failed", error.message);
+      return Alert.alert('Payment Failed', error.message);
     }
 
-    Alert.alert("Success", "Payment completed!");
+    Alert.alert('Success', 'Payment completed!');
   };
 
   return (
     <View style={styles.container}>
-      
       <Text style={styles.title}>Secure Payment</Text>
       <Text style={styles.subtitle}>Enter your card details to continue</Text>
 
       <View style={styles.cardContainer}>
-     <CardField
-  postalCodeEnabled={false}
-  style={{ height: 50, width: "100%" }}
-  cardStyle={{
-    backgroundColor: "#ffffff",
-    textColor: "#000000",
-  }}
-/>
-
+        {Platform.OS !== 'web' && StripeCardField ? (
+          <StripeCardField
+            postalCodeEnabled={false}
+            style={{ height: 50, width: '100%' }}
+            cardStyle={{ backgroundColor: '#ffffff', textColor: '#000000' }}
+          />
+        ) : (
+          <Text style={{ textAlign: 'center', color: '#666' }}>
+            Card input is available only on native builds. Use the dev-client on
+            a device to test payments.
+          </Text>
+        )}
       </View>
 
       <TouchableOpacity
@@ -67,7 +99,7 @@ const PaymentScreen = () => {
         disabled={loading}
       >
         <Text style={styles.payText}>
-          {loading ? "Processing..." : "Pay ₹1.00"}
+          {loading ? 'Processing...' : 'Pay ₹1.00'}
         </Text>
       </TouchableOpacity>
 
@@ -84,48 +116,48 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#F9F9F9",
-    justifyContent: "center"
+    backgroundColor: '#F9F9F9',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 26,
-    fontWeight: "700",
-    textAlign: "center",
-    marginBottom: 4
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 4,
   },
   subtitle: {
-    textAlign: "center",
-    color: "#666",
-    marginBottom: 20
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: 20,
   },
   cardContainer: {
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: "#DDD",
-    marginBottom: 24
+    borderColor: '#DDD',
+    marginBottom: 24,
   },
   cardField: {
-  height: 120,  // 👈 gives enough space for all fields
-  width: "100%",
-},
+    height: 120, // 👈 gives enough space for all fields
+    width: '100%',
+  },
 
   payButton: {
-    backgroundColor: "#0A7AFF",
+    backgroundColor: '#0A7AFF',
     paddingVertical: 14,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   payText: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 18,
-    fontWeight: "600"
+    fontWeight: '600',
   },
   secureText: {
     marginTop: 16,
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 12,
-    color: "#777",
-  }
+    color: '#777',
+  },
 });

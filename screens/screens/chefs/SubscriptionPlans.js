@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, RefreshControl, TouchableOpacity, Platform, KeyboardAvoidingView, Linking } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, RefreshControl, TouchableOpacity, Platform, KeyboardAvoidingView, Alert } from 'react-native';
+import SubscriptionService from '../../../services/SubscriptionService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomStatusBar from '../../components/CustomStatusBar';
 import CenterLoading from '../../components/CenterLoading';
@@ -12,6 +13,7 @@ const isTablet = width > 600;
 
 const SubscriptionPlans = ({ navigation }) => {
   const [plans, setPlans] = useState([]);
+  const [appleProducts, setAppleProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -41,7 +43,51 @@ const SubscriptionPlans = ({ navigation }) => {
 
   useEffect(() => {
     fetchPlans();
+    loadProducts();
   }, []);
+
+  const loadProducts = async () => {
+    try {
+      const products = await SubscriptionService.getSubscriptions();
+      setAppleProducts(products);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getAppleProduct = (plan) => {
+    if (!appleProducts.length) return null;
+
+    // Explicit mapping from Backend Title to Apple Product ID
+    let productId = '';
+    const header = plan.Header || '';
+
+    // Logical Ladder: Entry(1m) -> Business(3m) -> Pro(6m) -> Pro+(1y)
+    if (header.includes('Entry')) productId = 'chef_access_1m';
+    else if (header.includes('Business')) productId = 'chef_access_3m';
+    else if (header.includes('Pro+')) productId = 'chef_access_1y';
+    else if (header.includes('Pro')) productId = 'chef_access_6m';
+
+    // Safety: Check both p.productId (standard) and p.product_id (legacy/alternative)
+    return appleProducts.find(p => {
+      const id = p.productId || p.product_id;
+      return id && (id === productId || id?.endsWith(productId));
+    });
+  };
+
+  const handlePurchase = async (product) => {
+    setIsLoading(true);
+    // Request subscription - the actual result is handled by the global listener in App.js
+    // but we can catch immediate errors here
+    const sku = product.productId || product.product_id;
+    const { success, error } = await SubscriptionService.requestSubscription(sku);
+    setIsLoading(false);
+
+    if (!success && error) {
+      // Alert handled by listener globally for most errors, but if needed we can log
+      console.log('Purchase initialization failed:', error);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -59,18 +105,17 @@ const SubscriptionPlans = ({ navigation }) => {
           />
         }
       >
-      <CustomStatusBar title="Subscription Plans" />
+        <CustomStatusBar title="Subscription Plans" />
 
 
-      
+
         <View style={styles.subscriptionNotice}>
-          <Text style={styles.noticeTitle}>Thanks for your interest!</Text>
+          <Text style={styles.noticeTitle}>Subscribe Now</Text>
           <Text style={styles.noticeText}>
-            To subscribe and unlock all features, please complete your purchase on our website.
+            Choose a plan below to unlock premium features. Managed securely by the App Store.
           </Text>
-
-          <TouchableOpacity onPress={() => Linking.openURL('https://thechefday.com/Account/Login')} style={styles.websiteButton}>
-            <Text style={styles.websiteButtonText}>Visit Website</Text>
+          <TouchableOpacity onPress={() => SubscriptionService.restorePurchases()} style={{ marginTop: 10 }}>
+            <Text style={{ color: '#209E00', textDecorationLine: 'underline' }}>Restore Purchases</Text>
           </TouchableOpacity>
         </View>
 
@@ -80,25 +125,56 @@ const SubscriptionPlans = ({ navigation }) => {
             const isRecommended = plan.Recommended == 1;
             const isSpecial = plan.Special == 1;
 
+            // Standard retrieval without debug hacks
+            const appleProduct = getAppleProduct(plan);
+
             return (
               <View
                 key={plan.Id}
                 style={[styles.planBox, isSpecial && styles.specialBox]}
-                //onPress={() => navigation.navigate('SubscriptionDetail', { Id: plan.Id })}
               >
                 {isRecommended && (
                   <View style={styles.recommendedHeader}>
                     <Text style={styles.recommendedText}>RECOMMENDED</Text>
                   </View>
                 )}
-                <Text style={styles.planHeader}>{plan.Header}</Text>
-                <Text style={styles.planPrice}>Price: $ {plan.Price}</Text>
-                <Text style={styles.planDuration}>Duration: {plan.Duration}</Text>
+                {appleProduct ? (
+                  <>
+                    <Text style={styles.planPrice}>{appleProduct.localizedPrice}</Text>
+                    <Text style={styles.planDuration}>{appleProduct.title || plan.Header}</Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.planPrice}>Price: $ {plan.Price}</Text>
+                    <Text style={styles.planDuration}>Duration: {plan.Duration}</Text>
+                  </>
+                )}
+
                 <Text style={styles.planDesc}>{plan.Desc}</Text>
+
+                {appleProduct ? (
+                  <TouchableOpacity
+                    style={[styles.websiteButton, { width: '100%', alignItems: 'center', marginTop: 15 }]}
+                    onPress={() => handlePurchase(appleProduct)}
+                  >
+                    <Text style={styles.websiteButtonText}>Subscribe</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={{ color: '#999', marginTop: 10, fontStyle: 'italic' }}>
+                    {appleProducts.length > 0 ? "Plan unavailable" : "Loading Store info..."}
+                  </Text>
+                )}
               </View>
             );
           })}
         </View>
+
+        {/* DEBUG INFO */}
+        <View style={{ padding: 20, backgroundColor: '#eee' }}>
+          <Text style={{ fontWeight: 'bold' }}>Debug Info:</Text>
+          <Text>Apple Products Found: {appleProducts.length}</Text>
+        </View>
+
         {isLoading && <CenterLoading />}
       </ScrollView>
     </KeyboardAvoidingView>

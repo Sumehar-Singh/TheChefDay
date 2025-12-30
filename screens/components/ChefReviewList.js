@@ -1,5 +1,15 @@
-import React, { useState,useEffect,useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, FlatList, ScrollView ,ImageBackground} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  FlatList,
+  ScrollView,
+  ImageBackground,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
@@ -14,16 +24,20 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
 
   const fetchChefReviews = useCallback(async () => {
     if (!userId) return;
-    
+
     const formData = new FormData();
     formData.append('ChefID', userId);
     formData.append('Limit', limit);
-  
+
     try {
-      const response = await axios.post(`${BASE_URL}users/get_chef_reviews.php`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-  
+      const response = await axios.post(
+        `${BASE_URL}users/get_chef_reviews.php`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+
       if (response.data.success) {
         setReviews(response.data.data || []);
       } else {
@@ -37,7 +51,7 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
       setIsLoading(false);
     }
   }, [userId, limit]);
-  
+
   useEffect(() => {
     setIsLoading(true);
     fetchChefReviews();
@@ -45,10 +59,15 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
 
   const EmptyReviews = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="star-outline" size={isTablet ? 80 : 60} color="#ff0000" />
+      <MaterialCommunityIcons
+        name="star-outline"
+        size={isTablet ? 80 : 60}
+        color="#ff0000"
+      />
       <Text style={styles.emptyTitle}>No Reviews Yet</Text>
       <Text style={styles.emptyText}>
-        Start accepting bookings and delivering great experiences to receive reviews from your customers.
+        Start accepting bookings and delivering great experiences to receive
+        reviews from your customers.
       </Text>
       {/* <TouchableOpacity 
         style={styles.emptyButton}
@@ -64,8 +83,8 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
       <View style={styles.starsContainer}>
         {[...Array(5)].map((_, index) => (
           <MaterialCommunityIcons
-            key={index}
-            name={index < rating ? "star" : "star-outline"}
+            key={`star-${rating}-${index}`}
+            name={index < rating ? 'star' : 'star-outline'}
             size={isTablet ? 20 : 16}
             color="#ff0000"
             style={styles.star}
@@ -79,16 +98,24 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleContainer}>
-          <MaterialCommunityIcons name="star" size={isTablet ? 28 : 24} color="#ff0000" />
+          <MaterialCommunityIcons
+            name="star"
+            size={isTablet ? 28 : 24}
+            color="#ff0000"
+          />
           <Text style={styles.sectionTitle}>Customer Reviews</Text>
         </View>
         {reviews.length > 0 && limit && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.seeAllButton}
             onPress={() => navigation.navigate('ChefReviews')}
           >
             <Text style={styles.seeAllText}>View All</Text>
-            <MaterialCommunityIcons name="chevron-right" size={isTablet ? 24 : 20} color="#ff0000" />
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={isTablet ? 24 : 20}
+              color="#ff0000"
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -101,14 +128,23 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
         <EmptyReviews />
       ) : (
         <View style={styles.reviewsList}>
-          {reviews.map((review,index) => (
-            <View key={review.id} style={styles.reviewItem}>
+          {reviews.map((review, index) => (
+            <View
+              key={review.id ?? `review-${index}`}
+              style={styles.reviewItem}
+            >
               <View style={styles.reviewHeader}>
                 <View style={styles.reviewerInfo}>
-                  <MaterialCommunityIcons name="account-circle" size={isTablet ? 40 : 32} color="#ff0000" />
+                  <MaterialCommunityIcons
+                    name="account-circle"
+                    size={isTablet ? 40 : 32}
+                    color="#ff0000"
+                  />
                   <Text style={styles.reviewUser}>{review.UserName}</Text>
                 </View>
-                <Text style={styles.reviewDate}>{formatDate(review.CreatedAt)}</Text>
+                <Text style={styles.reviewDate}>
+                  {formatDate(review.CreatedAt)}
+                </Text>
               </View>
               {renderStars(review.Rating)}
               <Text style={styles.reviewComment}>{review.ReviewText}</Text>
