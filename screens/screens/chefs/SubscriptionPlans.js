@@ -59,14 +59,14 @@ const SubscriptionPlans = ({ navigation }) => {
     if (!appleProducts.length) return null;
 
     // Explicit mapping from Backend Title to Apple Product ID
-    let productId = '';
-    const header = plan.Header || '';
+    // We use the FULL Product ID to be 100% safe
+    const BUNDLE_ID = 'com.coder.chefday';
 
     // Logical Ladder: Entry(1m) -> Business(3m) -> Pro(6m) -> Pro+(1y)
-    if (header.includes('Entry')) productId = 'chef_access_1m';
-    else if (header.includes('Business')) productId = 'chef_access_3m';
-    else if (header.includes('Pro+')) productId = 'chef_access_1y';
-    else if (header.includes('Pro')) productId = 'chef_access_6m';
+    if (header.includes('Entry')) productId = `${BUNDLE_ID}.chef_access_1m_v2`;
+    else if (header.includes('Business')) productId = `${BUNDLE_ID}.chef_access_3m_v2`;
+    else if (header.includes('Pro+')) productId = `${BUNDLE_ID}.chef_access_1y_v2`;
+    else if (header.includes('Pro')) productId = `${BUNDLE_ID}.chef_access_6m_v2`;
 
     // Safety: Check both p.productId (standard) and p.product_id (legacy/alternative)
     return appleProducts.find(p => {
@@ -170,9 +170,17 @@ const SubscriptionPlans = ({ navigation }) => {
         </View>
 
         {/* DEBUG INFO */}
-        <View style={{ padding: 20, backgroundColor: '#eee' }}>
-          <Text style={{ fontWeight: 'bold' }}>Debug Info:</Text>
-          <Text>Apple Products Found: {appleProducts.length}</Text>
+        <View style={{ padding: 20, backgroundColor: '#eee', marginTop: 20 }}>
+          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Debug Info (Raw Apple Data):</Text>
+          <Text style={{ marginBottom: 10 }}>Products Found: {appleProducts.length}</Text>
+
+          {appleProducts.map((p, index) => (
+            <View key={index} style={{ marginBottom: 8, padding: 10, backgroundColor: '#e0e0e0', borderRadius: 4 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 12 }}>{p.productId}</Text>
+              <Text style={{ fontSize: 12 }}>Title: {p.title}</Text>
+              <Text style={{ fontSize: 12 }}>Price: {p.localizedPrice}</Text>
+            </View>
+          ))}
         </View>
 
         {isLoading && <CenterLoading />}

@@ -46,10 +46,22 @@ class SubscriptionService {
             // Standard method for auto-renewable subscriptions
             const products = await RNIap.getSubscriptions({ skus: itemSkus });
 
+            console.log('--- RAW IAP RESPONSE ---');
+            console.log(JSON.stringify(products, null, 2));
+            console.log('------------------------');
+
             console.log(`Found ${products.length} subscriptions`);
+
+            // DEBUG: Show alert to user on device
+            Alert.alert(
+                "IAP Debug",
+                `Requested ${itemSkus.length} SKUs.\nFound ${products.length} products.\n\nSKUs: ${itemSkus.join('\n')}`
+            );
+
             return products;
         } catch (e) {
             console.error('Error fetching subscriptions:', e);
+            Alert.alert("IAP Error", e.message || "Unknown Error");
             return [];
         }
     }
