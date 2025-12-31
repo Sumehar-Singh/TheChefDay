@@ -65,18 +65,28 @@ class SubscriptionService {
 
             // USE FOUND FUNCTION: fetchProducts
             if (typeof fetchProducts === 'function') {
-                // Check Storefront first
+                // Check Storefront first (Safe Access)
                 try {
-                    const country = await RNIapModule.default.getStorefront(); // or RNIapModule.getStorefront
-                    console.log('IAP Storefront:', country);
+                    const storefrontParams = RNIapModule.default?.getStorefront ? RNIapModule.default : RNIapModule;
+                    if (storefrontParams && typeof storefrontParams.getStorefront === 'function') {
+                        const country = await storefrontParams.getStorefront();
+                        console.log('IAP Storefront:', country);
+                    }
                 } catch (err) {
-                    console.log('IAP Storefront Error (Non-fatal):', err.message);
+                    console.log('IAP Storefront Error (Ignored):', err.message);
                 }
 
-                console.log('Calling fetchProducts({ skus: itemSkus }) for:', itemSkus);
+                // SHOTGUN STRATEGY: Try all possible ID variations
+                const shortIds = ['chef_access_1m_v2', 'chef_access_3m_v2', 'chef_access_6m_v2', 'chef_access_1y_v2'];
+                const doubleIds = shortIds.map(id => `${BUNDLE_ID}.${BUNDLE_ID}.${id}`);
+
+                // Combine all sets: [Full, Short, Double]
+                const allPossibleSkus = [...itemSkus, ...shortIds, ...doubleIds];
+
+                console.log('Fetching ALL permutations of IDs:', allPossibleSkus);
 
                 // Try parsing potential JSON error in response
-                products = await fetchProducts({ skus: itemSkus });
+                products = await fetchProducts({ skus: allPossibleSkus });
             } else {
                 console.error("IAP CRITICAL: fetchProducts is missing (despite being in keys).");
                 throw new Error("IAP Function Missing: fetchProducts");
