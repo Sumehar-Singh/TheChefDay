@@ -19,9 +19,6 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "entitlements": {
-        "com.apple.developer.in-app-purchase": true
-      },
       "runtimeVersion": {
         "policy": "appVersion"
       }
