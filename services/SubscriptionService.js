@@ -1,12 +1,20 @@
-import {
+import { Platform, Alert } from 'react-native';
+
+// --- IAP IMPORT DEBUGGING ---
+const RNIapModule = require('react-native-iap');
+console.log('--- RNIap EXPORT DEBUG ---');
+console.log('Keys:', Object.keys(RNIapModule));
+if (RNIapModule.default) console.log('Default Keys:', Object.keys(RNIapModule.default));
+console.log('--------------------------');
+
+const {
     initConnection,
     endConnection,
     getSubscriptions,
     requestSubscription,
     getAvailablePurchases,
     getProducts
-} from 'react-native-iap';
-import { Platform, Alert } from 'react-native';
+} = RNIapModule.default || RNIapModule;
 
 const BUNDLE_ID = 'com.coder.chefday';
 
