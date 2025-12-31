@@ -54,15 +54,19 @@ class SubscriptionService {
 
             console.log('Fetcher: itemSkus:', itemSkus);
 
-            // Safety Check
-            if (typeof getSubscriptions !== 'function') {
-                throw new Error("RNIap.getSubscriptions is not a function. Import failed.");
+            let products = [];
+
+            // Fallback Logic: Try getSubscriptions, then getProducts
+            if (typeof getSubscriptions === 'function') {
+                console.log('Calling getSubscriptions({ skus: ... })');
+                products = await getSubscriptions({ skus: itemSkus });
+            } else if (typeof getProducts === 'function') {
+                console.log('getSubscriptions not found (undefined). Using getProducts({ skus: ... }) instead.');
+                products = await getProducts({ skus: itemSkus }); // Fallback
+            } else {
+                console.error("IAP CRITICAL: No fetch function (getSubscriptions/getProducts) found.");
+                throw new Error("RNIap fetch functions are missing from import.");
             }
-
-            console.log('Calling getSubscriptions({ skus: ... })');
-
-            // Standard method for auto-renewable subscriptions
-            const products = await getSubscriptions({ skus: itemSkus });
 
             console.log('--- RAW IAP RESPONSE ---');
             console.log(JSON.stringify(products, null, 2));
