@@ -1,4 +1,11 @@
-import * as RNIap from 'react-native-iap';
+import {
+    initConnection,
+    endConnection,
+    getSubscriptions,
+    requestSubscription,
+    getAvailablePurchases,
+    getProducts
+} from 'react-native-iap';
 import { Platform, Alert } from 'react-native';
 
 const BUNDLE_ID = 'com.coder.chefday';
@@ -26,9 +33,11 @@ class SubscriptionService {
     async init() {
         try {
             if (!this.connectionPromise) {
-                this.connectionPromise = RNIap.initConnection();
+                console.log('IAP: Initializing connection...');
+                this.connectionPromise = initConnection();
             }
             await this.connectionPromise;
+            console.log('IAP: Connection initialized.');
             return true;
         } catch (e) {
             console.error('IAP Init Error:', e);
@@ -38,13 +47,22 @@ class SubscriptionService {
 
     async getSubscriptions() {
         try {
+            console.log('IAP: Starting getSubscriptions...');
             await this.init();
+
             if (!itemSkus || itemSkus.length === 0) return [];
 
-            console.log('Fetching subscriptions for:', itemSkus);
+            console.log('Fetcher: itemSkus:', itemSkus);
+
+            // Safety Check
+            if (typeof getSubscriptions !== 'function') {
+                throw new Error("RNIap.getSubscriptions is not a function. Import failed.");
+            }
+
+            console.log('Calling getSubscriptions({ skus: ... })');
 
             // Standard method for auto-renewable subscriptions
-            const products = await RNIap.getSubscriptions({ skus: itemSkus });
+            const products = await getSubscriptions({ skus: itemSkus });
 
             console.log('--- RAW IAP RESPONSE ---');
             console.log(JSON.stringify(products, null, 2));
@@ -72,7 +90,7 @@ class SubscriptionService {
             console.log('Requesting purchase for:', sku);
 
             // Standard purchase method
-            const offer = await RNIap.requestSubscription({ sku });
+            const offer = await requestSubscription({ sku });
 
             return { success: true, offer };
         } catch (e) {
@@ -85,7 +103,7 @@ class SubscriptionService {
     async restorePurchases() {
         try {
             await this.init();
-            const purchases = await RNIap.getAvailablePurchases();
+            const purchases = await getAvailablePurchases();
             Alert.alert("Restore Successful", `Restored ${purchases.length} transactions.`);
             return purchases;
         } catch (e) {
@@ -95,11 +113,10 @@ class SubscriptionService {
         }
     }
 
-    // Call this when the component unmounts if needed, 
-    // mostly handled by RNIap internal cleanup but good practice.
+    // Call this when the component unmounts if needed
     async endConnection() {
         try {
-            await RNIap.endConnection();
+            await endConnection();
             this.connectionPromise = null;
         } catch (e) {
             console.error('Error ending connection', e);
