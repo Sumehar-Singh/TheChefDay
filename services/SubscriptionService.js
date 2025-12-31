@@ -109,9 +109,34 @@ class SubscriptionService {
 
             // USE FOUND FUNCTION: requestPurchase
             if (typeof requestPurchase === 'function') {
-                // Try object param first { sku }, if fails, might need just sku string.
-                const offer = await requestPurchase({ sku });
-                return { success: true, offer };
+                console.log("Accessing requestPurchase function...");
+                let result;
+                try {
+                    // Try 1: Standard Object
+                    console.log("Trying requestPurchase({ sku })");
+                    result = await requestPurchase({ sku });
+                } catch (err1) {
+                    console.log("Attempt 1 failed:", err1.message);
+                    try {
+                        // Try 2: String only (Legacy/Alternative)
+                        console.log("Trying requestPurchase(sku) - String Only");
+                        result = await requestPurchase(sku);
+                    } catch (err2) {
+                        console.log("Attempt 2 failed:", err2.message);
+                        try {
+                            // Try 3: Object with extra config
+                            console.log("Trying requestPurchase({ sku, andDangerously... })");
+                            result = await requestPurchase({
+                                sku,
+                                andDangerouslyFinishTransactionAutomaticallyIOS: false
+                            });
+                        } catch (err3) {
+                            console.error("All purchase attempts failed.");
+                            throw err1; // Throw the original error
+                        }
+                    }
+                }
+                return { success: true, offer: result };
             } else {
                 throw new Error("IAP Function Missing: requestPurchase");
             }
