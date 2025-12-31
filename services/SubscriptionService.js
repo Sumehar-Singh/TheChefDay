@@ -65,8 +65,17 @@ class SubscriptionService {
 
             // USE FOUND FUNCTION: fetchProducts
             if (typeof fetchProducts === 'function') {
-                console.log('Calling fetchProducts({ skus: itemSkus })');
-                // Fix: Pass as object with 'skus' key
+                // Check Storefront first
+                try {
+                    const country = await RNIapModule.default.getStorefront(); // or RNIapModule.getStorefront
+                    console.log('IAP Storefront:', country);
+                } catch (err) {
+                    console.log('IAP Storefront Error (Non-fatal):', err.message);
+                }
+
+                console.log('Calling fetchProducts({ skus: itemSkus }) for:', itemSkus);
+
+                // Try parsing potential JSON error in response
                 products = await fetchProducts({ skus: itemSkus });
             } else {
                 console.error("IAP CRITICAL: fetchProducts is missing (despite being in keys).");
