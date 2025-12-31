@@ -152,18 +152,32 @@ const SubscriptionPlans = ({ navigation }) => {
 
                 <Text style={styles.planDesc}>{plan.Desc}</Text>
 
-                {appleProduct ? (
-                  <TouchableOpacity
-                    style={[styles.websiteButton, { width: '100%', alignItems: 'center', marginTop: 15 }]}
-                    onPress={() => handlePurchase(appleProduct)}
-                  >
-                    <Text style={styles.websiteButtonText}>Subscribe</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={{ color: '#999', marginTop: 10, fontStyle: 'italic' }}>
-                    {appleProducts.length > 0 ? "Plan unavailable" : "Loading Store info..."}
+                {/* BLIND BUY ENABLED: Show button even if appleProduct is null */}
+                <TouchableOpacity
+                  style={[styles.websiteButton, { width: '100%', alignItems: 'center', marginTop: 15 }]}
+                  onPress={() => {
+                    const BUNDLE_ID = 'com.coder.chefday';
+                    let sku = '';
+                    // Logic matching getAppleProduct
+                    const header = plan.Header || '';
+                    if (header.includes('Entry')) sku = `${BUNDLE_ID}.chef_access_1m_v2`;
+                    else if (header.includes('Business')) sku = `${BUNDLE_ID}.chef_access_3m_v2`;
+                    else if (header.includes('Pro+')) sku = `${BUNDLE_ID}.chef_access_1y_v2`;
+                    else if (header.includes('Pro')) sku = `${BUNDLE_ID}.chef_access_6m_v2`;
+
+                    // Pass either real product or fallback object
+                    const productToBuy = appleProduct || { productId: sku };
+                    if (productToBuy.productId) {
+                      handlePurchase(productToBuy);
+                    } else {
+                      Alert.alert("Error", "Could not determine SKU for this plan.");
+                    }
+                  }}
+                >
+                  <Text style={styles.websiteButtonText}>
+                    {appleProduct ? "Subscribe" : "Buy (Force Check)"}
                   </Text>
-                )}
+                </TouchableOpacity>
               </View>
             );
           })}
