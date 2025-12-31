@@ -10,10 +10,9 @@ console.log('--------------------------');
 const {
     initConnection,
     endConnection,
-    getSubscriptions,
-    requestSubscription,
+    fetchProducts, // Found in logs
     getAvailablePurchases,
-    getProducts
+    requestPurchase // Found in logs, replaces requestSubscription
 } = RNIapModule.default || RNIapModule;
 
 const BUNDLE_ID = 'com.coder.chefday';
@@ -55,7 +54,7 @@ class SubscriptionService {
 
     async getSubscriptions() {
         try {
-            console.log('IAP: Starting getSubscriptions...');
+            console.log('IAP: Starting fetchProducts...');
             await this.init();
 
             if (!itemSkus || itemSkus.length === 0) return [];
@@ -64,16 +63,15 @@ class SubscriptionService {
 
             let products = [];
 
-            // Fallback Logic: Try getSubscriptions, then getProducts
-            if (typeof getSubscriptions === 'function') {
-                console.log('Calling getSubscriptions({ skus: ... })');
-                products = await getSubscriptions({ skus: itemSkus });
-            } else if (typeof getProducts === 'function') {
-                console.log('getSubscriptions not found (undefined). Using getProducts({ skus: ... }) instead.');
-                products = await getProducts({ skus: itemSkus }); // Fallback
+            // USE FOUND FUNCTION: fetchProducts
+            if (typeof fetchProducts === 'function') {
+                console.log('Calling fetchProducts(itemSkus)');
+                // Note: fetchProducts typically takes the array directly or an object. 
+                // In modern RNIap it might be itemSkus (array). We try that first.
+                products = await fetchProducts(itemSkus);
             } else {
-                console.error("IAP CRITICAL: No fetch function (getSubscriptions/getProducts) found.");
-                throw new Error("RNIap fetch functions are missing from import.");
+                console.error("IAP CRITICAL: fetchProducts is missing (despite being in keys).");
+                throw new Error("IAP Function Missing: fetchProducts");
             }
 
             console.log('--- RAW IAP RESPONSE ---');
@@ -101,10 +99,15 @@ class SubscriptionService {
             await this.init();
             console.log('Requesting purchase for:', sku);
 
-            // Standard purchase method
-            const offer = await requestSubscription({ sku });
+            // USE FOUND FUNCTION: requestPurchase
+            if (typeof requestPurchase === 'function') {
+                // Try object param first { sku }, if fails, might need just sku string.
+                const offer = await requestPurchase({ sku });
+                return { success: true, offer };
+            } else {
+                throw new Error("IAP Function Missing: requestPurchase");
+            }
 
-            return { success: true, offer };
         } catch (e) {
             console.error('Purchase failed:', e);
             // Don't alert here, let the UI handle the error message
