@@ -65,10 +65,9 @@ class SubscriptionService {
 
             // USE FOUND FUNCTION: fetchProducts
             if (typeof fetchProducts === 'function') {
-                console.log('Calling fetchProducts(itemSkus)');
-                // Note: fetchProducts typically takes the array directly or an object. 
-                // In modern RNIap it might be itemSkus (array). We try that first.
-                products = await fetchProducts(itemSkus);
+                console.log('Calling fetchProducts({ skus: itemSkus })');
+                // Fix: Pass as object with 'skus' key
+                products = await fetchProducts({ skus: itemSkus });
             } else {
                 console.error("IAP CRITICAL: fetchProducts is missing (despite being in keys).");
                 throw new Error("IAP Function Missing: fetchProducts");
