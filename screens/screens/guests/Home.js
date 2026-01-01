@@ -169,29 +169,6 @@ const Home = ({ navigation }) => {
                 >
                 </TouchableOpacity>
               </View>
-
-              {/* Fake Search Bar - Aesthetic & Functional Guest Entry */}
-              <TouchableOpacity
-                activeOpacity={0.9}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  width: '100%',
-                  paddingVertical: 12,
-                  paddingHorizontal: 20,
-                  borderRadius: 30,
-                  marginTop: 25,
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.4)'
-                }}
-                onPress={() => navigation.navigate('ChefsList')}
-              >
-                <MaterialIcons name="search" size={24} color="white" style={{ marginRight: 10 }} />
-                <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 16 }}>
-                  Try "Italian", "Sushi", or "Steak"...
-                </Text>
-              </TouchableOpacity>
             </View>
           </LinearGradient>
         </View >
@@ -471,22 +448,20 @@ const styles = StyleSheet.create({
   featureCard: {
     width: isTablet ? '31%' : '100%',
     backgroundColor: '#fff',
-    borderRadius: 16, // More rounded
+    borderRadius: 12,
     padding: 20,
     marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 }, // Deeper shadow
-    shadowOpacity: 0.08, // Softer shadow
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: '#f0f0f0', // Subtle border
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   featureIcon: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(255, 26, 26, 0.08)', // Lighter background
+    backgroundColor: 'rgba(255, 26, 26, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -495,11 +470,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#222',
+    color: '#333',
   },
   featureDescription: {
-    color: '#555',
-    lineHeight: 22,
+    color: '#666',
+    lineHeight: 20,
   },
   // Chef Cards
   chefList: {
@@ -508,22 +483,20 @@ const styles = StyleSheet.create({
   chefCard: {
     width: 220,
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 12,
     marginRight: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 4,
+    shadowRadius: 8,
+    elevation: 3,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
   },
   chefImage: {
     width: '100%',
     height: 200,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   chefInfo: {
     padding: 15,
@@ -532,7 +505,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#222',
+    color: '#333',
   },
   verifiedIcon: {
     marginLeft: 5,
@@ -545,11 +518,11 @@ const styles = StyleSheet.create({
   ratingText: {
     marginLeft: 5,
     marginRight: 10,
-    color: '#444',
+    color: '#333',
     fontWeight: '600',
   },
   reviewCount: {
-    color: '#999',
+    color: '#888',
     fontSize: 12,
   },
   locationContainer: {
@@ -568,38 +541,30 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   step: {
-    marginBottom: 20,
+    marginBottom: 25,
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 12,
+    padding: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
     elevation: 2,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.03)',
-    flexDirection: 'row', // Align icon and text side-by-side? No, keep vertical for now but cleaner
-    alignItems: 'flex-start'
   },
   stepHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   stepNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#ff1a1a',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
-    marginTop: 0,
-    shadowColor: '#ff1a1a',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    marginTop: 2,
   },
   stepNumberText: {
     color: '#fff',
