@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#fff',
     borderWidth: 2,
     borderColor: '#fff',
   },
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   buttonTextLogin: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: 'white'
+    color: '#ff1a1a'
   },
   // Section Styles
   section: {
