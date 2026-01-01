@@ -252,9 +252,9 @@ const ChefDetail = ({ navigation }) => {
 
   const averageRating = reviews
     ? (
-        reviews.reduce((sum, item) => sum + parseInt(item.Rating), 0) /
-        reviews.length
-      ).toFixed(1)
+      reviews.reduce((sum, item) => sum + parseInt(item.Rating), 0) /
+      reviews.length
+    ).toFixed(1)
     : '0.0';
 
   const formatDate = (dateString) => {
@@ -651,12 +651,12 @@ const ChefDetail = ({ navigation }) => {
                     {rating === 1
                       ? 'Poor'
                       : rating === 2
-                      ? 'Fair'
-                      : rating === 3
-                      ? 'Good'
-                      : rating === 4
-                      ? 'Very Good'
-                      : 'Excellent'}
+                        ? 'Fair'
+                        : rating === 3
+                          ? 'Good'
+                          : rating === 4
+                            ? 'Very Good'
+                            : 'Excellent'}
                   </Text>
                 )}
               </View>
@@ -1079,12 +1079,12 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   bookButton: {
-    backgroundColor: '#ff5733',
+    backgroundColor: '#ff0000',
     padding: isTablet ? 18 : 15,
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 25,
-    shadowColor: '#ff5733',
+    shadowColor: '#ff0000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
