@@ -301,7 +301,7 @@ const Home = ({ navigation }) => {
                 flexDirection: 'row',
                 alignItems: 'center'
               }}
-              onPress={() => navigation.navigate('SignupScreen')}
+              onPress={() => navigation.navigate('SignupScreen', { fromScreen: 'Home' })}
             >
               <Text style={{ color: '#b30000', fontSize: 18, fontWeight: 'bold', marginRight: 8 }}>Get Started</Text>
               <MaterialIcons name="arrow-forward" size={20} color="#b30000" />
