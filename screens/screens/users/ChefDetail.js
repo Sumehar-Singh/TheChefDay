@@ -170,13 +170,13 @@ const ChefDetail = ({ navigation }) => {
     image: profileImage,
   };
   const handleSubmitReview = async () => {
-    if (!profile) {
-      navigation.navigate('LoginScreen');
+    if (!review.trim() || rating === 0) {
+      Alert.alert('Review Required', 'Please rate your experience and write a review.');
       return;
     }
 
-    if (!review.trim()) {
-      Alert.alert('Error', 'Please write your review.');
+    if (!profile) {
+      navigation.navigate('LoginScreen');
       return;
     }
 
@@ -693,16 +693,11 @@ const ChefDetail = ({ navigation }) => {
 
             {/* Submit Button */}
             <TouchableOpacity
-              style={[
-                styles.modernSubmitButton,
-                (!review.trim() || rating === 0) && styles.submitButtonDisabled,
-              ]}
+              style={styles.modernSubmitButton}
               onPress={handleSubmitReview}
               activeOpacity={0.8}
-              disabled={!review.trim() || rating === 0}
             >
               <View style={styles.submitButtonContent}>
-                <Text style={styles.submitButtonIcon}>📝</Text>
                 <Text style={styles.modernSubmitButtonText}>
                   {profile ? 'Submit Review' : 'Login to Submit Review'}
                 </Text>
@@ -1258,7 +1253,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   modernSubmitButton: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#ff0000',
     borderRadius: 12,
     paddingVertical: isTablet ? 16 : 14,
     paddingHorizontal: isTablet ? 20 : 18,
@@ -1287,7 +1282,7 @@ const styles = StyleSheet.create({
   },
   modernSubmitButtonText: {
     fontSize: isTablet ? 16 : 14,
-    color: '#374151',
+    color: '#fff',
     fontWeight: '600',
     letterSpacing: 0.3,
   },
