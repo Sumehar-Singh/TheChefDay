@@ -19,7 +19,7 @@ const PopUpScreen = () => {
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return { name: 'check-circle', color: '#4CAF50' };
+        return { name: 'check-circle', color: '#00E676' };
       case 'error':
       case 'fail':
         return { name: 'error', color: '#f44336' };
