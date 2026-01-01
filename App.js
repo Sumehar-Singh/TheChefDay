@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
-import SubscriptionService from './services/SubscriptionService';
-import * as RNIap from 'react-native-iap';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -63,48 +61,7 @@ function StripeProviderWrapper({ children }) {
 }
 
 export default function App() {
-  useEffect(() => {
-    let purchaseUpdateSubscription = null;
-    let purchaseErrorSubscription = null;
 
-    const initIAP = async () => {
-      await SubscriptionService.init();
-
-      purchaseUpdateSubscription = RNIap.purchaseUpdatedListener(async (purchase) => {
-        console.log('Purchase Updated:', purchase);
-        const receipt = purchase.transactionReceipt;
-        if (receipt) {
-          try {
-            await SubscriptionService.finishTransaction(purchase);
-            Alert.alert('Success', 'Your purchase was successful!');
-          } catch (ackErr) {
-            console.warn('ackErr', ackErr);
-          }
-        }
-      });
-
-      purchaseErrorSubscription = RNIap.purchaseErrorListener((error) => {
-        console.warn('Purchase Error:', error);
-        if (error.responseCode !== 'E_USER_CANCELLED') {
-          Alert.alert('Purchase Error', error.message);
-        }
-      });
-    };
-
-    initIAP();
-
-    return () => {
-      if (purchaseUpdateSubscription) {
-        purchaseUpdateSubscription.remove();
-        purchaseUpdateSubscription = null;
-      }
-      if (purchaseErrorSubscription) {
-        purchaseErrorSubscription.remove();
-        purchaseErrorSubscription = null;
-      }
-      SubscriptionService.disconnect();
-    };
-  }, []);
 
   return (
     <AuthProvider>
