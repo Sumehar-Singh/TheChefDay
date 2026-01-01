@@ -636,8 +636,8 @@ const ChefEditProfile = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.label}>Latitude</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Enter Latitude"
+            style={[styles.input, { backgroundColor: '#f0f0f0', color: '#666' }]}
+            placeholder="Generated from Pin Code"
             value={lat}
             onChangeText={setLat}
             editable={false}
@@ -647,8 +647,8 @@ const ChefEditProfile = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.label}>Longitude</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Enter Longitude"
+            style={[styles.input, { backgroundColor: '#f0f0f0', color: '#666' }]}
+            placeholder="Generated from Pin Code"
             value={lon}
             onChangeText={setLon}
             editable={false}
