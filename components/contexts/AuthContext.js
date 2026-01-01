@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
           routes: [{ name: 'Home' }, { name: fromScreen }],
         });
         // Small delay to ensure reset is processed before popping
-        setTimeout(() => navigation.goBack(), 0);
+        setTimeout(() => navigation.goBack(), 50);
       } else {
         // Fallback if screen name not provided
         navigation.reset({
