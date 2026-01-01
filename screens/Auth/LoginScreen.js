@@ -109,7 +109,7 @@ export default function LoginScreen({ navigation }) {
             left: 20,
             zIndex: 999,
           }}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('Home')}
         >
           <Ionicons name="arrow-back" size={28} color="#333" />
         </TouchableOpacity>
