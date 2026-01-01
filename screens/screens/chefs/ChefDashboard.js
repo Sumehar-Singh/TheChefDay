@@ -179,7 +179,7 @@ const ChefDashboard = ({ navigation }) => {
 const styles = StyleSheet.create({
     superContainer: {
         height: "100%",
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#ff0000',
     },
     container: {
         paddingBottom: 20,
