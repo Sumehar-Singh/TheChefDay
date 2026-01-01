@@ -40,11 +40,11 @@ const CustomModal = ({
           <View style={[styles.iconContainer, { backgroundColor: `${icon.color}20` }]}>
             <MaterialIcons name={icon.name} size={40} color={icon.color} />
           </View>
-          
+
           <Text style={styles.modalTitle}>{title}</Text>
-          
+
           {message && <Text style={styles.modalText}>{message}</Text>}
-          
+
           <View style={styles.buttonContainer}>
             {showCancel && (
               <TouchableOpacity
@@ -54,7 +54,7 @@ const CustomModal = ({
                 <Text style={[styles.buttonText, { color: '#666' }]}>{cancelText}</Text>
               </TouchableOpacity>
             )}
-            
+
             <TouchableOpacity
               style={[styles.button, { backgroundColor: icon.color }]}
               onPress={onConfirm}
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     padding: 20,
   },
   modalView: {
