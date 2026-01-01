@@ -167,15 +167,37 @@ const Home = ({ navigation }) => {
                   style={[styles.button, styles.secondaryButton]}
                   onPress={() => navigation.navigate('LoginScreen')}
                 >
-                  <Text style={[styles.buttonTextLogin]}>Login</Text>
                 </TouchableOpacity>
               </View>
+
+              {/* Fake Search Bar - Aesthetic & Functional Guest Entry */}
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  width: '100%',
+                  paddingVertical: 12,
+                  paddingHorizontal: 20,
+                  borderRadius: 30,
+                  marginTop: 25,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.4)'
+                }}
+                onPress={() => navigation.navigate('ChefsList')}
+              >
+                <MaterialIcons name="search" size={24} color="white" style={{ marginRight: 10 }} />
+                <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 16 }}>
+                  Try "Italian", "Sushi", or "Steak"...
+                </Text>
+              </TouchableOpacity>
             </View>
           </LinearGradient>
-        </View>
+        </View >
 
         {/* Features Section */}
-        <View style={styles.section}>
+        < View style={styles.section} >
           <Text style={styles.sectionTitle}>Why Choose The Chef Day?</Text>
           <View style={styles.featuresContainer}>
             {features.map((feature) => (
@@ -192,10 +214,10 @@ const Home = ({ navigation }) => {
               </View>
             ))}
           </View>
-        </View>
+        </View >
 
         {/* Top Chefs Section */}
-        <View style={[styles.section, { paddingBottom: 10 }]}>
+        < View style={[styles.section, { paddingBottom: 10 }]} >
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Featured Chefs</Text>
             <TouchableOpacity onPress={() => navigation.navigate('ChefsList')}>
@@ -203,24 +225,26 @@ const Home = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <Text>Loading chefs...</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={chefs.slice(0, 5)}
-              renderItem={renderChefCard}
-              keyExtractor={(item) => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chefList}
-            />
-          )}
-        </View>
+          {
+            loading ? (
+              <View style={styles.loadingContainer}>
+                <Text>Loading chefs...</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={chefs.slice(0, 5)}
+                renderItem={renderChefCard}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chefList}
+              />
+            )
+          }
+        </View >
 
         {/* How It Works Section */}
-        <View style={[styles.section, { backgroundColor: '#f9f9f9', paddingVertical: 40 }]}>
+        < View style={[styles.section, { backgroundColor: '#f9f9f9', paddingVertical: 40 }]} >
           <Text style={[styles.sectionTitle, { textAlign: 'center' }]}>How It Works</Text>
 
           <View style={styles.stepsContainer}>
@@ -254,10 +278,10 @@ const Home = ({ navigation }) => {
               <Text style={styles.stepDescription}>Sit back and enjoy a restaurant-quality meal at home</Text>
             </View>
           </View>
-        </View>
+        </View >
 
         {/* CTA Section */}
-        <View style={[styles.section, { alignItems: 'center', paddingVertical: 50 }]}>
+        < View style={[styles.section, { alignItems: 'center', paddingVertical: 50 }]} >
 
           <Text style={[styles.sectionTitle, { textAlign: 'center', marginBottom: 15 }]}>
             Ready to Experience ChefDay?
@@ -271,9 +295,9 @@ const Home = ({ navigation }) => {
           >
             <Text style={styles.buttonText}>Get Started</Text>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </View >
+      </ScrollView >
+    </SafeAreaView >
   );
 };
 
