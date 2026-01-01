@@ -564,7 +564,7 @@ const ChefEditProfile = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Enter Experience"
-            value={experience}
+            value={experience ? String(experience) : ''}
             onChangeText={setExperience}
             keyboardType="numeric"
           />
