@@ -83,11 +83,11 @@ export const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem('appUser');
     await AsyncStorage.removeItem('profile');
 
-    // Navigate to login screen if navigation is provided
+    // Navigate to Home screen with pop-like animation
     if (navigation) {
       navigation.reset({
-        index: 1,
-        routes: [{ name: 'Home' }, { name: 'LoginScreen' }],
+        index: 0,
+        routes: [{ name: 'Home' }],
       });
     }
   };
