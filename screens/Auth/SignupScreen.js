@@ -674,8 +674,6 @@ const styles = StyleSheet.create({
     paddingVertical: isTablet ? 40 : 30,
     paddingHorizontal: isTablet ? 60 : 30,
     marginBottom: isTablet ? 30 : 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
