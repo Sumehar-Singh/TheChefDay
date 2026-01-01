@@ -101,6 +101,18 @@ export default function LoginScreen({ navigation }) {
     <LinearGradient colors={['white', '#f2f2f2', '#e6e6e6']} style={styles.superContainer}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={false} />
       <SafeAreaView style={styles.safeArea}>
+        {/* Back Arrow */}
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            top: Platform.OS === 'ios' ? 60 : 40,
+            left: 20,
+            zIndex: 999,
+          }}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={28} color="#333" />
+        </TouchableOpacity>
 
         <KeyboardAvoidingView
           style={styles.formContainer}
