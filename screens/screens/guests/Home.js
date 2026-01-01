@@ -280,22 +280,54 @@ const Home = ({ navigation }) => {
           </View>
         </View >
 
-        {/* CTA Section */}
-        < View style={[styles.section, { alignItems: 'center', paddingVertical: 50 }]} >
-
-          <Text style={[styles.sectionTitle, { textAlign: 'center', marginBottom: 15 }]}>
-            Ready to Experience ChefDay?
-          </Text>
-          <Text style={[styles.heroSubtitle, { textAlign: 'center', marginBottom: 25, color: '#666' }]}>
-            Join thousands of satisfied customers who have enjoyed our private chef services
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, styles.primaryButton, { width: '60%', marginTop: 10 }]}
-            onPress={() => navigation.navigate('SignupScreen')}
+        {/* Premium CTA Section */}
+        <View style={{ padding: 20, marginBottom: 30 }}>
+          <LinearGradient
+            colors={['#ff4d4d', '#b30000']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              padding: 30,
+              borderRadius: 20,
+              alignItems: 'center',
+              shadowColor: '#ff1a1a',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.3,
+              shadowRadius: 20,
+              elevation: 10,
+            }}
           >
-            <Text style={styles.buttonText}>Get Started</Text>
-          </TouchableOpacity>
-        </View >
+            <MaterialCommunityIcons name="chef-hat" size={50} color="rgba(255,255,255,0.2)" style={{ position: 'absolute', top: 10, right: 20 }} />
+            <MaterialCommunityIcons name="silverware" size={40} color="rgba(255,255,255,0.1)" style={{ position: 'absolute', bottom: 10, left: 20 }} />
+
+            <Text style={{ fontSize: 28, fontWeight: '800', color: 'white', textAlign: 'center', marginBottom: 10 }}>
+              Ready to Taste?
+            </Text>
+            <Text style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', textAlign: 'center', marginBottom: 25, lineHeight: 24, paddingHorizontal: 10 }}>
+              Join thousands of food lovers enjoying restaurant-quality dining at home.
+            </Text>
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'white',
+                paddingVertical: 16,
+                paddingHorizontal: 40,
+                borderRadius: 50,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+                elevation: 5,
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}
+              onPress={() => navigation.navigate('SignupScreen')}
+            >
+              <Text style={{ color: '#b30000', fontSize: 18, fontWeight: 'bold', marginRight: 8 }}>Get Started</Text>
+              <MaterialIcons name="arrow-forward" size={20} color="#b30000" />
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
       </ScrollView >
     </SafeAreaView >
   );
@@ -439,20 +471,22 @@ const styles = StyleSheet.create({
   featureCard: {
     width: isTablet ? '31%' : '100%',
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16, // More rounded
     padding: 20,
     marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 }, // Deeper shadow
+    shadowOpacity: 0.08, // Softer shadow
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#f0f0f0', // Subtle border
   },
   featureIcon: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(255, 26, 26, 0.1)',
+    backgroundColor: 'rgba(255, 26, 26, 0.08)', // Lighter background
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -461,11 +495,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#333',
+    color: '#222',
   },
   featureDescription: {
-    color: '#666',
-    lineHeight: 20,
+    color: '#555',
+    lineHeight: 22,
   },
   // Chef Cards
   chefList: {
@@ -474,20 +508,22 @@ const styles = StyleSheet.create({
   chefCard: {
     width: 220,
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     marginRight: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowRadius: 10,
+    elevation: 4,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   chefImage: {
     width: '100%',
     height: 200,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   chefInfo: {
     padding: 15,
@@ -496,7 +532,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#333',
+    color: '#222',
   },
   verifiedIcon: {
     marginLeft: 5,
@@ -509,11 +545,11 @@ const styles = StyleSheet.create({
   ratingText: {
     marginLeft: 5,
     marginRight: 10,
-    color: '#333',
+    color: '#444',
     fontWeight: '600',
   },
   reviewCount: {
-    color: '#888',
+    color: '#999',
     fontSize: 12,
   },
   locationContainer: {
@@ -532,30 +568,38 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   step: {
-    marginBottom: 25,
+    marginBottom: 20,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
+    borderRadius: 16,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
+    flexDirection: 'row', // Align icon and text side-by-side? No, keep vertical for now but cleaner
+    alignItems: 'flex-start'
   },
   stepHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   stepNumber: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#ff1a1a',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
-    marginTop: 2,
+    marginTop: 0,
+    shadowColor: '#ff1a1a',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   stepNumberText: {
     color: '#fff',
