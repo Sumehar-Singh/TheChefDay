@@ -47,7 +47,9 @@ const SubscriptionPlans = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
+      <CustomStatusBar title="Subscription Plans" />
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl
@@ -58,7 +60,6 @@ const SubscriptionPlans = ({ navigation }) => {
           />
         }
       >
-        <CustomStatusBar title="Subscription Plans" />
 
 
 
