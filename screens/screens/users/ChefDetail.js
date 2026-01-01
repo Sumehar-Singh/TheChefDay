@@ -1075,7 +1075,7 @@ const styles = StyleSheet.create({
   detailValueRed: {
     fontSize: isTablet ? 16 : 14,
     fontWeight: '600',
-    color: '#ff5733',
+    color: '#ff0000',
     textAlign: 'left',
   },
   bookButton: {
