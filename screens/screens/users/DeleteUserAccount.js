@@ -331,7 +331,7 @@ const DeleteUserAccount = ({ navigation }) => {
           <Ionicons
             name="warning"
             size={60}
-            color="#FF4F4F"
+            color="#ff0000"
             style={styles.warningIcon}
           />
           <Text style={styles.title}>Delete Your Account</Text>
@@ -462,13 +462,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   cancelButton: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#DDD',
     marginRight: 10,
   },
   deleteButton: {
-    backgroundColor: '#FF4F4F',
+    backgroundColor: '#ff0000',
     marginLeft: 10,
   },
   disabledButton: {
