@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async (navigation = null, fromScreen = null) => {
+  const logout = async (navigation = null, fromScreen = null, fromKey = null) => {
     setAppUser(null);
     setProfile(null);
     await AsyncStorage.removeItem('appUser');
@@ -85,17 +85,20 @@ export const AuthProvider = ({ children }) => {
 
     // Navigate to Home screen with pop-like animation (Left to Right)
     if (navigation) {
-      if (fromScreen) {
+      if (fromScreen && fromKey) {
         // Trick: Reset stack to [Home, CurrentScreen] then go back
-        // This forces the native "pop" animation
+        // Passing 'key' preserves the current screen instance to prevent flashing
         navigation.reset({
           index: 1,
-          routes: [{ name: 'Home' }, { name: fromScreen }],
+          routes: [
+            { name: 'Home' },
+            { name: fromScreen, key: fromKey }
+          ],
         });
-        // Small delay to ensure reset is processed before popping
-        setTimeout(() => navigation.goBack(), 50);
+        // Delay to ensure reset is processed before popping
+        setTimeout(() => navigation.goBack(), 100);
       } else {
-        // Fallback if screen name not provided
+        // Fallback if screen details not provided
         navigation.reset({
           index: 0,
           routes: [{ name: 'Home' }],

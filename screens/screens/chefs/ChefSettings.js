@@ -7,13 +7,8 @@ import ChefFullName from '../../components/strings/chefs/ChefFullName';
 import CustomStatusBar from '../../components/CustomStatusBar';
 import { useAuth } from '../../../components/contexts/AuthContext';
 
-const ChefSettings = ({ navigation }) => {
+const ChefSettings = ({ navigation, route }) => {
   const { profile, logout } = useAuth();
-
-
-
-
-
 
   const navigateToChefSetPricing = () => {
     if (!profile) return;
@@ -23,10 +18,7 @@ const ChefSettings = ({ navigation }) => {
   };
 
   const handleLogout = async () => {
-
-    await logout(navigation, 'ChefSettings');
-
-    // Remove the manual navigation reset since logout now handles it
+    await logout(navigation, 'ChefSettings', route.key);
   };
 
 
