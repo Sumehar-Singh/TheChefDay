@@ -13,27 +13,35 @@ const UpdateChefPricing = ({ route, navigation }) => {
   const [HourlyRate, setHourlyRate] = useState('');
   const [DayRate, setDayRate] = useState('');
 
-  useEffect(() => {
-    const fetchPricing = async () => {
-      try {
-        const form = new FormData();
-        form.append('ChefID', ChefID);
-  
-        const response = await axios.post(`${BASE_URL}/chefs/get_chef_pricing.php`, form, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-  
-        if (response.data.success && response.data.data) {
-          setHourlyRate(response.data.data.HourlyRate.toString());
-          setDayRate(response.data.data.DayRate.toString());
-        }
-      } catch (error) {
-        console.error('Error fetching pricing:', error);
+  const fetchPricing = async () => {
+    try {
+      const form = new FormData();
+      form.append('ChefID', ChefID);
+
+      const response = await axios.post(`${BASE_URL}/chefs/get_chef_pricing.php`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (response.data.success && response.data.data) {
+        setHourlyRate(response.data.data.HourlyRate.toString());
+        setDayRate(response.data.data.DayRate.toString());
       }
-    };
-  
+    } catch (error) {
+      console.error('Error fetching pricing:', error);
+    }
+  };
+
+  useEffect(() => {
     fetchPricing();
   }, []);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchPricing();
+    setRefreshing(false);
+  };
 
   const handleSubmit = async () => {
     if (!ChefID || !HourlyRate || !DayRate) {
@@ -64,14 +72,23 @@ const UpdateChefPricing = ({ route, navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
       <CustomStatusBar title="Update Pricing" />
-
-
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        style={{ flex: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#ff0000']}
+            tintColor="#ff0000"
+          />
+        }
+      >
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Hourly Rate</Text>
@@ -103,8 +120,8 @@ const UpdateChefPricing = ({ route, navigation }) => {
             </View>
           </View>
 
-          <TouchableOpacity 
-            onPress={handleSubmit} 
+          <TouchableOpacity
+            onPress={handleSubmit}
             style={styles.submitButton}
           >
             <Text style={styles.submitButtonText}>Update Pricing</Text>
@@ -160,7 +177,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: isTablet ? 20 : 16,
     color: '#ff0000',
-   
+
     marginBottom: isTablet ? 15 : 10,
     fontWeight: '600',
   },
