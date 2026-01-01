@@ -80,7 +80,7 @@ export default function App() {
             <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="LoginScreen" component={LoginScreen} />
-            <Stack.Screen name="LoginScreen" component={LoginScreen} />
+
             <Stack.Screen name="SignupRoleScreen" component={SignupRoleScreen} />
             <Stack.Screen name="SignupScreen" component={SignupScreen} />
             <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
