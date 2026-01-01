@@ -30,10 +30,12 @@ const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
 
 const SignupScreen = ({ navigation, route }) => {
-  const { fromScreen } = route.params || {};
-  const [isChef, setIsChef] = useState(null);
-  const [showFirstModal, setShowFirstModal] = useState(true);
+  const { fromScreen, isChef } = route.params || {};
+  // Removed internal isChef state since it's passed via params now.
+  // const [isChef, setIsChef] = useState(null); 
+  // const [showFirstModal, setShowFirstModal] = useState(true); // Removed
   const [showTermsModal, setShowTermsModal] = useState(false);
+
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [FirstName, setFirstName] = useState('');
   const [MiddleName, setMiddleName] = useState('');
@@ -77,19 +79,11 @@ const SignupScreen = ({ navigation, route }) => {
     }, [])
   );
 
-  const handleChefSelection = () => {
-    resetForm();
-    setIsChef(true);
-    setShowFirstModal(false);
-    setStep(1);
-  };
-
-  const handleUserSelection = () => {
-    resetForm();
-    setIsChef(false);
-    setShowFirstModal(false);
-    setStep(1);
-  };
+  // Removed internal role handlers
+  /*
+  const handleChefSelection = () => { ... }
+  const handleUserSelection = () => { ... }
+  */
 
   const handleScroll = (event) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
@@ -208,63 +202,7 @@ const SignupScreen = ({ navigation, route }) => {
 
   };
 
-  const renderFirstModal = () => (
-    <Modal
-      visible={showFirstModal}
-      animationType="fade"
-      transparent={true}
-      onRequestClose={() => setShowFirstModal(false)}
-    >
-      <SafeAreaView style={[styles.modalOverlay, { paddingTop: STATUS_BAR_HEIGHT }]}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <View style={styles.modalContainer}>
-          <TopSVG />
-          <View style={styles.selectionContainer}>
-            <Text style={styles.modalTitle}>Welcome to The Chef's Day</Text>
-            <Text style={styles.modalSubtitle}>Please select your role to continue</Text>
-
-            <View style={styles.roleSelectionContainer}>
-              <TouchableOpacity
-                style={styles.roleButton}
-                onPress={handleChefSelection}
-              >
-                <View style={styles.roleIconContainer}>
-                  <Ionicons name="restaurant" size={40} color="#ff0000" />
-                </View>
-                <Text style={styles.roleTitle}>Chef</Text>
-                <Text style={styles.roleDescription}>
-                  Share your culinary expertise and connect with food lovers
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.roleButton}
-                onPress={handleUserSelection}
-              >
-                <View style={styles.roleIconContainer}>
-                  <Ionicons name="person" size={40} color="#ff0000" />
-                </View>
-                <Text style={styles.roleTitle}>User</Text>
-                <Text style={styles.roleDescription}>
-                  Book talented chefs for your special occasions
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-              style={styles.backToLoginButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Ionicons name="arrow-back" size={20} color="#ff0000" />
-              <Text style={styles.backToLoginText}>
-                {fromScreen === 'Home' ? 'Back to Home' : fromScreen === 'Login' ? 'Back' : 'Back to Login'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </SafeAreaView>
-    </Modal>
-  );
+  // Removed renderFirstModal
 
   const renderTermsModal = () => (
     <Modal
@@ -332,8 +270,7 @@ const SignupScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
-            resetForm();
-            setShowFirstModal(true);
+            navigation.goBack(); // Go back to Role Selection
           }}
         >
           <Ionicons name="arrow-back" size={24} color="#333" />
@@ -527,9 +464,8 @@ const SignupScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {renderFirstModal()}
       {renderTermsModal()}
-      {!showFirstModal && !showTermsModal && step === 1 && renderRegistrationForm()}
+      {step === 1 && renderRegistrationForm()}
     </View>
   );
 };

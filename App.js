@@ -8,6 +8,7 @@ import Home from './screens/screens/guests/Home';
 
 import LoginScreen from './screens/Auth/LoginScreen';
 import SignupScreen from './screens/Auth/SignupScreen';
+import SignupRoleScreen from './screens/Auth/SignupRoleScreen';
 
 //Chef
 import ChefDashboard from './screens/screens/chefs/ChefDashboard';
@@ -77,6 +78,8 @@ export default function App() {
             <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="LoginScreen" component={LoginScreen} />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} />
+            <Stack.Screen name="SignupRoleScreen" component={SignupRoleScreen} />
             <Stack.Screen name="SignupScreen" component={SignupScreen} />
             <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
 

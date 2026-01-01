@@ -158,7 +158,7 @@ const Home = ({ navigation }) => {
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={[styles.button, styles.primaryButton]}
-                  onPress={() => navigation.navigate('SignupScreen', { fromScreen: 'Home' })}
+                  onPress={() => navigation.navigate('SignupRoleScreen', { fromScreen: 'Home' })}
                 >
                   <Text style={styles.buttonText}>Sign Up</Text>
                 </TouchableOpacity>
@@ -301,7 +301,7 @@ const Home = ({ navigation }) => {
                 flexDirection: 'row',
                 alignItems: 'center'
               }}
-              onPress={() => navigation.navigate('SignupScreen', { fromScreen: 'Home' })}
+              onPress={() => navigation.navigate('SignupRoleScreen', { fromScreen: 'Home' })}
             >
               <Text style={{ color: '#b30000', fontSize: 18, fontWeight: 'bold', marginRight: 8 }}>Get Started</Text>
             </TouchableOpacity>
