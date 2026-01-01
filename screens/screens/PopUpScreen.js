@@ -27,10 +27,18 @@ const PopUpScreen = () => {
   }, [type]);
 
   const handleOkPress = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: returnTo }],
-    });
+    // If returning to ChefSettings, include ChefDashboard behind it for proper back navigation
+    if (returnTo === 'ChefSettings') {
+      navigation.reset({
+        index: 1,
+        routes: [{ name: 'ChefDashboard' }, { name: 'ChefSettings' }],
+      });
+    } else {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: returnTo }],
+      });
+    }
   };
 
   return (
