@@ -674,11 +674,7 @@ const styles = StyleSheet.create({
     paddingVertical: isTablet ? 40 : 30,
     paddingHorizontal: isTablet ? 60 : 30,
     marginBottom: isTablet ? 30 : 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 6,
+    alignItems: 'center', // Ensure content is centered
   },
   form: {
     width: '100%',
@@ -709,21 +705,20 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontSize: isTablet ? 32 : 28,
-    fontWeight: 'bold',
+    fontWeight: '800', // Stronger weight
     color: '#fff',
-    marginBottom: 10,
+    marginBottom: 8, // Tighter spacing
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    letterSpacing: 1, // Add spacing for "premium" feel
+    textTransform: 'uppercase',
   },
   subText: {
-    fontSize: isTablet ? 18 : 15,
-    color: '#fff',
+    fontSize: isTablet ? 16 : 15,
+    color: 'rgba(255, 255, 255, 0.9)', // Softer white
     textAlign: 'center',
-    marginBottom: 0, // Removed margin as container has padding
-    lineHeight: isTablet ? 26 : 22,
-    opacity: 0.95,
+    marginBottom: 0,
+    lineHeight: isTablet ? 24 : 20,
+    maxWidth: 600, // Prevent too wide lines on tablets
   },
   loginLink: {
     marginTop: 20,
