@@ -137,7 +137,7 @@ const Home = ({ navigation }) => {
         {/* Hero Section */}
         <View style={styles.heroContainer}>
           <LinearGradient
-            colors={['#ff4d4d', '#ff1a1a']}
+            colors={['#ff0000', '#ff0000']}
             style={styles.heroGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
