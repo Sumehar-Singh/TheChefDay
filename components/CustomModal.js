@@ -16,7 +16,7 @@ const CustomModal = ({
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return { name: 'check-circle', color: '#00E676' };
+        return { name: 'check-circle', color: '#34C759' };
       case 'error':
         return { name: 'error', color: '#f44336' };
       case 'confirm':
