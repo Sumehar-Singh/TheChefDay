@@ -168,7 +168,8 @@ export default function LoginScreen({ navigation }) {
 
 
 
-              <View style={styles.exploreContainer}>
+              {/* Guest Button Removed - User navigates from Home -> Login, so 'Back' is sufficient */}
+              {/* <View style={styles.exploreContainer}>
                 <View style={styles.dividerContainer}>
                   <View style={styles.divider} />
                   <Text style={styles.dividerText}>OR</Text>
@@ -183,7 +184,7 @@ export default function LoginScreen({ navigation }) {
                   <Text style={styles.exploreButtonText}>Continue as Guest</Text>
                 </TouchableOpacity>
 
-              </View>
+              </View> */}
             </View>
 
           </View>
