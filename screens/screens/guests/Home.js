@@ -142,7 +142,10 @@ const Home = ({ navigation }) => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-
+            {/* Decorative Background Icons */}
+            <MaterialCommunityIcons name="chef-hat" size={80} color="rgba(255,255,255,0.15)" style={{ position: 'absolute', top: 20, right: 20 }} />
+            <MaterialCommunityIcons name="silverware-fork-knife" size={60} color="rgba(255,255,255,0.1)" style={{ position: 'absolute', bottom: 40, left: 20 }} />
+            <MaterialCommunityIcons name="food-variant" size={50} color="rgba(255,255,255,0.08)" style={{ position: 'absolute', top: 80, left: 40 }} />
 
             <View style={styles.heroContent}>
               <Animated.View style={[styles.logoContainer, animatedStyle]}>
