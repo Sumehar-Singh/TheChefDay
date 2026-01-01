@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { 
-  View, 
-  Text, 
-  Modal, 
-  TouchableOpacity, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  StyleSheet,
   TextInput,
   Dimensions,
   Alert,
-  ScrollView, 
-  KeyboardAvoidingView, 
+  ScrollView,
+  KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ActivityIndicator,
@@ -28,8 +28,9 @@ import { BASE_URL } from "../../config";
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
 
-const SignupScreen = ({navigation}) => {
-  const [isChef, setIsChef] = useState(null); 
+const SignupScreen = ({ navigation, route }) => {
+  const { fromScreen } = route.params || {};
+  const [isChef, setIsChef] = useState(null);
   const [showFirstModal, setShowFirstModal] = useState(true);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -45,7 +46,7 @@ const SignupScreen = ({navigation}) => {
   const [step, setStep] = useState(1);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const scrollViewRef = React.useRef(null);
-  
+
   // Add status bar height for proper header spacing
   const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight;
 
@@ -66,9 +67,9 @@ const SignupScreen = ({navigation}) => {
   const handleScroll = (event) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     const paddingToBottom = 20;
-    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= 
+    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >=
       contentSize.height - paddingToBottom;
-    
+
     if (isCloseToBottom) {
       setHasScrolledToBottom(true);
     }
@@ -115,7 +116,7 @@ const SignupScreen = ({navigation}) => {
       Alert.alert('Required', 'All fields are required. Middle or Last Name must be provided.');
       return;
     }
-    
+
 
     if (!termsAccepted) {
       Alert.alert('Required', 'Please accept the terms and conditions');
@@ -142,7 +143,7 @@ const SignupScreen = ({navigation}) => {
       Alert.alert('Password Mismatch', 'Password does not match with Confirm Password');
       return;
     }
-    
+
     setLoading(true);
     try {
       const response = await axios.post(`${BASE_URL}register.php`, {
@@ -156,9 +157,9 @@ const SignupScreen = ({navigation}) => {
         terms_accepted: 1,
         terms_accepted_at: new Date().toISOString(),
       });
-    
+
       const { status, message } = response.data;
-    
+
       if (status === "success") {
         handleSuccessRegister();
       } else {
@@ -179,26 +180,26 @@ const SignupScreen = ({navigation}) => {
     } finally {
       setLoading(false);
     }
-    
+
   };
 
   const renderFirstModal = () => (
-    <Modal 
-      visible={showFirstModal} 
-      animationType="fade" 
+    <Modal
+      visible={showFirstModal}
+      animationType="fade"
       transparent={true}
       onRequestClose={() => setShowFirstModal(false)}
     >
-      <SafeAreaView style={[styles.modalOverlay, {paddingTop: STATUS_BAR_HEIGHT}]}>
+      <SafeAreaView style={[styles.modalOverlay, { paddingTop: STATUS_BAR_HEIGHT }]}>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
         <View style={styles.modalContainer}>
-          <TopSVG/>
+          <TopSVG />
           <View style={styles.selectionContainer}>
             <Text style={styles.modalTitle}>Welcome to The Chef's Day</Text>
             <Text style={styles.modalSubtitle}>Please select your role to continue</Text>
-            
+
             <View style={styles.roleSelectionContainer}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.roleButton}
                 onPress={handleChefSelection}
               >
@@ -211,7 +212,7 @@ const SignupScreen = ({navigation}) => {
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.roleButton}
                 onPress={handleUserSelection}
               >
@@ -224,13 +225,15 @@ const SignupScreen = ({navigation}) => {
                 </Text>
               </TouchableOpacity>
             </View>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.backToLoginButton}
               onPress={() => navigation.goBack()}
             >
               <Ionicons name="arrow-back" size={20} color="#ff0000" />
-              <Text style={styles.backToLoginText}>Back to Login</Text>
+              <Text style={styles.backToLoginText}>
+                {fromScreen === 'Home' ? 'Back to Home' : fromScreen === 'Login' ? 'Back' : 'Back to Login'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -254,7 +257,7 @@ const SignupScreen = ({navigation}) => {
             <Text style={styles.termsTitle}>
               {isChef ? "Chef Terms and Conditions" : "User Terms and Conditions"}
             </Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.closeButton}
               onPress={() => {
                 setShowTermsModal(false);
@@ -264,7 +267,7 @@ const SignupScreen = ({navigation}) => {
               <Text style={styles.closeButtonText}>×</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView 
+          <ScrollView
             ref={scrollViewRef}
             style={styles.termsScrollView}
             onScroll={handleScroll}
@@ -274,7 +277,7 @@ const SignupScreen = ({navigation}) => {
             {isChef ? <ChefTerms /> : <UserTerms />}
             <View style={styles.scrollIndicator}>
               <Text style={styles.scrollIndicatorText}>
-                {hasScrolledToBottom 
+                {hasScrolledToBottom
                   ? "✓ You have read all terms and conditions"
                   : "Please scroll to read all terms and conditions"}
               </Text>
@@ -298,10 +301,10 @@ const SignupScreen = ({navigation}) => {
   );
 
   const renderRegistrationForm = () => (
-    <SafeAreaView style={[styles.safeArea, {paddingTop: STATUS_BAR_HEIGHT}]}>
+    <SafeAreaView style={[styles.safeArea, { paddingTop: STATUS_BAR_HEIGHT }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.headerBar}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
             setShowFirstModal(true);
@@ -313,14 +316,14 @@ const SignupScreen = ({navigation}) => {
         <Text style={styles.headerTitle}>
           Register as {isChef ? "Chef" : "User"}
         </Text>
-        <View style={{width: 24}} />
+        <View style={{ width: 24 }} />
       </View>
       <KeyboardAvoidingView
         style={styles.formContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -329,7 +332,7 @@ const SignupScreen = ({navigation}) => {
           <View style={styles.headerContainer}>
             <Text style={styles.signupText}>SIGN UP</Text>
             <Text style={styles.subText}>
-              {!isChef 
+              {!isChef
                 ? "From home dinners to special events, we've got the perfect chef for you. Sign up and start your search!"
                 : "Sign up to showcase your culinary skills and connect with top kitchens looking for chefs like you!"
               }
@@ -400,7 +403,7 @@ const SignupScreen = ({navigation}) => {
               />
             </View>
 
-            
+
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Password</Text>
@@ -429,7 +432,7 @@ const SignupScreen = ({navigation}) => {
             </View>
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.termsButton}
                 onPress={() => setShowTermsModal(true)}
               >
@@ -458,8 +461,8 @@ const SignupScreen = ({navigation}) => {
                   <Text style={styles.primaryButtonText}>SIGN UP</Text>
                 )}
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.loginLink} 
+              <TouchableOpacity
+                style={styles.loginLink}
                 onPress={() => navigation.navigate('LoginScreen')}
               >
                 <Text style={styles.loginText}>

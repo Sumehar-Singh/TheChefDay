@@ -158,7 +158,7 @@ const Home = ({ navigation }) => {
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={[styles.button, styles.primaryButton]}
-                  onPress={() => navigation.navigate('SignupScreen')}
+                  onPress={() => navigation.navigate('SignupScreen', { fromScreen: 'Home' })}
                 >
                   <Text style={styles.buttonText}>Sign Up</Text>
                 </TouchableOpacity>
