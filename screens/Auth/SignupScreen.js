@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
     paddingVertical: isTablet ? 40 : 30,
     paddingHorizontal: isTablet ? 60 : 30,
     marginBottom: isTablet ? 30 : 20,
-    alignItems: 'center', // Ensure content is centered
+    alignItems: 'flex-start', // Left align content
   },
   form: {
     width: '100%',
@@ -746,14 +746,14 @@ const styles = StyleSheet.create({
     fontWeight: '800', // Stronger weight
     color: '#fff',
     marginBottom: 8, // Tighter spacing
-    textAlign: 'center',
+    textAlign: 'left',
     letterSpacing: 1, // Add spacing for "premium" feel
     textTransform: 'uppercase',
   },
   subText: {
     fontSize: isTablet ? 16 : 15,
     color: 'rgba(255, 255, 255, 0.9)', // Softer white
-    textAlign: 'center',
+    textAlign: 'left',
     marginBottom: 0,
     lineHeight: isTablet ? 24 : 20,
     maxWidth: 600, // Prevent too wide lines on tablets
