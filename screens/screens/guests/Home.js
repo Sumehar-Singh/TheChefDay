@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Image, 
-  TouchableOpacity, 
-  ScrollView, 
-  FlatList, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
   Dimensions,
   SafeAreaView,
   ImageBackground,
   RefreshControl,
   StatusBar,
-  Platform,Animated, Easing
+  Platform, Animated, Easing
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
@@ -26,46 +26,46 @@ const Home = ({ navigation }) => {
   const [chefs, setChefs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-const [flipAnim] = useState(new Animated.Value(0));
+  const [flipAnim] = useState(new Animated.Value(0));
 
-useEffect(() => {
-  const flipLogo = () => {
-    Animated.sequence([
-      Animated.timing(flipAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-        easing: Easing.inOut(Easing.ease)
-      }),
-      Animated.delay(14000),
-      Animated.timing(flipAnim, {
-        toValue: 0,
-        duration: 1000,
-        useNativeDriver: true,
-        easing: Easing.inOut(Easing.ease)
-      })
-    ]).start(() => flipLogo());
+  useEffect(() => {
+    const flipLogo = () => {
+      Animated.sequence([
+        Animated.timing(flipAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+          easing: Easing.inOut(Easing.ease)
+        }),
+        Animated.delay(14000),
+        Animated.timing(flipAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+          easing: Easing.inOut(Easing.ease)
+        })
+      ]).start(() => flipLogo());
+    };
+
+    flipLogo();
+    return () => flipAnim.stopAnimation();
+  }, []);
+
+  const flipInterpolation = flipAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg']
+  });
+
+  const animatedStyle = {
+    transform: [{ rotateY: flipInterpolation }]
   };
-
-  flipLogo();
-  return () => flipAnim.stopAnimation();
-}, []);
-
-const flipInterpolation = flipAnim.interpolate({
-  inputRange: [0, 1],
-  outputRange: ['0deg', '360deg']
-});
-
-const animatedStyle = {
-  transform: [{ rotateY: flipInterpolation }]
-};
   const fetchChefs = async () => {
     try {
       const response = await axios.get(`${BASE_URL}guest/get_chefs_list.php?limit=10`);
       if (response.data.status === 'success') {
         setChefs(response.data.data);
-     
-        
+
+
       }
     } catch (error) {
       console.error('Error fetching chefs:', error);
@@ -85,15 +85,15 @@ const animatedStyle = {
   };
 
   const renderChefCard = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.chefCard}
       onPress={() => navigation.navigate('ChefDetail', { ChefId: item.ChefID })}
     >
-      <Image 
-        source={  item.Image
-                                  ? { uri: item.Image }
-                                  : require('../../../assets/userImage.jpg')} 
-        style={styles.chefImage} 
+      <Image
+        source={item.Image
+          ? { uri: item.Image }
+          : require('../../../assets/userImage.jpg')}
+        style={styles.chefImage}
         resizeMode="cover"
       />
       <View style={styles.chefInfo}>
@@ -103,11 +103,11 @@ const animatedStyle = {
             <MaterialIcons name="verified" size={16} color="#1E90FF" style={styles.verifiedIcon} />
           )}
         </Text>
-        
+
         <View style={styles.ratingContainer}>
           <MaterialIcons name="star" size={16} color="#FFD700" />
           <Text style={styles.ratingText}>{parseFloat(item.AvgRating).toFixed(1) || '4.5'}</Text>
-        {item.ReviewCount!==0 ?   <Text style={styles.reviewCount}>({item.ReviewCount || '0'} reviews)</Text> :  <Text style={styles.reviewCount}>(No Reviews Yet)</Text>}
+          {item.ReviewCount !== 0 ? <Text style={styles.reviewCount}>({item.ReviewCount || '0'} reviews)</Text> : <Text style={styles.reviewCount}>(No Reviews Yet)</Text>}
         </View>
         <View style={styles.locationContainer}>
           <MaterialIcons name="location-on" size={14} color="#666" />
@@ -128,7 +128,7 @@ const animatedStyle = {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#ff1a1a" />
-      <ScrollView 
+      <ScrollView
         style={styles.container}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -143,33 +143,43 @@ const animatedStyle = {
             end={{ x: 1, y: 0 }}
           >
 
-            
+
             <View style={styles.heroContent}>
-                <Animated.View style={[styles.logoContainer, animatedStyle]}>
-  <Image 
-    source={require('../../../assets/logo.png')} 
-    style={styles.logo}
-    resizeMode="contain"
-  />
-</Animated.View>
+              <Animated.View style={[styles.logoContainer, animatedStyle]}>
+                <Image
+                  source={require('../../../assets/logo.png')}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+              </Animated.View>
               <Text style={styles.heroTitle}>Find the Perfect Private Chef</Text>
               <Text style={styles.heroSubtitle}>For your next dinner party, corporate event, or special occasion</Text>
-              
+
               <View style={styles.buttonContainer}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.button, styles.primaryButton]}
                   onPress={() => navigation.navigate('SignupScreen')}
                 >
                   <Text style={styles.buttonText}>Sign Up</Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={[styles.button, styles.secondaryButton]}
                   onPress={() => navigation.navigate('LoginScreen')}
                 >
                   <Text style={[styles.buttonTextLogin]}>Login</Text>
                 </TouchableOpacity>
               </View>
+
+              {/* Explicit Guest Browse Link for Apple 5.1.1 Compliance */}
+              <TouchableOpacity
+                style={{ marginTop: 20 }}
+                onPress={() => navigation.navigate('ChefsList')}
+              >
+                <Text style={{ color: 'white', textDecorationLine: 'underline', fontSize: 16 }}>
+                  Skip & Browse as Guest
+                </Text>
+              </TouchableOpacity>
             </View>
           </LinearGradient>
         </View>
@@ -181,10 +191,10 @@ const animatedStyle = {
             {features.map((feature) => (
               <View key={feature.id} style={styles.featureCard}>
                 <View style={styles.featureIcon}>
-                  <MaterialCommunityIcons 
-                    name={feature.icon} 
-                    size={32} 
-                    color="#ff1a1a" 
+                  <MaterialCommunityIcons
+                    name={feature.icon}
+                    size={32}
+                    color="#ff1a1a"
                   />
                 </View>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
@@ -202,7 +212,7 @@ const animatedStyle = {
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
           </View>
-          
+
           {loading ? (
             <View style={styles.loadingContainer}>
               <Text>Loading chefs...</Text>
@@ -222,7 +232,7 @@ const animatedStyle = {
         {/* How It Works Section */}
         <View style={[styles.section, { backgroundColor: '#f9f9f9', paddingVertical: 40 }]}>
           <Text style={[styles.sectionTitle, { textAlign: 'center' }]}>How It Works</Text>
-          
+
           <View style={styles.stepsContainer}>
             <View style={styles.step}>
               <View style={styles.stepHeader}>
@@ -233,7 +243,7 @@ const animatedStyle = {
               </View>
               <Text style={styles.stepDescription}>Explore our talented chefs and their specialties</Text>
             </View>
-            
+
             <View style={styles.step}>
               <View style={styles.stepHeader}>
                 <View style={styles.stepNumber}>
@@ -243,7 +253,7 @@ const animatedStyle = {
               </View>
               <Text style={styles.stepDescription}>Choose your menu and schedule your event</Text>
             </View>
-            
+
             <View style={styles.step}>
               <View style={styles.stepHeader}>
                 <View style={styles.stepNumber}>
@@ -265,7 +275,7 @@ const animatedStyle = {
           <Text style={[styles.heroSubtitle, { textAlign: 'center', marginBottom: 25, color: '#666' }]}>
             Join thousands of satisfied customers who have enjoyed our private chef services
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.button, styles.primaryButton, { width: '60%', marginTop: 10 }]}
             onPress={() => navigation.navigate('SignupScreen')}
           >
@@ -288,23 +298,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   logoContainer: {
-  width: 150,
-  height: 150,
-  marginBottom: 20,
-  alignSelf: 'center',
-  backgroundColor: '#fdfdfd',
-  borderRadius: 40,
-  shadowColor: '#555555',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 8,
-  elevation: 3,
-},
-logo: {
-  width: '100%',
-  height: '100%',
-  borderRadius: 40,
-},
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    alignSelf: 'center',
+    backgroundColor: '#fdfdfd',
+    borderRadius: 40,
+    shadowColor: '#555555',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  logo: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 40,
+  },
   // Hero Section
   heroContainer: {
     height: 450,
@@ -319,44 +329,44 @@ logo: {
     padding: 20,
     justifyContent: 'center',
   },
-logo: {
-  width: 150,
-  height: 150,
-  marginBottom: 20,
-  alignSelf: 'center',
-  backgroundColor: '#fdfdfdff',
-  borderRadius: 40,
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    alignSelf: 'center',
+    backgroundColor: '#fdfdfdff',
+    borderRadius: 40,
 
-  shadowColor: '#555555ff',
+    shadowColor: '#555555ff',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
-},
+  },
 
 
-heroContent: {
-  padding: 20,
-  alignItems: 'center',
-  width: '100%',
-  paddingTop: 40,
-  paddingBottom: 30,
-},
-heroTitle: {
-  fontSize: isTablet ? 24 : 21,
-  fontWeight: 'bold',
-  color: '#fff',
-  textAlign: 'center',
-  marginBottom: 10,
-  marginTop: 10,
-},
-heroSubtitle: {
-  fontSize: 16,
-  color: 'rgba(255, 255, 255, 0.9)',
-  textAlign: 'center',
-  marginBottom: 20,
-  paddingHorizontal: 20,
-},
+  heroContent: {
+    padding: 20,
+    alignItems: 'center',
+    width: '100%',
+    paddingTop: 40,
+    paddingBottom: 30,
+  },
+  heroTitle: {
+    fontSize: isTablet ? 24 : 21,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
   buttonContainer: {
     flexDirection: 'row',
     marginTop: 20,
@@ -383,7 +393,7 @@ heroSubtitle: {
     fontWeight: 'bold',
     color: '#ff1a1a',
   },
-  buttonTextLogin:{color:'white'},
+  buttonTextLogin: { color: 'white' },
   // Section Styles
   section: {
     paddingHorizontal: 20,
@@ -393,7 +403,7 @@ heroSubtitle: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    
+
   },
   sectionTitle: {
     fontSize: isTablet ? 24 : 20,
