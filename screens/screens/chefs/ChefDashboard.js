@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, FlatList, ScrollView, ImageBackground, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, FlatList, ScrollView, ImageBackground, RefreshControl, SafeAreaView, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CenterLoading from '../../components/CenterLoading';
@@ -25,10 +25,10 @@ const ChefDashboard = ({ navigation }) => {
     const [hasBookings, setHasBookings] = useState(false);
     const [hasReviews, setHasReviews] = useState(false);
     const [isProfileCompleted, setIsProfileCompleted] = useState(false);
-   const {profile}=useAuth();
+    const { profile } = useAuth();
     const fetchProfileStatus = async () => {
         if (!profile?.Id) return;
-        
+
         try {
             const response = await axios.post(
                 `${BASE_URL}chefs/get_chef_profile_status.php`,
@@ -115,7 +115,7 @@ const ChefDashboard = ({ navigation }) => {
     }, [profile?.Id]);
 
     return (
-        <View style={styles.superContainer}>
+        <SafeAreaView style={styles.superContainer}>
             {!profile?.Id ? (
                 <CenterLoading />
             ) : (
@@ -165,14 +165,14 @@ const ChefDashboard = ({ navigation }) => {
                         <ChefProfileCompletionSection navigation={navigation} />
                     )}
                     <View style={styles.section}>
-                        <ChefBookingList navigation={navigation} userId={profile?.Id} limit={5}/>
+                        <ChefBookingList navigation={navigation} userId={profile?.Id} limit={5} />
                     </View>
 
                     <ChefReviewList navigation={navigation} userId={profile?.Id} limit={5} />
                 </ScrollView>
             )}
             {(isLoading || initialLoad) && <CenterLoading />}
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     headerContainer: {
-        paddingTop:25,
         padding: isTablet ? 20 : 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
