@@ -44,7 +44,7 @@ export default function LoginScreen({ navigation }) {
   const loginUser = async (email, password) => {
 
     if (!email || !password) {
-      setLoginError("Email and password are required");
+      setLoginError("Email/Username and password are required");
       setLoading(false);
 
       return;  // Exit early without making the request
@@ -138,7 +138,7 @@ export default function LoginScreen({ navigation }) {
             <View style={styles.form}>
               <TextInput
                 style={styles.input}
-                placeholder="Username"
+                placeholder="Email or Username"
                 placeholderTextColor="#8c8c8c"
                 value={email}
                 onChangeText={setEmail}
