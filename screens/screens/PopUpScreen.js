@@ -1,33 +1,39 @@
-import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Dimensions } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
-const iconMap = {
-  success: require("../../assets/icons/success.png"),
-  warning: require("../../assets/icons/warning.png"),
-  fail: require("../../assets/icons/fail.png"),
-  info: require("../../assets/icons/info.png"),
-};
+import { MaterialIcons } from '@expo/vector-icons';
 
 const PopUpScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const { width } = Dimensions.get('window');
+  const isTablet = width > 600;
 
   const {
     title = "Success!",
     type = "success",
     detail = "Your action was successful.",
-    returnTo = "Home", // Default screen if not passed
+    returnTo = "Home",
   } = route.params || {};
 
-  useEffect(() => {
-    if (!iconMap[type]) {
-      console.warn("Invalid type passed to PopUpScreen. Defaulting to info.");
+  const getIcon = () => {
+    switch (type) {
+      case 'success':
+        return { name: 'check-circle', color: '#4CAF50' };
+      case 'error':
+      case 'fail':
+        return { name: 'error', color: '#f44336' };
+      case 'warning':
+        return { name: 'help', color: '#FFA500' };
+      case 'info':
+      default:
+        return { name: 'info', color: '#2196F3' };
     }
-  }, [type]);
+  };
+
+  const icon = getIcon();
 
   const handleOkPress = () => {
-    // If returning to ChefSettings, include ChefDashboard behind it for proper back navigation
     if (returnTo === 'ChefSettings') {
       navigation.reset({
         index: 1,
@@ -43,12 +49,18 @@ const PopUpScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Image source={iconMap[type] || iconMap.info} style={styles.icon} />
+      <View style={[styles.card, isTablet && styles.cardTablet]}>
+        <View style={[styles.iconContainer, { backgroundColor: `${icon.color}20` }]}>
+          <MaterialIcons name={icon.name} size={40} color={icon.color} />
+        </View>
+
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.detail}>{detail}</Text>
 
-        <TouchableOpacity style={styles.okButton} onPress={handleOkPress}>
+        <TouchableOpacity
+          style={[styles.okButton, { backgroundColor: icon.color }]}
+          onPress={handleOkPress}
+        >
           <Text style={styles.okText}>OK</Text>
         </TouchableOpacity>
       </View>
@@ -64,45 +76,69 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
   card: {
-    width: "80%",
+    width: "100%",
     backgroundColor: "#fff",
-    padding: 20,
     borderRadius: 15,
+    padding: 25,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  icon: {
+  cardTablet: {
+    width: "60%",
+    maxWidth: 500,
+  },
+  iconContainer: {
     width: 80,
     height: 80,
-    marginBottom: 10,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
     color: "#333",
-    marginBottom: 5,
   },
   detail: {
     fontSize: 16,
-    color: "#666",
-    textAlign: "center",
     marginBottom: 20,
+    textAlign: "center",
+    color: "#666",
+    lineHeight: 22,
   },
   okButton: {
-    backgroundColor: "#4CAF50",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
+    width: "100%",
+    padding: 12,
     borderRadius: 8,
+    alignItems: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   okText: {
     fontSize: 16,
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
 });
