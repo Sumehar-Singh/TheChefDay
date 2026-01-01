@@ -106,17 +106,35 @@ const SignupScreen = ({ navigation, route }) => {
   };
 
   const registerUserWithRole = async () => {
-    if (
-      !email ||
-      !password ||
-      !FirstName ||
-      !phone ||
-      (!MiddleName && !LastName) // One of these must be present
-    ) {
-      Alert.alert('Required', 'All fields are required. Middle or Last Name must be provided.');
+    if (!FirstName.trim()) {
+      Alert.alert('Required', 'Please enter your First Name.');
       return;
     }
 
+    if (!LastName.trim()) {
+      Alert.alert('Required', 'Please enter your Last Name.');
+      return;
+    }
+
+    if (!email.trim()) {
+      Alert.alert('Required', 'Please enter your Email Address.');
+      return;
+    }
+
+    if (!phone.trim()) {
+      Alert.alert('Required', 'Please enter your Phone Number.');
+      return;
+    }
+
+    if (!password) {
+      Alert.alert('Required', 'Please create a Password.');
+      return;
+    }
+
+    if (!confirmPassword) {
+      Alert.alert('Required', 'Please confirm your Password.');
+      return;
+    }
 
     if (!termsAccepted) {
       Alert.alert('Required', 'Please accept the terms and conditions');
@@ -125,22 +143,23 @@ const SignupScreen = ({ navigation, route }) => {
 
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Invalid email format');
+      Alert.alert('Error', 'Please enter a valid email address.');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long');
-      return;
-    }
-
-    if (!/^\d+$/.test(phone) || phone.length < 10) {
-      Alert.alert('Error', 'Invalid phone number');
+      Alert.alert('Error', 'Password must be at least 6 characters long.');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Password Mismatch', 'Password does not match with Confirm Password');
+      Alert.alert('Password Mismatch', 'Passwords do not match.');
+      return;
+    }
+
+    // Phone validation (simple check for now)
+    if (phone.length < 10) {
+      Alert.alert('Error', 'Please enter a valid phone number (at least 10 digits).');
       return;
     }
 
