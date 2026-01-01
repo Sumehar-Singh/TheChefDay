@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView, Dimensions, Switch, Alert, Platform, ActivityIndicator,Linking } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView, Dimensions, Switch, Alert, Platform, ActivityIndicator, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Checkbox } from 'react-native-paper';
@@ -15,7 +15,7 @@ import { BASE_URL } from '../../../config';
 import { useAuth } from '../../../components/contexts/AuthContext';
 
 const ChefEditProfile = ({ navigation }) => {
-const {profile}=useAuth();
+  const { profile } = useAuth();
   const [geoLoading, setGeoLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [name, setName] = useState('');
@@ -99,10 +99,10 @@ const {profile}=useAuth();
 
 
   useEffect(() => {
-      
-        getChefData();
-        getCuisineSpecialities();
-     
+
+    getChefData();
+    getCuisineSpecialities();
+
   }, []);
 
   const getAssignedSpecialities = async () => {
@@ -246,7 +246,7 @@ const {profile}=useAuth();
       }
 
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
+
       if (permissionResult.status !== 'granted') {
         Alert.alert(
           'Permission Required',
@@ -290,22 +290,16 @@ const {profile}=useAuth();
     // Step 1: Validation
 
     // Validate required fields
-    if (
-      !name ||
-      !bio ||
-      !experience ||
-      !phone ||
-      !address ||
-      !lat ||
-      !lon ||
-      !pinCode ||
-      (!middle && !last) // Only one of these is required
-    ) {
-      alert('Please fill in all required fields. Either Middle Name or Last Name must be provided.');
-      setIsUpdating(false);
-      return; // Exit the function if validation fails
-    }
-    
+    // Validate required fields individually for better UX
+    if (!name) { alert('Please enter your First Name.'); setIsUpdating(false); return; }
+    if (!middle && !last) { alert('Please enter either a Middle Name or a Last Name.'); setIsUpdating(false); return; }
+    if (!bio) { alert('Please write a short Bio about yourself.'); setIsUpdating(false); return; }
+    if (!experience) { alert('Please enter your defined Experience (Years).'); setIsUpdating(false); return; }
+    if (!phone) { alert('Please enter your Phone Number.'); setIsUpdating(false); return; }
+    if (!address) { alert('Please enter your Address.'); setIsUpdating(false); return; }
+    if (!pinCode) { alert('Please enter your Pin Code.'); setIsUpdating(false); return; }
+    if (!lat || !lon) { alert('Please click "Verify" to confirm your location coordinates.'); setIsUpdating(false); return; }
+
 
     // Validate that at least one checkbox is selected in each category
     const isCuisineSelected = Object.values(cuisines).some((cuisine) => cuisine.checked);
@@ -410,7 +404,7 @@ const {profile}=useAuth();
         }
       );
 
-     
+
       if (response.data.success) {
         handleSuccessUpdate();
       } else {
