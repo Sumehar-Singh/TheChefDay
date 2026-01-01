@@ -139,7 +139,7 @@ const UpdateChefPricing = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      </ScrollView>
+
 
       <CustomModal
         visible={modalConfig.visible}
