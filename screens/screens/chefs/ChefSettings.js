@@ -8,10 +8,10 @@ import CustomStatusBar from '../../components/CustomStatusBar';
 import { useAuth } from '../../../components/contexts/AuthContext';
 
 const ChefSettings = ({ navigation }) => {
-  const { profile, logout  } = useAuth();
-  
+  const { profile, logout } = useAuth();
 
- 
+
+
 
 
 
@@ -23,8 +23,8 @@ const ChefSettings = ({ navigation }) => {
   };
 
   const handleLogout = async () => {
-   
-await logout(navigation);
+
+    await logout(navigation);
 
     // Remove the manual navigation reset since logout now handles it
   };
@@ -50,8 +50,8 @@ await logout(navigation);
       <CustomStatusBar title="Settings" includeTopInset={false} />
       <ScrollView style={styles.scrollView}>
         {/* Profile Section */}
-        <TouchableOpacity 
-          style={styles.profileSection} 
+        <TouchableOpacity
+          style={styles.profileSection}
           onPress={() => navigation.navigate("ChefEditProfile")}
         >
           <View style={styles.profileContainer}>
@@ -69,55 +69,50 @@ await logout(navigation);
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Account Settings</Text>
           <View style={styles.settingsGroup}>
-            <SettingItem 
-              icon="person-outline" 
-              title="Update Profile" 
-              onPress={() => navigation.navigate("ChefEditProfile")} 
+
+            <SettingItem
+              icon="card-outline"
+              title="Choose Subscription"
+              onPress={() => navigation.navigate("SubscriptionPlans")}
             />
 
-<SettingItem 
-  icon="card-outline" 
-  title="Choose Subscription" 
-  onPress={() => navigation.navigate("SubscriptionPlans")} 
-/>
-
-<SettingItem 
-  icon="document-text-outline" 
-  title="Upload Documents" 
-  onPress={() => navigation.navigate("UploadDocuments")} 
-/>
-            <SettingItem 
-              icon="pricetag-outline" 
-              title="Set Pricing" 
-              onPress={navigateToChefSetPricing} 
+            <SettingItem
+              icon="document-text-outline"
+              title="Upload Documents"
+              onPress={() => navigation.navigate("UploadDocuments")}
             />
-             <SettingItem 
-              icon="information-circle-outline" 
-              title="Profile Status" 
-              onPress={() => navigation.navigate("ChefProfileStatus")} 
+            <SettingItem
+              icon="pricetag-outline"
+              title="Set Pricing"
+              onPress={navigateToChefSetPricing}
             />
-            <SettingItem 
-              icon="document-text-outline" 
-              title="Terms and Conditions" 
-              onPress={() => navigation.navigate("ChefTermsScreen")} 
+            <SettingItem
+              icon="information-circle-outline"
+              title="Profile Status"
+              onPress={() => navigation.navigate("ChefProfileStatus")}
             />
-            <SettingItem 
-              icon="remove-circle-outline" 
-              title="Delete Account" 
-              onPress={() => navigation.navigate("DeleteChefAccount")} 
+            <SettingItem
+              icon="document-text-outline"
+              title="Terms and Conditions"
+              onPress={() => navigation.navigate("ChefTermsScreen")}
+            />
+            <SettingItem
+              icon="remove-circle-outline"
+              title="Delete Account"
+              onPress={() => navigation.navigate("DeleteChefAccount")}
             />
           </View>
         </View>
 
         {/* Logout Button */}
-        <TouchableOpacity 
-          style={styles.logoutButton} 
+        <TouchableOpacity
+          style={styles.logoutButton}
           onPress={handleLogout}
-                >
-         
-              <Ionicons name="log-out-outline" size={24} color="#FFF" />
-              <Text style={styles.logoutText}>Logout</Text>
-           
+        >
+
+          <Ionicons name="log-out-outline" size={24} color="#FFF" />
+          <Text style={styles.logoutText}>Logout</Text>
+
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -140,7 +135,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   profileSection: {
-    
+
     marginBottom: 15,
     padding: 18,
     backgroundColor: '#fff',
@@ -152,21 +147,24 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   profileContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
   },
   profileInfo: {
-    marginLeft: 5,
+    marginTop: 10,
+    alignItems: 'center',
   },
   userName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
+    textAlign: 'center',
   },
   editProfileText: {
     fontSize: 14,
     color: '#FF4F4F',
+    textAlign: 'center',
   },
   settingsSection: {
     marginTop: 8,
