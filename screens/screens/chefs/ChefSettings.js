@@ -50,25 +50,26 @@ const ChefSettings = ({ navigation }) => {
       <CustomStatusBar title="Settings" includeTopInset={false} />
       <ScrollView style={styles.scrollView}>
         {/* Profile Section */}
-        <TouchableOpacity
-          style={styles.profileSection}
-          onPress={() => navigation.navigate("ChefEditProfile")}
-        >
+        <View style={styles.profileSection}>
           <View style={styles.profileContainer}>
             <ChefProfileImage height={80} width={80} userId={profile?.Id} mr={10} />
             <View style={styles.profileInfo}>
               <Text style={styles.userName}>
                 <ChefFullName userId={profile?.Id} />
               </Text>
-              <Text style={styles.editProfileText}>Edit Profile</Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </View>
 
         {/* Settings Section */}
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Account Settings</Text>
           <View style={styles.settingsGroup}>
+            <SettingItem
+              icon="person-outline"
+              title="Update Profile"
+              onPress={() => navigation.navigate("ChefEditProfile")}
+            />
 
             <SettingItem
               icon="card-outline"
@@ -164,7 +165,6 @@ const styles = StyleSheet.create({
   editProfileText: {
     fontSize: 14,
     color: '#FF4F4F',
-    textAlign: 'center',
   },
   settingsSection: {
     marginTop: 8,
