@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
-    marginTop: 2,
+    // Removed marginTop to ensure perfect centering
   },
   stepNumberText: {
     color: '#fff',
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 18,
     fontWeight: '700',
-    marginBottom: 6,
+    marginBottom: 0, // Removed bottom margin so text centers perfectly with icon
     color: '#222',
   },
   stepDescription: {
