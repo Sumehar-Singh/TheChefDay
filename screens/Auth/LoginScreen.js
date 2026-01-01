@@ -61,7 +61,7 @@ export default function LoginScreen({ navigation }) {
         // Use the centralized login function with navigation
         await login(response.data.app_user, response.data.profile, navigation);
       } else {
-        setLoginError("Username or Password is incorrect");
+        setLoginError("Email or Password is incorrect");
         console.log('Login failed:', response.data.message);
       }
     } catch (error) {
