@@ -482,15 +482,16 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   featureTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18, // Scaling up to match Step Title
+    fontWeight: '700',
     marginBottom: 0,
     color: '#333',
-    flex: 1, // Allow text to wrap nicely if needed
+    flex: 1,
   },
   featureDescription: {
-    color: '#666',
-    lineHeight: 20,
+    color: '#555', // Darker to match Step Description
+    fontSize: 15, // Match Step Description
+    lineHeight: 22, // Match Step Description
   },
   // Chef Cards
   chefList: {
@@ -573,9 +574,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stepNumber: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 40, // Match Feature Icon size
+    height: 40, // Match Feature Icon size
+    borderRadius: 20, // Match Feature Icon radius
     backgroundColor: '#ff1a1a',
     justifyContent: 'center',
     alignItems: 'center',
