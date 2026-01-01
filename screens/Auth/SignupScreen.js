@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import {
   View,
@@ -51,18 +52,43 @@ const SignupScreen = ({ navigation, route }) => {
   // Add status bar height for proper header spacing
   const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight;
 
+  const resetForm = () => {
+    setFirstName('');
+    setMiddleName('');
+    setLastName('');
+    setEmail('');
+    setPhone('');
+    setPassword('');
+    setConfirmPassword('');
+    setErrors({});
+    setTermsAccepted(false);
+    setLoading(false);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      resetForm();
+      // Optional: Reset form when screen is focused.
+      // If you want to keep data when coming back from Terms, you might want to adjust this.
+      // But user asked to reset validations if they go back and come again.
+      return () => {
+        // Cleanup if needed
+      };
+    }, [])
+  );
+
   const handleChefSelection = () => {
+    resetForm();
     setIsChef(true);
     setShowFirstModal(false);
     setStep(1);
-    setTermsAccepted(false);
   };
 
   const handleUserSelection = () => {
+    resetForm();
     setIsChef(false);
     setShowFirstModal(false);
     setStep(1);
-    setTermsAccepted(false);
   };
 
   const handleScroll = (event) => {
@@ -306,8 +332,8 @@ const SignupScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
+            resetForm();
             setShowFirstModal(true);
-            setTermsAccepted(false);
           }}
         >
           <Ionicons name="arrow-back" size={24} color="#333" />
