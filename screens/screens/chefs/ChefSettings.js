@@ -148,12 +148,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   profileContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
   },
   profileInfo: {
-    marginTop: 10,
-    alignItems: 'center',
+    marginLeft: 15,
+    justifyContent: 'center',
   },
   userName: {
     fontSize: 22,
