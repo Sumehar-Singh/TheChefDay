@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Animated, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
@@ -279,13 +279,7 @@ const DeleteChefAccount = ({ navigation }) => {
     );
   };
 
-  const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchDeletionInfo();
-    setRefreshing(false);
-  };
 
   if (loading) {
     return (
@@ -301,14 +295,7 @@ const DeleteChefAccount = ({ navigation }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         style={{ flex: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#ff0000']}
-            tintColor="#ff0000"
-          />
-        }
+
       >
         <View style={styles.header}>
           <Ionicons name="warning" size={60} color="#ff0000" style={styles.warningIcon} />

@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
-  RefreshControl,
+
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -295,13 +295,7 @@ const DeleteUserAccount = ({ navigation }) => {
     );
   };
 
-  const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchDeletionInfo();
-    setRefreshing(false);
-  };
 
   if (loading) {
     return (
@@ -317,14 +311,7 @@ const DeleteUserAccount = ({ navigation }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         style={{ flex: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#ff0000']}
-            tintColor="#ff0000"
-          />
-        }
+
       >
         <View style={styles.header}>
           <Ionicons
