@@ -27,7 +27,10 @@ const PopUpScreen = () => {
   }, [type]);
 
   const handleOkPress = () => {
-    navigation.replace(returnTo);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: returnTo }],
+    });
   };
 
   return (
