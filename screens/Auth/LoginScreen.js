@@ -168,7 +168,7 @@ export default function LoginScreen({ navigation }) {
                   onPress={() => navigation.navigate('Home')}
                 >
                   <Ionicons name="search" size={20} color="#fff" style={styles.exploreIcon} />
-                  <Text style={styles.exploreButtonText}>Explore Chefs</Text>
+                  <Text style={styles.exploreButtonText}>Continue as Guest</Text>
                 </TouchableOpacity>
 
               </View>
