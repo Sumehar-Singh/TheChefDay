@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, RefreshControl, TouchableOpacity, Platform, KeyboardAvoidingView, Alert } from 'react-native';
-import SubscriptionService from '../../../services/SubscriptionService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, StyleSheet, Dimensions, ScrollView, RefreshControl, Platform, KeyboardAvoidingView } from 'react-native';
 import CustomStatusBar from '../../components/CustomStatusBar';
 import CenterLoading from '../../components/CenterLoading';
 import axios from 'axios';
@@ -13,7 +11,6 @@ const isTablet = width > 600;
 
 const SubscriptionPlans = ({ navigation }) => {
   const [plans, setPlans] = useState([]);
-  const [appleProducts, setAppleProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -43,51 +40,7 @@ const SubscriptionPlans = ({ navigation }) => {
 
   useEffect(() => {
     fetchPlans();
-    loadProducts();
   }, []);
-
-  const loadProducts = async () => {
-    try {
-      const products = await SubscriptionService.getSubscriptions();
-      setAppleProducts(products);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const getAppleProduct = (plan) => {
-    if (!appleProducts.length) return null;
-
-    // Explicit mapping from Backend Title to Apple Product ID
-    // We use the FULL Product ID to be 100% safe
-    const BUNDLE_ID = 'com.coder.chefday';
-
-    // Logical Ladder: Entry(1m) -> Business(3m) -> Pro(6m) -> Pro+(1y)
-    if (header.includes('Entry')) productId = `${BUNDLE_ID}.chef_access_1m_v2`;
-    else if (header.includes('Business')) productId = `${BUNDLE_ID}.chef_access_3m_v2`;
-    else if (header.includes('Pro+')) productId = `${BUNDLE_ID}.chef_access_1y_v2`;
-    else if (header.includes('Pro')) productId = `${BUNDLE_ID}.chef_access_6m_v2`;
-
-    // Safety: Check both p.productId (standard) and p.product_id (legacy/alternative)
-    return appleProducts.find(p => {
-      const id = p.productId || p.product_id;
-      return id && (id === productId || id?.endsWith(productId));
-    });
-  };
-
-  const handlePurchase = async (product) => {
-    setIsLoading(true);
-    // Request subscription - the actual result is handled by the global listener in App.js
-    // but we can catch immediate errors here
-    const sku = product.productId || product.product_id;
-    const { success, error } = await SubscriptionService.requestSubscription(sku);
-    setIsLoading(false);
-
-    if (!success && error) {
-      // Alert handled by listener globally for most errors, but if needed we can log
-      console.log('Purchase initialization failed:', error);
-    }
-  };
 
   return (
     <KeyboardAvoidingView
@@ -110,13 +63,10 @@ const SubscriptionPlans = ({ navigation }) => {
 
 
         <View style={styles.subscriptionNotice}>
-          <Text style={styles.noticeTitle}>Subscribe Now</Text>
+          <Text style={styles.noticeTitle}>Subscription Plans</Text>
           <Text style={styles.noticeText}>
-            Choose a plan below to unlock premium features. Managed securely by the App Store.
+            View our available plans below. Subscriptions are managed on our website.
           </Text>
-          <TouchableOpacity onPress={() => SubscriptionService.restorePurchases()} style={{ marginTop: 10 }}>
-            <Text style={{ color: '#209E00', textDecorationLine: 'underline' }}>Restore Purchases</Text>
-          </TouchableOpacity>
         </View>
 
 
@@ -124,9 +74,6 @@ const SubscriptionPlans = ({ navigation }) => {
           {plans.map((plan) => {
             const isRecommended = plan.Recommended == 1;
             const isSpecial = plan.Special == 1;
-
-            // Standard retrieval without debug hacks
-            const appleProduct = getAppleProduct(plan);
 
             return (
               <View
@@ -138,63 +85,20 @@ const SubscriptionPlans = ({ navigation }) => {
                     <Text style={styles.recommendedText}>RECOMMENDED</Text>
                   </View>
                 )}
-                {appleProduct ? (
-                  <>
-                    <Text style={styles.planPrice}>{appleProduct.localizedPrice}</Text>
-                    <Text style={styles.planDuration}>{appleProduct.title || plan.Header}</Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.planPrice}>Price: $ {plan.Price}</Text>
-                    <Text style={styles.planDuration}>Duration: {plan.Duration}</Text>
-                  </>
-                )}
 
+                <Text style={styles.planPrice}>Price: $ {plan.Price}</Text>
+                <Text style={styles.planDuration}>Duration: {plan.Duration}</Text>
                 <Text style={styles.planDesc}>{plan.Desc}</Text>
 
-                {/* BLIND BUY ENABLED: Show button even if appleProduct is null */}
-                <TouchableOpacity
-                  style={[styles.websiteButton, { width: '100%', alignItems: 'center', marginTop: 15 }]}
-                  onPress={() => {
-                    const BUNDLE_ID = 'com.coder.chefday';
-                    let sku = '';
-                    // Logic matching getAppleProduct
-                    const header = plan.Header || '';
-                    if (header.includes('Entry')) sku = `${BUNDLE_ID}.chef_access_1m_v2`;
-                    else if (header.includes('Business')) sku = `${BUNDLE_ID}.chef_access_3m_v2`;
-                    else if (header.includes('Pro+')) sku = `${BUNDLE_ID}.chef_access_1y_v2`;
-                    else if (header.includes('Pro')) sku = `${BUNDLE_ID}.chef_access_6m_v2`;
-
-                    // Pass either real product or fallback object
-                    const productToBuy = appleProduct || { productId: sku };
-                    if (productToBuy.productId) {
-                      handlePurchase(productToBuy);
-                    } else {
-                      Alert.alert("Error", "Could not determine SKU for this plan.");
-                    }
-                  }}
-                >
-                  <Text style={styles.websiteButtonText}>
-                    {appleProduct ? "Subscribe" : "Buy (Force Check)"}
+                {/* Informational message - NO clickable link */}
+                <View style={styles.infoMessageBox}>
+                  <Text style={styles.infoMessageText}>
+                    To subscribe, please visit The Chef Day website
                   </Text>
-                </TouchableOpacity>
+                </View>
               </View>
             );
           })}
-        </View>
-
-        {/* DEBUG INFO */}
-        <View style={{ padding: 20, backgroundColor: '#eee', marginTop: 20 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Debug Info (Raw Apple Data):</Text>
-          <Text style={{ marginBottom: 10 }}>Products Found: {appleProducts.length}</Text>
-
-          {appleProducts.map((p, index) => (
-            <View key={index} style={{ marginBottom: 8, padding: 10, backgroundColor: '#e0e0e0', borderRadius: 4 }}>
-              <Text style={{ fontWeight: 'bold', fontSize: 12 }}>{p.productId}</Text>
-              <Text style={{ fontSize: 12 }}>Title: {p.title}</Text>
-              <Text style={{ fontSize: 12 }}>Price: {p.localizedPrice}</Text>
-            </View>
-          ))}
         </View>
 
         {isLoading && <CenterLoading />}
@@ -335,6 +239,21 @@ const styles = StyleSheet.create({
     fontSize: isTablet ? 24 : 18,
     fontWeight: '700',
     color: '#ff0000',
+  },
+  infoMessageBox: {
+    width: '100%',
+    backgroundColor: '#f0f8ff',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 15,
+    borderWidth: 1,
+    borderColor: '#209E00',
+  },
+  infoMessageText: {
+    fontSize: isTablet ? 15 : 13,
+    color: '#333',
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });
 
