@@ -35,13 +35,7 @@ const UpdateChefPricing = ({ route, navigation }) => {
     fetchPricing();
   }, []);
 
-  const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchPricing();
-    setRefreshing(false);
-  };
 
   const handleSubmit = async () => {
     if (!ChefID || !HourlyRate || !DayRate) {
@@ -80,14 +74,7 @@ const UpdateChefPricing = ({ route, navigation }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         style={{ flex: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#ff0000']}
-            tintColor="#ff0000"
-          />
-        }
+
       >
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
