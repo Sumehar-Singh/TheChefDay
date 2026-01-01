@@ -179,14 +179,16 @@ const Home = ({ navigation }) => {
           <View style={styles.featuresContainer}>
             {features.map((feature) => (
               <View key={feature.id} style={styles.featureCard}>
-                <View style={styles.featureIcon}>
-                  <MaterialCommunityIcons
-                    name={feature.icon}
-                    size={32}
-                    color="#ff1a1a"
-                  />
+                <View style={styles.featureHeader}>
+                  <View style={styles.featureIcon}>
+                    <MaterialCommunityIcons
+                      name={feature.icon}
+                      size={24}
+                      color="#ff1a1a"
+                    />
+                  </View>
+                  <Text style={styles.featureTitle}>{feature.title}</Text>
                 </View>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
                 <Text style={styles.featureDescription}>{feature.description}</Text>
               </View>
             ))}
@@ -462,20 +464,27 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  featureHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   featureIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(255, 26, 26, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
+    marginRight: 10,
+    marginBottom: 0,
   },
   featureTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 0,
     color: '#333',
+    flex: 1, // Allow text to wrap nicely if needed
   },
   featureDescription: {
     color: '#666',
