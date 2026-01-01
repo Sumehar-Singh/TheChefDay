@@ -78,27 +78,39 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async (navigation = null, fromScreen = null, fromKey = null) => {
-    setAppUser(null);
-    setProfile(null);
-    await AsyncStorage.removeItem('appUser');
-    await AsyncStorage.removeItem('profile');
+    // Helper to clear state
+    const clearState = async () => {
+      setAppUser(null);
+      setProfile(null);
+      await AsyncStorage.removeItem('appUser');
+      await AsyncStorage.removeItem('profile');
+    };
 
     // Navigate to Home screen with pop-like animation (Left to Right)
-    if (navigation) {
-      if (fromScreen && fromKey) {
-        // Trick: Reset stack to [Home, CurrentScreen] then go back
-        // Passing 'key' preserves the current screen instance to prevent flashing
-        navigation.reset({
-          index: 1,
-          routes: [
-            { name: 'Home' },
-            { name: fromScreen, key: fromKey }
-          ],
-        });
-        // Delay to ensure reset is processed before popping
-        setTimeout(() => navigation.goBack(), 100);
-      } else {
-        // Fallback if screen details not provided
+    if (navigation && fromScreen && fromKey) {
+      // Trick: Reset stack to [Home, CurrentScreen] then go back
+      // Passing 'key' preserves the current screen instance to prevent flashing
+      navigation.reset({
+        index: 1,
+        routes: [
+          { name: 'Home' },
+          { name: fromScreen, key: fromKey }
+        ],
+      });
+
+      // Delay to ensure reset is processed before popping
+      setTimeout(() => {
+        navigation.goBack();
+      }, 50);
+
+      // Delay clearing state until animation completes (avoid flicker)
+      setTimeout(() => {
+        clearState();
+      }, 500);
+    } else {
+      // Fallback: Clear immediately and navigate if possible
+      await clearState();
+      if (navigation) {
         navigation.reset({
           index: 0,
           routes: [{ name: 'Home' }],
