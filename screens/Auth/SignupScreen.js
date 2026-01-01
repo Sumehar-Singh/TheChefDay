@@ -681,12 +681,13 @@ const styles = StyleSheet.create({
     height: isTablet ? 60 : 50,
     fontSize: isTablet ? 18 : 16,
     color: '#333',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    marginBottom: isTablet ? 20 : 15,
-    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    marginBottom: isTablet ? 25 : 15,
+    paddingHorizontal: 0,
+    backgroundColor: 'transparent', // Reset
+    borderRadius: 0, // Reset
+    borderWidth: 0, // Reset
   },
   buttonContainer: {
     marginTop: isTablet ? 40 : 20,
@@ -698,11 +699,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   signupText: {
-    fontSize: isTablet ? 32 : 28,
+    fontSize: isTablet ? 32 : 24,
     fontWeight: 'bold',
-    color: '#ff0000',
-    marginBottom: 10,
+    color: '#fff',
+    backgroundColor: '#ff0000',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    marginBottom: 20,
     textAlign: 'center',
+    width: 'auto',
+    minWidth: 200,
   },
   subText: {
     fontSize: isTablet ? 18 : 14,
