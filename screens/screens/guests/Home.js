@@ -433,10 +433,11 @@ const styles = StyleSheet.create({
 
   },
   sectionTitle: {
-    fontSize: isTablet ? 24 : 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 2,
+    fontSize: isTablet ? 26 : 22,
+    fontWeight: '800', // Extra Bold
+    color: '#1a1a1a', // Darker Black
+    marginBottom: 10,
+    letterSpacing: 0.5,
   },
   seeAllText: {
     color: '#ff1a1a',
