@@ -278,10 +278,10 @@ const Home = ({ navigation }) => {
             <MaterialCommunityIcons name="silverware" size={40} color="rgba(255,255,255,0.1)" style={{ position: 'absolute', bottom: 10, left: 20 }} />
 
             <Text style={{ fontSize: 28, fontWeight: '800', color: 'white', textAlign: 'center', marginBottom: 10 }}>
-              Ready to Taste?
+              Join The Chef Day
             </Text>
             <Text style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', textAlign: 'center', marginBottom: 25, lineHeight: 24, paddingHorizontal: 10 }}>
-              Join thousands of food lovers enjoying restaurant-quality dining at home.
+              Book a private chef for your next event, or sign up as a chef to showcase your culinary skills.
             </Text>
 
             <TouchableOpacity
