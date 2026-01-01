@@ -699,7 +699,7 @@ const ChefDetail = ({ navigation }) => {
             >
               <View style={styles.submitButtonContent}>
                 <Text style={styles.modernSubmitButtonText}>
-                  {profile ? 'Submit Review' : 'Login to Submit Review'}
+                  {profile ? 'Submit Review' : 'Submit Review'}
                 </Text>
               </View>
             </TouchableOpacity>
