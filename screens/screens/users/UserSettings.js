@@ -8,15 +8,15 @@ import CustomStatusBar from '../../components/CustomStatusBar';
 import { useAuth } from '../../../components/contexts/AuthContext';
 const UserSettings = ({ navigation }) => {
   const [userId, setUserId] = useState('');
-  const {profile, logout}=useAuth();
-  
+  const { profile, logout } = useAuth();
 
-  const handleLogout =async () => {
-    const keysToRemove = ['userid', 'user_id', 'userCoods','role_id']; // List of keys to remove
 
-for (let key of keysToRemove) {
-  await AsyncStorage.removeItem(key);
-}
+  const handleLogout = async () => {
+    const keysToRemove = ['userid', 'user_id', 'userCoods', 'role_id']; // List of keys to remove
+
+    for (let key of keysToRemove) {
+      await AsyncStorage.removeItem(key);
+    }
     // Use the centralized logout function
     await logout(navigation);
   };
@@ -38,11 +38,11 @@ for (let key of keysToRemove) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <CustomStatusBar title="Settings" includeTopInset={false}/>
+      <CustomStatusBar title="Settings" includeTopInset={false} />
       <ScrollView style={styles.container}>
         {/* Profile Section */}
-        <TouchableOpacity 
-          style={styles.profileSection} 
+        <TouchableOpacity
+          style={styles.profileSection}
           onPress={() => navigation.navigate("UserEditProfile")}
         >
           <View style={styles.profileContainer}>
@@ -60,25 +60,25 @@ for (let key of keysToRemove) {
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Account Settings</Text>
           <View style={styles.settingsGroup}>
-            <SettingItem 
-              icon="person-outline" 
-              title="Update Profile" 
-              onPress={() => navigation.navigate("UserEditProfile")} 
+            <SettingItem
+              icon="person-outline"
+              title="Update Profile"
+              onPress={() => navigation.navigate("UserEditProfile")}
             />
             {/* <SettingItem 
               icon="settings-outline" 
               title="Account Settings" 
               onPress={() => {}} 
             /> */}
-            <SettingItem 
-              icon="document-text-outline" 
-              title="Terms and Conditions" 
-              onPress={() => navigation.navigate("UserTermsScreen")} 
+            <SettingItem
+              icon="document-text-outline"
+              title="Terms and Conditions"
+              onPress={() => navigation.navigate("UserTermsScreen")}
             />
-             <SettingItem 
-              icon="remove-circle-outline" 
-              title="Delete Account" 
-              onPress={() => navigation.navigate("DeleteUserAccount")} 
+            <SettingItem
+              icon="remove-circle-outline"
+              title="Delete Account"
+              onPress={() => navigation.navigate("DeleteUserAccount")}
             />
           </View>
         </View>
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   profileSection: {
-  
+
     marginBottom: 15,
     padding: 18,
     backgroundColor: '#fff',
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   logoutButton: {
-    backgroundColor: '#FF4F4F',
+    backgroundColor: '#ff0000',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
