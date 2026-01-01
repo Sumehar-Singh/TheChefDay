@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Alert, TouchableOpacity, Dimensions, StyleSheet, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
-import CustomModal from '../../components/CustomModal';
+import CustomModal from '../../../components/CustomModal';
 import CustomStatusBar from '../../components/CustomStatusBar';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
