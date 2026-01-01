@@ -18,7 +18,7 @@ const UserSettings = ({ navigation }) => {
       await AsyncStorage.removeItem(key);
     }
     // Use the centralized logout function
-    await logout(navigation);
+    await logout(navigation, 'UserSettings');
   };
 
   const SettingItem = ({ icon, title, onPress }) => (

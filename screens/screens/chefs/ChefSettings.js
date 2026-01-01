@@ -24,7 +24,7 @@ const ChefSettings = ({ navigation }) => {
 
   const handleLogout = async () => {
 
-    await logout(navigation);
+    await logout(navigation, 'ChefSettings');
 
     // Remove the manual navigation reset since logout now handles it
   };
