@@ -167,6 +167,7 @@ const Home = ({ navigation }) => {
                   style={[styles.button, styles.secondaryButton]}
                   onPress={() => navigation.navigate('LoginScreen')}
                 >
+                  <Text style={styles.buttonTextLogin}>Login</Text>
                 </TouchableOpacity>
               </View>
             </View>
