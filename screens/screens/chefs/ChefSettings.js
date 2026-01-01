@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileInfo: {
+    flex: 1,
     marginLeft: 15,
     justifyContent: 'center',
   },
