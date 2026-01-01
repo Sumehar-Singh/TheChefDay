@@ -416,7 +416,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ff1a1a',
   },
-  buttonTextLogin: { color: 'white' },
+  buttonTextLogin: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white'
+  },
   // Section Styles
   section: {
     paddingHorizontal: 20,
