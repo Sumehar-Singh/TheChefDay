@@ -202,7 +202,8 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     headerContainer: {
-        padding: isTablet ? 15 : 8,
+        paddingTop: isTablet ? 15 : 8,
+        paddingBottom: isTablet ? 20 : 15,
         paddingHorizontal: isTablet ? 20 : 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
