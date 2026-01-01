@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Animated, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
@@ -7,7 +7,7 @@ import { useAuth } from '../../../components/contexts/AuthContext';
 import CustomStatusBar from '../../components/CustomStatusBar';
 import { BASE_URL } from '../../../config';
 const DeleteChefAccount = ({ navigation }) => {
-  const { profile, logout,appUser } = useAuth();
+  const { profile, logout, appUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [deletionInfo, setDeletionInfo] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -24,7 +24,7 @@ const DeleteChefAccount = ({ navigation }) => {
 
   const fetchDeletionInfo = async () => {
 
-    
+
     try {
       const response = await axios.post(
         `${BASE_URL}chefs/get_chef_deletion_info.php`,
@@ -35,7 +35,7 @@ const DeleteChefAccount = ({ navigation }) => {
           },
         }
       );
-      
+
       if (response.data.success) {
         setDeletionInfo(response.data.data);
       }
@@ -86,10 +86,10 @@ const DeleteChefAccount = ({ navigation }) => {
       // Call PHP API to delete chef account (always call regardless of visible items)
       const response = await axios.post(
         `${BASE_URL}delete_user.php`,
-        { 
+        {
           app_user_id: appUser.Id,
           user_id: profile.Id,
-          role_id: 3 
+          role_id: 3
         },
         {
           headers: {
@@ -97,19 +97,19 @@ const DeleteChefAccount = ({ navigation }) => {
           },
         }
       );
-      
-      
+
+
       if (response.data.success) {
         // Show visual progress if there are items to display
         if (itemsToDelete.length > 0) {
           // Animate deletion of each item sequentially (UI only)
           for (let i = 0; i < itemsToDelete.length; i++) {
-            setDeletionProgress(prev => ({ 
-              ...prev, 
+            setDeletionProgress(prev => ({
+              ...prev,
               currentStep: i + 1,
               completedSteps: [...prev.completedSteps, itemsToDelete[i].label]
             }));
-            
+
             // Wait 1.5 seconds before moving to next item
             await new Promise(resolve => setTimeout(resolve, 1500));
           }
@@ -128,7 +128,7 @@ const DeleteChefAccount = ({ navigation }) => {
       } else {
         throw new Error('API call failed');
       }
-     
+
     } catch (error) {
       console.error('Error deleting account:', error);
       Alert.alert('Error', 'Failed to delete account. Please try again later.');
@@ -144,7 +144,7 @@ const DeleteChefAccount = ({ navigation }) => {
   };
 
   const navigateToScreen = (screenName) => {
-    switch(screenName) {
+    switch (screenName) {
       case 'Documents':
         navigation.navigate('UploadDocuments');
         break;
@@ -174,27 +174,27 @@ const DeleteChefAccount = ({ navigation }) => {
     }
 
     const items = [
-      { 
-        label: 'Documents', 
-        count: deletionInfo.documents, 
+      {
+        label: 'Documents',
+        count: deletionInfo.documents,
         icon: 'document-text-outline',
         screen: 'UploadDocuments'
       },
-      { 
-        label: 'Reviews', 
-        count: deletionInfo.reviews, 
+      {
+        label: 'Reviews',
+        count: deletionInfo.reviews,
         icon: 'star-outline',
         screen: 'ChefReviews'
       },
-      { 
-        label: 'Bookings', 
-        count: deletionInfo.bookings, 
+      {
+        label: 'Bookings',
+        count: deletionInfo.bookings,
         icon: 'calendar-outline',
         screen: 'Bookings'
       },
-      { 
-        label: 'Subscriptions', 
-        count: deletionInfo.subscriptions, 
+      {
+        label: 'Subscriptions',
+        count: deletionInfo.subscriptions,
         icon: 'card-outline',
         screen: 'ChefProfileStatus'
       },
@@ -210,21 +210,21 @@ const DeleteChefAccount = ({ navigation }) => {
           {items.map((item, index) => {
             const isCompleted = deletionProgress.completedSteps.includes(item.label);
             const isCurrent = deletionProgress.currentStep === index + 1 && !isCompleted;
-            
+
             return (
-              <View 
-                key={index} 
+              <View
+                key={index}
                 style={[
-                  styles.infoItem, 
+                  styles.infoItem,
                   isCompleted && styles.completedItem,
                   isCurrent && styles.currentItem
                 ]}
               >
-                <Ionicons 
-                  name={isCompleted ? "checkmark-circle" : item.icon} 
-                  size={20} 
-                  color={isCompleted ? "#4CAF50" : (isCurrent ? "#FF4F4F" : "#999")} 
-                  style={styles.infoIcon} 
+                <Ionicons
+                  name={isCompleted ? "checkmark-circle" : item.icon}
+                  size={20}
+                  color={isCompleted ? "#4CAF50" : (isCurrent ? "#FF4F4F" : "#999")}
+                  style={styles.infoIcon}
                 />
                 <View style={styles.infoTextContainer}>
                   <Text style={[
@@ -241,7 +241,7 @@ const DeleteChefAccount = ({ navigation }) => {
               </View>
             );
           })}
-          
+
           {deletionProgress.showFinalLoading && (
             <View style={styles.finalLoadingContainer}>
               <ActivityIndicator size="large" color="#FF4F4F" />
@@ -260,8 +260,8 @@ const DeleteChefAccount = ({ navigation }) => {
           Deleting your account will permanently remove the following data as well:
         </Text>
         {items.map((item, index) => (
-          <TouchableOpacity 
-            key={index} 
+          <TouchableOpacity
+            key={index}
             style={styles.infoItem}
             onPress={() => navigateToScreen(item.label)}
             activeOpacity={0.7}
@@ -279,6 +279,14 @@ const DeleteChefAccount = ({ navigation }) => {
     );
   };
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchDeletionInfo();
+    setRefreshing(false);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -289,8 +297,19 @@ const DeleteChefAccount = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <CustomStatusBar title="Delete Account" includeTopInset={false} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <CustomStatusBar title="Delete Account" />
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        style={{ flex: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#ff0000']}
+            tintColor="#ff0000"
+          />
+        }
+      >
         <View style={styles.header}>
           <Ionicons name="warning" size={60} color="#FF4F4F" style={styles.warningIcon} />
           <Text style={styles.title}>Delete Your Account</Text>
@@ -310,7 +329,7 @@ const DeleteChefAccount = ({ navigation }) => {
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.button, styles.deleteButton, isDeleting && styles.disabledButton]}
               onPress={handleDeleteAccount}
@@ -347,7 +366,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 30,
-    
+
   },
   warningIcon: {
     marginBottom: 15,
