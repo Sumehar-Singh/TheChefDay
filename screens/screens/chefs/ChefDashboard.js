@@ -123,20 +123,11 @@ const ChefDashboard = ({ navigation }) => {
             {!profile?.Id ? (
                 <CenterLoading />
             ) : (
-                <ScrollView
-                    contentContainerStyle={styles.container}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                            colors={['#ff0000']}
-                            tintColor="#70BD5C"
-                        />
-                    }
-                >
+                <React.Fragment>
+                    {/* Fixed Header */}
                     <LinearGradient
                         colors={['#ff0000', '#c90000']}
-                        style={[styles.headerGradient, { paddingTop: insets.top }]}
+                        style={[styles.headerGradient, { paddingTop: insets.top, marginBottom: 0 }]}
                     >
                         <TouchableOpacity
                             style={styles.headerContainer}
@@ -155,25 +146,42 @@ const ChefDashboard = ({ navigation }) => {
                         </TouchableOpacity>
                     </LinearGradient>
 
-                    {/* Welcome Section for New Chefs */}
-                    {!initialLoad && !isLoading && !isProfileCompleted && !hasBookings && !hasReviews && (
-                        <View style={styles.welcomeContainer}>
-                            <MaterialCommunityIcons name="chef-hat" size={isTablet ? 80 : 60} color="#ff0000" />
-                            <Text style={styles.welcomeTitle}>Welcome to Your Chef Dashboard!</Text>
-                            <Text style={styles.welcomeText}>
-                                Complete your profile to start receiving bookings and build your reputation as a chef.
-                            </Text>
-                        </View>
-                    )}
-                    {!initialLoad && !isLoading && !isProfileCompleted && (
-                        <ChefProfileCompletionSection navigation={navigation} />
-                    )}
-                    <View style={styles.section}>
-                        <ChefBookingList navigation={navigation} userId={profile?.Id} limit={5} />
-                    </View>
+                    {/* Scrollable Content */}
+                    <ScrollView
+                        contentContainerStyle={styles.container}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                colors={['#ff0000']}
+                                tintColor="#70BD5C"
+                                progressViewOffset={10}
+                            />
+                        }
+                    >
+                        {/* Add spacing at top so content doesn't start immediately under header edge */}
+                        <View style={{ marginTop: 15 }}>
+                            {/* Welcome Section for New Chefs */}
+                            {!initialLoad && !isLoading && !isProfileCompleted && !hasBookings && !hasReviews && (
+                                <View style={styles.welcomeContainer}>
+                                    <MaterialCommunityIcons name="chef-hat" size={isTablet ? 80 : 60} color="#ff0000" />
+                                    <Text style={styles.welcomeTitle}>Welcome to Your Chef Dashboard!</Text>
+                                    <Text style={styles.welcomeText}>
+                                        Complete your profile to start receiving bookings and build your reputation as a chef.
+                                    </Text>
+                                </View>
+                            )}
+                            {!initialLoad && !isLoading && !isProfileCompleted && (
+                                <ChefProfileCompletionSection navigation={navigation} />
+                            )}
+                            <View style={styles.section}>
+                                <ChefBookingList navigation={navigation} userId={profile?.Id} limit={5} />
+                            </View>
 
-                    <ChefReviewList navigation={navigation} userId={profile?.Id} limit={5} />
-                </ScrollView>
+                            <ChefReviewList navigation={navigation} userId={profile?.Id} limit={5} />
+                        </View>
+                    </ScrollView>
+                </React.Fragment>
             )}
             {(isLoading || initialLoad) && <CenterLoading />}
         </View>
@@ -194,7 +202,8 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     headerContainer: {
-        padding: isTablet ? 20 : 15,
+        padding: isTablet ? 15 : 8,
+        paddingHorizontal: isTablet ? 20 : 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
