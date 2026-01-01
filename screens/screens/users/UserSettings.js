@@ -119,13 +119,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileInfo: {
+    flex: 1,
     marginLeft: 10,
+    justifyContent: 'center',
   },
   userName: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 5,
+    marginBottom: 2,
   },
   editProfileText: {
     fontSize: 14,
