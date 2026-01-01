@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import PopUpScreen from './screens/screens/PopUpScreen';
 import Home from './screens/screens/guests/Home';
 
@@ -71,7 +71,9 @@ export default function App() {
           <Stack.Navigator
             screenOptions={{
               headerShown: false,
-              ...TransitionPresets.SlideFromRightIOS,
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+              gestureEnabled: true,
+              gestureDirection: 'horizontal',
             }}
             initialRouteName="AnimatedSplash"
           >
