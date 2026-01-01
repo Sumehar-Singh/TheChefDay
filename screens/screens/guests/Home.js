@@ -221,8 +221,8 @@ const Home = ({ navigation }) => {
         </View >
 
         {/* How It Works Section */}
-        < View style={[styles.section, { backgroundColor: '#f9f9f9', paddingVertical: 40 }]} >
-          <Text style={[styles.sectionTitle, { textAlign: 'center' }]}>How It Works</Text>
+        < View style={[styles.section, { backgroundColor: '#f9f9f9', paddingVertical: 20, marginBottom: 30 }]} >
+          <Text style={styles.sectionTitle}>How It Works</Text>
 
           <View style={styles.stepsContainer}>
             <View style={styles.step}>
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   // Section Styles
   section: {
     paddingHorizontal: 20,
-    marginBottom: 10,
+    marginBottom: 30,
   },
   sectionHeader: {
     flexDirection: 'row',
