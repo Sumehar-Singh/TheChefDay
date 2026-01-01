@@ -13,6 +13,7 @@ import axios from 'axios';
 import { BASE_URL } from '../../../config';
 import { useAuth } from '../../../components/contexts/AuthContext';
 import { Provider } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
@@ -114,8 +115,13 @@ const ChefDashboard = ({ navigation }) => {
         }
     }, [profile?.Id]);
 
+    const insets = useSafeAreaInsets();
+
     return (
-        <SafeAreaView style={styles.superContainer}>
+        <View style={styles.superContainer}>
+            {/* Red notch area */}
+            <View style={{ backgroundColor: '#ff0000', height: insets.top }} />
+            <StatusBar backgroundColor="#ff0000" barStyle="light-content" />
             {!profile?.Id ? (
                 <CenterLoading />
             ) : (
@@ -172,7 +178,7 @@ const ChefDashboard = ({ navigation }) => {
                 </ScrollView>
             )}
             {(isLoading || initialLoad) && <CenterLoading />}
-        </SafeAreaView>
+        </View>
     );
 };
 
