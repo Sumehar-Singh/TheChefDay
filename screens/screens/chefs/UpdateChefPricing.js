@@ -3,6 +3,7 @@ import { View, Text, TextInput, Alert, TouchableOpacity, Dimensions, StyleSheet,
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
 import { Ionicons } from '@expo/vector-icons';
+import CustomModal from '../../components/CustomModal';
 import CustomStatusBar from '../../components/CustomStatusBar';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
@@ -12,6 +13,31 @@ const UpdateChefPricing = ({ route, navigation }) => {
 
   const [HourlyRate, setHourlyRate] = useState('');
   const [DayRate, setDayRate] = useState('');
+
+  const [modalConfig, setModalConfig] = useState({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: null,
+  });
+
+  const showModal = (title, message, type = 'info', onConfirm = null) => {
+    setModalConfig({
+      visible: true,
+      title,
+      message,
+      type,
+      onConfirm: () => {
+        setModalConfig(prev => ({ ...prev, visible: false }));
+        if (onConfirm) onConfirm();
+      },
+    });
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig(prev => ({ ...prev, visible: false }));
+  };
 
   const fetchPricing = async () => {
     try {
@@ -36,10 +62,9 @@ const UpdateChefPricing = ({ route, navigation }) => {
   }, []);
 
 
-
   const handleSubmit = async () => {
     if (!ChefID || !HourlyRate || !DayRate) {
-      Alert.alert('Error', 'All fields are required.');
+      showModal('Error', 'All fields are required.', 'error');
       return;
     }
 
@@ -54,14 +79,13 @@ const UpdateChefPricing = ({ route, navigation }) => {
       });
 
       if (response.data.success) {
-        Alert.alert('Success', response.data.message);
-        navigation.goBack();
+        showModal('Success', response.data.message, 'success', () => navigation.goBack());
       } else {
-        Alert.alert('Error', response.data.message);
+        showModal('Error', response.data.message, 'error');
       }
     } catch (error) {
       console.error('Error updating pricing:', error);
-      Alert.alert('Error', 'Something went wrong');
+      showModal('Error', 'Something went wrong', 'error');
     }
   };
 
@@ -115,7 +139,19 @@ const UpdateChefPricing = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </ScrollView>
+
+      <CustomModal
+        visible={modalConfig.visible}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onConfirm={modalConfig.onConfirm || handleCloseModal}
+        onCancel={handleCloseModal}
+        showCancel={false}
+        confirmText="OK"
+      />
+    </KeyboardAvoidingView >
   );
 };
 
