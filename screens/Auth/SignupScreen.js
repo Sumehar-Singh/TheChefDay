@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: isTablet ? 32 : 20,
     fontWeight: 'bold',
-    color: '#ff0000',
+    color: '#BB0000',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -614,14 +614,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderWidth: 1.5,
-    borderColor: '#ffcccc',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   roleIconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#ffe6e6',
+    backgroundColor: '#FFF8E1',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
   roleTitle: {
     fontSize: isTablet ? 24 : 20,
     fontWeight: 'bold',
-    color: '#ff0000',
+    color: '#BB0000',
     marginBottom: 10,
   },
   roleDescription: {
