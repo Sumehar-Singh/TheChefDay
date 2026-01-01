@@ -15,11 +15,11 @@ export const AuthProvider = ({ children }) => {
       try {
         const appUserData = await AsyncStorage.getItem('appUser');
         const profileData = await AsyncStorage.getItem('profile');
-        
+
         if (appUserData && profileData) {
           const parsedAppUser = JSON.parse(appUserData);
           const parsedProfile = JSON.parse(profileData);
-          
+
           setAppUser(parsedAppUser);
           setProfile(parsedProfile);
         }
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   // Helper function to handle navigation logic
   const handleUserNavigation = async (appUserData, profileData, navigation) => {
     const { storeUserCoords } = await import('../../screens/components/utils');
-    
+
     // Admin 1, User 2 and Chef 3
     if (appUserData.RoleId == 3) {
       // Reset navigation stack to prevent back navigation to login
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
     setProfile(profileData);
     await AsyncStorage.setItem('appUser', JSON.stringify(appUserData));
     await AsyncStorage.setItem('profile', JSON.stringify(profileData));
-    
+
     // Handle navigation if provided
     if (navigation) {
       await handleUserNavigation(appUserData, profileData, navigation);
@@ -82,24 +82,24 @@ export const AuthProvider = ({ children }) => {
     setProfile(null);
     await AsyncStorage.removeItem('appUser');
     await AsyncStorage.removeItem('profile');
-    
+
     // Navigate to login screen if navigation is provided
     if (navigation) {
       navigation.reset({
-        index: 0,
-        routes: [{ name: 'LoginScreen' }],
+        index: 1,
+        routes: [{ name: 'Home' }, { name: 'LoginScreen' }],
       });
     }
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      appUser, 
-      profile, 
-      isLoading, 
-      login, 
-      logout, 
-      handleUserNavigation 
+    <AuthContext.Provider value={{
+      appUser,
+      profile,
+      isLoading,
+      login,
+      logout,
+      handleUserNavigation
     }}>
       {children}
     </AuthContext.Provider>
