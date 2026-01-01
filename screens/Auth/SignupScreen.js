@@ -42,6 +42,7 @@ const SignupScreen = ({ navigation, route }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
@@ -106,60 +107,39 @@ const SignupScreen = ({ navigation, route }) => {
   };
 
   const registerUserWithRole = async () => {
-    if (!FirstName.trim()) {
-      Alert.alert('Required', 'Please enter your First Name.');
-      return;
-    }
+    let currentErrors = {};
 
-    if (!LastName.trim()) {
-      Alert.alert('Required', 'Please enter your Last Name.');
-      return;
-    }
-
-    if (!email.trim()) {
-      Alert.alert('Required', 'Please enter your Email Address.');
-      return;
-    }
-
-    if (!phone.trim()) {
-      Alert.alert('Required', 'Please enter your Phone Number.');
-      return;
-    }
-
-    if (!password) {
-      Alert.alert('Required', 'Please create a Password.');
-      return;
-    }
-
-    if (!confirmPassword) {
-      Alert.alert('Required', 'Please confirm your Password.');
-      return;
-    }
-
-    if (!termsAccepted) {
-      Alert.alert('Required', 'Please accept the terms and conditions');
-      return;
-    }
+    if (!FirstName.trim()) currentErrors.FirstName = 'Please enter your First Name.';
+    if (!LastName.trim()) currentErrors.LastName = 'Please enter your Last Name.';
+    if (!email.trim()) currentErrors.email = 'Please enter your Email Address.';
+    if (!phone.trim()) currentErrors.phone = 'Please enter your Phone Number.';
+    if (!password) currentErrors.password = 'Please create a Password.';
+    if (!confirmPassword) currentErrors.confirmPassword = 'Please confirm your Password.';
 
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
-      return;
+    if (email.trim() && !emailRegex.test(email)) {
+      currentErrors.email = 'Please enter a valid email address.';
     }
 
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long.');
-      return;
+    if (password && password.length < 6) {
+      currentErrors.password = 'Password must be at least 6 characters long.';
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Password Mismatch', 'Passwords do not match.');
+      currentErrors.confirmPassword = 'Passwords do not match.';
+    }
+
+    if (phone.trim() && phone.length < 10) {
+      currentErrors.phone = 'Please enter a valid phone number (at least 10 digits).';
+    }
+
+    if (!termsAccepted) {
+      Alert.alert('Required', 'Please accept the terms and conditions'); // Converting this one too? User said "validations above inputs". Terms is a checkbox/button. I'll leave alert for Terms or add a text above button. I'll leave alert for terms as it's separate.
       return;
     }
 
-    // Phone validation (simple check for now)
-    if (phone.length < 10) {
-      Alert.alert('Error', 'Please enter a valid phone number (at least 10 digits).');
+    if (Object.keys(currentErrors).length > 0) {
+      setErrors(currentErrors);
       return;
     }
 
@@ -361,12 +341,16 @@ const SignupScreen = ({ navigation, route }) => {
           <View style={styles.form}>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>First Name</Text>
+              {errors.FirstName && <Text style={styles.errorText}>{errors.FirstName}</Text>}
               <TextInput
                 style={styles.input}
                 placeholder="Enter your first name"
                 placeholderTextColor="#8c8c8c"
                 value={FirstName}
-                onChangeText={setFirstName}
+                onChangeText={(text) => {
+                  setFirstName(text);
+                  if (errors.FirstName) setErrors({ ...errors, FirstName: null });
+                }}
                 autoCapitalize="words"
               />
             </View>
@@ -385,25 +369,33 @@ const SignupScreen = ({ navigation, route }) => {
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Last Name</Text>
+              {errors.LastName && <Text style={styles.errorText}>{errors.LastName}</Text>}
               <TextInput
                 style={styles.input}
                 placeholder="Enter your last name"
                 placeholderTextColor="#8c8c8c"
                 value={LastName}
-                onChangeText={setLastName}
+                onChangeText={(text) => {
+                  setLastName(text);
+                  if (errors.LastName) setErrors({ ...errors, LastName: null });
+                }}
                 autoCapitalize="words"
               />
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Email</Text>
+              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
               <TextInput
                 style={styles.input}
                 placeholder="Enter your email address"
                 placeholderTextColor="#8c8c8c"
                 keyboardType="email-address"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  if (errors.email) setErrors({ ...errors, email: null });
+                }}
                 autoCapitalize="none"
                 autoComplete="email"
               />
@@ -411,13 +403,17 @@ const SignupScreen = ({ navigation, route }) => {
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Phone</Text>
+              {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
               <TextInput
                 style={styles.input}
                 placeholder="Enter your phone number"
                 placeholderTextColor="#8c8c8c"
                 keyboardType="phone-pad"
                 value={phone}
-                onChangeText={setPhone}
+                onChangeText={(text) => {
+                  setPhone(text);
+                  if (errors.phone) setErrors({ ...errors, phone: null });
+                }}
                 maxLength={15}
               />
             </View>
@@ -426,26 +422,34 @@ const SignupScreen = ({ navigation, route }) => {
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Password</Text>
+              {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
               <TextInput
                 style={styles.input}
                 placeholder="Create a password"
                 placeholderTextColor="#8c8c8c"
                 secureTextEntry
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  if (errors.password) setErrors({ ...errors, password: null });
+                }}
                 autoCapitalize="none"
               />
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Confirm Password</Text>
+              {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
               <TextInput
                 style={styles.input}
                 placeholder="Confirm your password"
                 placeholderTextColor="#8c8c8c"
                 secureTextEntry
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                  if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: null });
+                }}
                 autoCapitalize="none"
               />
             </View>
@@ -693,6 +697,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent', // Reset
     borderRadius: 0, // Reset
     borderWidth: 0, // Reset
+  },
+  errorText: {
+    color: '#ff0000',
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 5,
+    marginLeft: 0,
+    fontWeight: '500',
   },
   buttonContainer: {
     marginTop: isTablet ? 40 : 20,
