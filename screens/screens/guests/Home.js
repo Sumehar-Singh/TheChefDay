@@ -378,8 +378,8 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   heroTitle: {
-    fontSize: isTablet ? 24 : 21,
-    fontWeight: 'bold',
+    fontSize: isTablet ? 28 : 22,
+    fontWeight: '700', // Consistent bold
     color: '#fff',
     textAlign: 'center',
     marginBottom: 10,
@@ -387,7 +387,8 @@ const styles = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '500', // Medium weight for better legibility
+    color: 'rgba(255, 255, 255, 0.95)',
     textAlign: 'center',
     marginBottom: 20,
     paddingHorizontal: 20,
