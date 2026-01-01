@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BASE_URL } from "../../config";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, ImageBackground, SafeAreaView, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,21 +13,21 @@ const isTablet = width > 600;
 export default function LoginScreen({ navigation }) {
   // const [email, setEmail] = useState('user@gmail.com');
   // const [password, setPassword] = useState('Info@123#');
-   const [email, setEmail] = useState('');
-   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginError,setLoginError]=useState("");
-  const {login}=useAuth();
+  const [loginError, setLoginError] = useState("");
+  const { login } = useAuth();
 
   // useEffect(() => {
   //   const isLoggedIn = async () => {
   //     const usrId = await AsyncStorage.getItem("userid");
-      
+
   //     if(usrId)
   //     {
-    
+
   //       const roleId = await AsyncStorage.getItem("role_id");
-       
+
   //       if(roleId==2)
   //       {
   //         navigation.navigate("UserDashboard");
@@ -42,13 +42,13 @@ export default function LoginScreen({ navigation }) {
   // }, []);
 
   const loginUser = async (email, password) => {
-    
- if (!email || !password) {
-    setLoginError("Email and password are required");
-    setLoading(false);
 
-    return;  // Exit early without making the request
-  }
+    if (!email || !password) {
+      setLoginError("Email and password are required");
+      setLoading(false);
+
+      return;  // Exit early without making the request
+    }
     //console.log(`${BASE_URL}login2.php`);
     console.log("You are running with this URL: ", BASE_URL);
     try {
@@ -56,7 +56,7 @@ export default function LoginScreen({ navigation }) {
         email: email,
         password: password
       });
-   
+
       if (response.data.status === "success") {
         // Use the centralized login function with navigation
         await login(response.data.app_user, response.data.profile, navigation);
@@ -82,37 +82,17 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = () => {
     setLoginError("");
     setLoading(true);
-   
-      // Handle login logic here
-      //fetchData();
-      //registerUserWithRole('test2@example.com', 'Info@123#', 2); // 1 = Admin
-      loginUser(email, password); // 1 = Admin
 
-   
-  };
-  const UserButtons = () => {
-    // Handle cancel logic here
-    return (
-      <>
-        <CustomButton
-          title="User LOG IN"
-          onPress={()=>loginUser ("user@gmail.com","Info@123#")}
-          isLoading={loading}
-          type="warning"
-        />
-        <CustomButton
-          title="Chef LOG IN"
-                   onPress={()=>loginUser ("chef@gmail.com","Info@123#")}
+    // Handle login logic here
+    //fetchData();
+    //registerUserWithRole('test2@example.com', 'Info@123#', 2); // 1 = Admin
+    loginUser(email, password); // 1 = Admin
 
-        
-          isLoading={loading}
-          type="warning"
-        />
-      </>
-    );
+
   };
-  
-  
+
+
+
   const handleCancel = () => {
     // Handle cancel logic here
     console.log('Cancel clicked');
@@ -159,7 +139,7 @@ export default function LoginScreen({ navigation }) {
                 value={password}
                 onChangeText={setPassword}
               />
-<Text style={styles.loginFailed}>{loginError}</Text>
+              <Text style={styles.loginFailed}>{loginError}</Text>
               <CustomButton
                 title="LOG IN"
                 onPress={handleLogin}
@@ -170,36 +150,28 @@ export default function LoginScreen({ navigation }) {
               <TouchableOpacity style={styles.signupLink} onPress={() => navigation.navigate('SignupScreen')}>
                 <Text style={styles.signupText}>If you don’t have an account <Text style={styles.signupTextHighlight}>SIGN UP</Text></Text>
               </TouchableOpacity>
-              
-              
-              
-             
 
 
-  <View style={styles.exploreContainer}>
-  <View style={styles.dividerContainer}>
-    <View style={styles.divider} />
-    <Text style={styles.dividerText}>OR</Text>
-    <View style={styles.divider} />
-  </View>
-  
-  <TouchableOpacity 
-    style={styles.exploreButton}
-    onPress={() => navigation.navigate('Home')}
-  >
-    <Ionicons name="search" size={20} color="#fff" style={styles.exploreIcon} />
-    <Text style={styles.exploreButtonText}>Explore Chefs</Text>
-  </TouchableOpacity>
 
-    <TouchableOpacity 
-    style={styles.exploreButton}
-    onPress={() => navigation.navigate('PaymentScreen')}
-  >
-    <Ionicons name="search" size={20} color="#fff" style={styles.exploreIcon} />
-    <Text style={styles.exploreButtonText}>Test Payment</Text>
-  </TouchableOpacity>
-  <UserButtons/>
-</View>
+
+
+
+              <View style={styles.exploreContainer}>
+                <View style={styles.dividerContainer}>
+                  <View style={styles.divider} />
+                  <Text style={styles.dividerText}>OR</Text>
+                  <View style={styles.divider} />
+                </View>
+
+                <TouchableOpacity
+                  style={styles.exploreButton}
+                  onPress={() => navigation.navigate('Home')}
+                >
+                  <Ionicons name="search" size={20} color="#fff" style={styles.exploreIcon} />
+                  <Text style={styles.exploreButtonText}>Explore Chefs</Text>
+                </TouchableOpacity>
+
+              </View>
             </View>
 
           </View>
@@ -340,9 +312,9 @@ const styles = StyleSheet.create({
     color: '#ff0000',
     fontWeight: '600',
   },
-  loginFailed:{
-    color:"red",
-    
+  loginFailed: {
+    color: "red",
+
   },
   svgContainer: {
     position: "absolute",
@@ -357,46 +329,46 @@ const styles = StyleSheet.create({
 
 
   exploreContainer: {
-  width: '100%',
-  marginTop: 20,
-  paddingHorizontal: 20,
-},
-dividerContainer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginVertical: 20,
-},
-divider: {
-  flex: 1,
-  height: 1,
-  backgroundColor: '#E0E0E0',
-},
-dividerText: {
-  marginHorizontal: 10,
-  color: '#666',
-  fontSize: 14,
-},
-exploreButton: {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#FF6B6B',
-  borderRadius: 25,
-  paddingVertical: 15,
-  paddingHorizontal: 25,
-  elevation: 3,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-},
-exploreIcon: {
-  marginRight: 10,
-},
-exploreButtonText: {
-  color: '#fff',
-  fontSize: 16,
-  fontWeight: '600',
-  textAlign: 'center',
-},
+    width: '100%',
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    color: '#666',
+    fontSize: 14,
+  },
+  exploreButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FF6B6B',
+    borderRadius: 25,
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  exploreIcon: {
+    marginRight: 10,
+  },
+  exploreButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
 });

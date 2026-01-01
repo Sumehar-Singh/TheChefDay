@@ -86,6 +86,10 @@ const SubscriptionPlans = ({ navigation }) => {
                   </View>
                 )}
 
+
+                {/* Plan Title (e.g. Monthly, Quarterly) */}
+                <Text style={styles.planHeaderTitle}>{plan.Header}</Text>
+
                 <Text style={styles.planPrice}>Price: $ {plan.Price}</Text>
                 <Text style={styles.planDuration}>Duration: {plan.Duration}</Text>
                 <Text style={styles.planDesc}>{plan.Desc}</Text>
@@ -254,6 +258,12 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     fontWeight: '500',
+  },
+  planHeaderTitle: {
+    fontSize: isTablet ? 20 : 18,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 5,
   },
 });
 
