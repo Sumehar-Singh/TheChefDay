@@ -17,7 +17,9 @@
       "bundleIdentifier": "com.coder.chefday",
       "buildNumber": "1",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "The Chef Day uses your photo library to let you upload profile pictures, food portfolio images, and credential documents.",
+        "NSCameraUsageDescription": "The Chef Day uses your camera to let you take a photo for your profile or capture images of your dishes to showcase in your portfolio."
       },
       "runtimeVersion": {
         "policy": "appVersion"
