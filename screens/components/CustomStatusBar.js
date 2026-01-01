@@ -36,7 +36,13 @@ const CustomStatusBar = ({ title, includeTopInset = true }) => {
       )}
       <StatusBar backgroundColor="#ff0000" barStyle="light-content" />
       <View style={styles.statusBar}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} onPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.navigate('ChefDashboard');
+          }
+        }}>
           <MaterialCommunityIcons name="arrow-left" size={isTablet ? 30 : 24} color="white" />
         </TouchableOpacity>
         {title && <Text style={styles.title}>{title}</Text>}
