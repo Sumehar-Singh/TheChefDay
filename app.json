@@ -42,9 +42,7 @@
         "projectId": "ac33e2c4-979e-40e2-a817-e69e79ff467a"
       }
     },
-    "plugins": [
-      "react-native-iap"
-    ],
+    "plugins": [],
     "updates": {
       "url": "https://u.expo.dev/ac33e2c4-979e-40e2-a817-e69e79ff467a"
     }
