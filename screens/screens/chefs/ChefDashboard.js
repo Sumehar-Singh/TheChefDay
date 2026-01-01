@@ -119,9 +119,7 @@ const ChefDashboard = ({ navigation }) => {
 
     return (
         <View style={styles.superContainer}>
-            {/* Red notch area */}
-            <View style={{ backgroundColor: '#ff0000', height: insets.top }} />
-            <StatusBar backgroundColor="#ff0000" barStyle="light-content" />
+            <StatusBar backgroundColor="transparent" barStyle="light-content" translucent={true} />
             {!profile?.Id ? (
                 <CenterLoading />
             ) : (
@@ -138,7 +136,7 @@ const ChefDashboard = ({ navigation }) => {
                 >
                     <LinearGradient
                         colors={['#ff0000', '#c90000']}
-                        style={styles.headerGradient}
+                        style={[styles.headerGradient, { paddingTop: insets.top }]}
                     >
                         <TouchableOpacity
                             style={styles.headerContainer}
@@ -194,7 +192,6 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
         marginBottom: 15,
-        paddingTop: 10,
     },
     headerContainer: {
         padding: isTablet ? 20 : 15,
