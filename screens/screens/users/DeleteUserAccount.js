@@ -7,7 +7,6 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
-  Alert,
   Animated,
   RefreshControl,
 } from 'react-native';
