@@ -170,16 +170,6 @@ const Home = ({ navigation }) => {
                   <Text style={[styles.buttonTextLogin]}>Login</Text>
                 </TouchableOpacity>
               </View>
-
-              {/* Explicit Guest Browse Link for Apple 5.1.1 Compliance */}
-              <TouchableOpacity
-                style={{ marginTop: 20 }}
-                onPress={() => navigation.navigate('ChefsList')}
-              >
-                <Text style={{ color: 'white', textDecorationLine: 'underline', fontSize: 16 }}>
-                  Skip & Browse as Guest
-                </Text>
-              </TouchableOpacity>
             </View>
           </LinearGradient>
         </View>
