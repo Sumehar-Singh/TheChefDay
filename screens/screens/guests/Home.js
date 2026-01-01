@@ -556,15 +556,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   step: {
-    marginBottom: 25,
+    marginBottom: 20, // Match featureCard
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 15,
+    padding: 20, // Match featureCard
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
+    shadowOpacity: 0.1, // Match featureCard
+    shadowRadius: 8, // Match featureCard
+    elevation: 3, // Match featureCard
   },
   stepHeader: {
     flexDirection: 'row',
