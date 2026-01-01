@@ -137,10 +137,10 @@ const Home = ({ navigation }) => {
         {/* Hero Section */}
         <View style={styles.heroContainer}>
           <LinearGradient
-            colors={['#ff0000', '#ff0000']}
+            colors={['#ff4d4d', '#b30000']}
             style={styles.heroGradient}
             start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            end={{ x: 1, y: 1 }}
           >
             {/* Decorative Background Icons */}
             <MaterialCommunityIcons name="chef-hat" size={80} color="rgba(255,255,255,0.15)" style={{ position: 'absolute', top: 20, right: 20 }} />
