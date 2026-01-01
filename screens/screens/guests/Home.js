@@ -577,15 +577,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   stepTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 6,
+    color: '#222',
   },
   stepDescription: {
-    color: '#666',
-    fontSize: 14,
-    lineHeight: 20,
+    color: '#555',
+    fontSize: 15,
+    lineHeight: 22,
   },
   loadingContainer: {
     height: 200,
