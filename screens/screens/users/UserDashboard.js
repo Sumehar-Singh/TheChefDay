@@ -13,7 +13,9 @@ import {
   Dimensions,
   RefreshControl,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import BlueTick from '../../components/BlueTick';
@@ -30,6 +32,7 @@ import getDistanceInMiles from '../../components/DistanceCalculator';
 import { useAuth } from '../../../components/contexts/AuthContext';
 
 const UserDashboard = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const [allChefs, setAllChefs] = useState([]);
   const [recentChefIds, setRecentChefIds] = useState([]);
   const [userId, setUserId] = useState('');
@@ -137,7 +140,7 @@ const UserDashboard = ({ navigation }) => {
         (chef) =>
           coords &&
           getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <=
-            nearByMiles
+          nearByMiles
       ),
     },
     {
@@ -172,18 +175,9 @@ const UserDashboard = ({ navigation }) => {
 
   return (
     <View style={styles.superContainer}>
-      <ScrollView
-        style={styles.container}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#ff0000']}
-            tintColor="#ff0000"
-          />
-        }
-      >
+      <StatusBar barStyle="light-content" backgroundColor="#ff0000" />
+
+      <View style={{ backgroundColor: '#ff0000', paddingTop: insets.top }}>
         <LinearGradient
           colors={['#ff0000', '#c90000']}
           style={styles.headerGradient}
@@ -216,6 +210,20 @@ const UserDashboard = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         </LinearGradient>
+      </View>
+
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#ff0000']}
+            tintColor="#ff0000"
+          />
+        }
+      >
 
         {sections.map((section, index) => (
           <View
@@ -229,10 +237,10 @@ const UserDashboard = ({ navigation }) => {
                     section.title.includes('Recently')
                       ? 'clock-outline'
                       : section.title.includes('Random')
-                      ? 'dice-multiple'
-                      : section.title.includes('Nearby')
-                      ? 'map-marker'
-                      : 'fire'
+                        ? 'dice-multiple'
+                        : section.title.includes('Nearby')
+                          ? 'map-marker'
+                          : 'fire'
                   }
                   size={isTablet ? 28 : 24}
                   color="#ff0000"
@@ -285,13 +293,13 @@ const UserDashboard = ({ navigation }) => {
                           item.Lon
                         ) < radiusMiles &&
                         '~' +
-                          getDistanceInMiles(
-                            coords.lat,
-                            coords.lon,
-                            item.Lat,
-                            item.Lon
-                          ).toFixed(2) +
-                          ' mi'}
+                        getDistanceInMiles(
+                          coords.lat,
+                          coords.lon,
+                          item.Lat,
+                          item.Lon
+                        ).toFixed(2) +
+                        ' mi'}
                     </Text>
                   </TouchableOpacity>
                 ) : (
@@ -350,11 +358,10 @@ const styles = StyleSheet.create({
   headerGradient: {
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    marginBottom: 15,
-    paddingTop: 10,
+    marginBottom: 0, // Removed marginBottom
+    paddingBottom: 15, // Added paddingBottom for spacing inside gradient
   },
   headerContainer: {
-    paddingTop: 25,
     padding: isTablet ? 20 : 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
