@@ -170,6 +170,10 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                 }
               >
                 <View style={styles.bookingItemLeft}>
+                  {/* DEBUG: Print raw keys to solve mystery */}
+                  <Text style={{ fontSize: 10, color: 'blue', marginBottom: 5 }}>
+                    DEBUG KEYS: {Object.keys(rawItem).join(', ')}
+                  </Text>
                   <View style={styles.bookingHeader}>
                     <Text style={styles.bookingTextCustomer}>
                       {item.ChefName || `Booking #${item.BookingId || '?'}`}
