@@ -59,10 +59,10 @@ const BookingsList = ({ UserID, navigation, limit }) => {
   const normalizeBooking = (item) => {
     if (!item) return {};
     return {
-      BookingId: item.BookingId || item.bookingId || item.booking_id || item.id || item.ID,
-      ChefName: item.ChefName || item.chefName || item.chef_name || item.Chef_Name,
-      ChefID: item.ChefID || item.chefID || item.chef_id || item.ChefId,
-      EventDate: item.EventDate || item.eventDate || item.event_date || item.date || item.Date,
+      BookingId: item.BookingId || item.bookingId || item.booking_id || item.bookingid || item.id || item.ID,
+      ChefName: item.ChefName || item.chefName || item.chef_name || item.chefname || item.Chef_Name,
+      ChefID: item.ChefID || item.chefID || item.chef_id || item.chefid || item.ChefId,
+      EventDate: item.EventDate || item.eventDate || item.event_date || item.eventdate || item.date || item.Date,
       BookingDate: item.BookingDate || item.bookingDate || item.booking_date || item.created_at,
       ServiceType: item.ServiceType || item.serviceType || item.service_type || item.Service,
       Status: item.Status || item.status,
@@ -160,6 +160,11 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                 }
               >
                 <View style={styles.bookingItemLeft}>
+                  {/* DEBUG: Print raw keys to solve mystery */}
+                  <Text style={{ fontSize: 10, color: 'blue', marginBottom: 5 }}>
+                    DEBUG KEYS: {Object.keys(rawItem).join(', ')}
+                  </Text>
+
                   <View style={styles.bookingHeader}>
                     <Text style={styles.bookingTextCustomer}>
                       {item.ChefName || `Booking #${item.BookingId || '?'}`}
