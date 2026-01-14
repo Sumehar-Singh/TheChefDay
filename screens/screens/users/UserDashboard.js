@@ -458,6 +458,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: isTablet ? 15 : 12,
     width: isTablet ? 180 : 150,
+    height: isTablet ? 240 : 180,
     alignItems: 'center',
     marginHorizontal: isTablet ? 8 : 6,
     marginBottom: isTablet ? 10 : 8,
@@ -495,7 +496,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: isTablet ? 180 : 150,
-    height: isTablet ? 180 : 150,
+    height: isTablet ? 240 : 180,
   },
   seeAllCardText: {
     fontSize: isTablet ? 16 : 14,
