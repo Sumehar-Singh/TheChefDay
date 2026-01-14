@@ -356,11 +356,12 @@ const styles = StyleSheet.create({
   headerGradient: {
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    marginBottom: 0, // Removed marginBottom
-    paddingBottom: 15, // Added paddingBottom for spacing inside gradient
+    marginBottom: 0,
   },
   headerContainer: {
-    padding: isTablet ? 20 : 15,
+    paddingTop: isTablet ? 15 : 8,
+    paddingBottom: isTablet ? 20 : 15,
+    paddingHorizontal: isTablet ? 20 : 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
