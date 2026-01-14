@@ -223,97 +223,99 @@ const UserDashboard = ({ navigation }) => {
         }
       >
 
-        {sections.map((section, index) => (
-          <View
-            key={`section-${section.title}-${index}`}
-            style={styles.sectionContainer}
-          >
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitleContainer}>
-                <MaterialCommunityIcons
-                  name={
-                    section.title.includes('Recently')
-                      ? 'clock-outline'
-                      : section.title.includes('Random')
-                        ? 'dice-multiple'
-                        : section.title.includes('Nearby')
-                          ? 'map-marker'
-                          : 'fire'
-                  }
-                  size={isTablet ? 28 : 24}
-                  color="#ff0000"
-                />
-                <Text style={styles.sectionTitle}>{section.title}</Text>
+        <View style={{ marginTop: 15 }}>
+          {sections.map((section, index) => (
+            <View
+              key={`section-${section.title}-${index}`}
+              style={styles.sectionContainer}
+            >
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionTitleContainer}>
+                  <MaterialCommunityIcons
+                    name={
+                      section.title.includes('Recently')
+                        ? 'clock-outline'
+                        : section.title.includes('Random')
+                          ? 'dice-multiple'
+                          : section.title.includes('Nearby')
+                            ? 'map-marker'
+                            : 'fire'
+                    }
+                    size={isTablet ? 28 : 24}
+                    color="#ff0000"
+                  />
+                  <Text style={styles.sectionTitle}>{section.title}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.seeAllButton}
+                  onPress={() => navigation.navigate('ChefsList')}
+                >
+                  <Text style={styles.seeAllText}>View All</Text>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={isTablet ? 24 : 20}
+                    color="#209E00"
+                  />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.seeAllButton}
-                onPress={() => navigation.navigate('ChefsList')}
-              >
-                <Text style={styles.seeAllText}>View All</Text>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={isTablet ? 24 : 20}
-                  color="#209E00"
-                />
-              </TouchableOpacity>
-            </View>
 
-            <FlatList
-              horizontal
-              data={[...section.data, { id: 'seeAll' }]}
-              keyExtractor={(item, idx) =>
-                item.ChefID ?? `seeAll-${index}-${idx}`
-              }
-              renderItem={({ item }) =>
-                item.id !== 'seeAll' ? (
-                  <TouchableOpacity
-                    style={styles.chefCard}
-                    onPress={() => navigateToChefDetail(item.ChefID)}
-                  >
-                    <Image
-                      source={
-                        item.Image
-                          ? { uri: item.Image }
-                          : require('../../../assets/userImage.jpg')
-                      }
-                      style={styles.chefImage}
-                    />
-                    <Text style={styles.chefName}>{item.FirstName}</Text>
-                    <Text style={styles.chefExperience}>
-                      {item.ExperienceYears} yrs
-                    </Text>
-                    <Text style={styles.chefDistance}>
-                      {coords &&
-                        getDistanceInMiles(
-                          coords.lat,
-                          coords.lon,
-                          item.Lat,
-                          item.Lon
-                        ) < radiusMiles &&
-                        '~' +
-                        getDistanceInMiles(
-                          coords.lat,
-                          coords.lon,
-                          item.Lat,
-                          item.Lon
-                        ).toFixed(2) +
-                        ' mi'}
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={[styles.chefCard, styles.seeAllCard]}
-                    onPress={() => navigation.navigate('ChefsList')}
-                  >
-                    <Text style={styles.seeAllCardText}>View All</Text>
-                  </TouchableOpacity>
-                )
-              }
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chefListContent}
-            />
-          </View>
-        ))}
+              <FlatList
+                horizontal
+                data={[...section.data, { id: 'seeAll' }]}
+                keyExtractor={(item, idx) =>
+                  item.ChefID ?? `seeAll-${index}-${idx}`
+                }
+                renderItem={({ item }) =>
+                  item.id !== 'seeAll' ? (
+                    <TouchableOpacity
+                      style={styles.chefCard}
+                      onPress={() => navigateToChefDetail(item.ChefID)}
+                    >
+                      <Image
+                        source={
+                          item.Image
+                            ? { uri: item.Image }
+                            : require('../../../assets/userImage.jpg')
+                        }
+                        style={styles.chefImage}
+                      />
+                      <Text style={styles.chefName}>{item.FirstName}</Text>
+                      <Text style={styles.chefExperience}>
+                        {item.ExperienceYears} yrs
+                      </Text>
+                      <Text style={styles.chefDistance}>
+                        {coords &&
+                          getDistanceInMiles(
+                            coords.lat,
+                            coords.lon,
+                            item.Lat,
+                            item.Lon
+                          ) < radiusMiles &&
+                          '~' +
+                          getDistanceInMiles(
+                            coords.lat,
+                            coords.lon,
+                            item.Lat,
+                            item.Lon
+                          ).toFixed(2) +
+                          ' mi'}
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={[styles.chefCard, styles.seeAllCard]}
+                      onPress={() => navigation.navigate('ChefsList')}
+                    >
+                      <Text style={styles.seeAllCardText}>View All</Text>
+                    </TouchableOpacity>
+                  )
+                }
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chefListContent}
+              />
+            </View>
+          ))}
+        </View>
 
         {profile.Id && (
           <View style={styles.bookingsSection}>
