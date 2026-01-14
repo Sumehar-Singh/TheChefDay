@@ -253,18 +253,39 @@ const UserEditProfile = ({ navigation }) => {
     setIsUpdating(true);
     // Step 1: Validation
 
-    if (
-      !name ||
-      !email ||
-      !address ||
-      !phone ||
-      !pinCode ||
-      !lat ||
-      !lon ||
-      !last
-    ) {
+    if (!name) {
       setIsUpdating(false);
-      Alert.alert('Error', 'Please fill in all required fields.');
+      Alert.alert('Error', 'Please enter your First Name.');
+      return;
+    }
+    if (!last) {
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please enter your Last Name.');
+      return;
+    }
+    if (!email) {
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please enter your Email.');
+      return;
+    }
+    if (!phone) {
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please enter your Phone Number.');
+      return;
+    }
+    if (!address) {
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please enter your Address.');
+      return;
+    }
+    if (!pinCode) {
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please enter your Pin Code.');
+      return;
+    }
+    if (!lat || !lon) {
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please select a valid location from the map or suggestions.');
       return;
     }
 
