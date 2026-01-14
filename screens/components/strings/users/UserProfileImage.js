@@ -21,7 +21,11 @@ const UserProfileImage = ({ userId, height = 100, width = 100, mr = 0, ml = 0 })
       if (response.data.status === 'success') {
         const user = response.data.data;
 
-        setProfileImage(user[0].Image + '?t=' + new Date().getTime());
+        if (user[0].Image) {
+          setProfileImage(user[0].Image + '?t=' + new Date().getTime());
+        } else {
+          setProfileImage(null);
+        }
       } else {
         console.log('Error:', response.data.message);
       }

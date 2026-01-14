@@ -18,6 +18,7 @@ import { useAuth } from '../../../components/contexts/AuthContext';
 
 const UserEditProfile = ({ navigation }) => {
   const [geoLoading, setGeoLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const { profile } = useAuth();
 
   const [name, setName] = useState('');
