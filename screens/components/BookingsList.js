@@ -37,9 +37,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
           // Ensure we have an array
           const bookingData = Array.isArray(response.data.data) ? response.data.data : [];
           setBookings(bookingData);
-          if (bookingData.length > 0) {
-            console.log('Sample Booking Item:', bookingData[0]);
-          }
+          console.log('All Bookings Data:', JSON.stringify(bookingData, null, 2));
         } else {
           // If status is not success (e.g., no bookings found), set empty array
           setBookings([]);
@@ -164,7 +162,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                 <View style={styles.bookingItemLeft}>
                   <View style={styles.bookingHeader}>
                     <Text style={styles.bookingTextCustomer}>
-                      {item.ChefName || (item.ChefID ? `Chef #${item.ChefID}` : JSON.stringify(rawItem))}
+                      {item.ChefName || `Booking #${item.BookingId || '?'}`}
                     </Text>
                   </View>
                   <View style={styles.bookingDetails}>
