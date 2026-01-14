@@ -206,6 +206,7 @@ const UserDashboard = ({ navigation }) => {
               size={isTablet ? 40 : 25}
               color="#fff"
             />
+          </View>
         </TouchableOpacity>
       </LinearGradient>
 
