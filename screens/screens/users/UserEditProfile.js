@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Switch, ScrollView, Dimensions, Alert, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Switch, ScrollView, Dimensions, Alert, Platform, ActivityIndicator, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Checkbox } from 'react-native-paper';
