@@ -497,6 +497,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: isTablet ? 180 : 150,
     height: isTablet ? 240 : 180,
+    backgroundColor: '#f6f6f6',
   },
   seeAllCardText: {
     fontSize: isTablet ? 16 : 14,
