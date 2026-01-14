@@ -209,7 +209,8 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                   </View>
                 </View>
               </TouchableOpacity>
-            ))}
+            );
+          })}
         </>
       )}
     </View>
