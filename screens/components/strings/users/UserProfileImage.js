@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Image, View, ActivityIndicator } from 'react-native';
-import axios from 'axios'; 
+import axios from 'axios';
 import { BASE_URL } from '../../../../config';
 
 
 import localImage from '../../../../assets/DefaultImage.jpg';
 
-const UserProfileImage = ({ userId, height = 100, width = 100,mr=0,ml=0 }) => {
+const UserProfileImage = ({ userId, height = 100, width = 100, mr = 0, ml = 0 }) => {
 
- 
+
   const [profileImage, setProfileImage] = useState('');
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const getUserProfileImage = async (userId) => {
     try {
@@ -20,27 +20,27 @@ const UserProfileImage = ({ userId, height = 100, width = 100,mr=0,ml=0 }) => {
 
       if (response.data.status === 'success') {
         const user = response.data.data;
-       
-        setProfileImage(user[0].Image); 
+
+        setProfileImage(user[0].Image + '?t=' + new Date().getTime());
       } else {
         console.log('Error:', response.data.message);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (userId) {
-      setLoading(true); 
+      setLoading(true);
       getUserProfileImage(userId);
     }
   }, [userId]);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />; 
+    return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
 
@@ -50,7 +50,7 @@ const UserProfileImage = ({ userId, height = 100, width = 100,mr=0,ml=0 }) => {
     <View>
       <Image
         source={imageSource}
-        style={{ height: height, width: width, borderRadius: 50,marginRight:mr,marginLeft:ml }}
+        style={{ height: height, width: width, borderRadius: 50, marginRight: mr, marginLeft: ml }}
       />
     </View>
   );
