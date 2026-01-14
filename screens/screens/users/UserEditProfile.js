@@ -200,9 +200,10 @@ const UserEditProfile = ({ navigation }) => {
 
   const handleImagePick = async () => {
     try {
-      if (Platform.OS === 'ios') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== 'granted') {
+        if (Platform.OS === 'ios') {
           Alert.alert(
             'Permission Required',
             'Please enable media library access in your settings to upload images.',
@@ -211,17 +212,12 @@ const UserEditProfile = ({ navigation }) => {
               { text: 'Open Settings', onPress: () => Linking.openSettings() }
             ]
           );
-          return;
+        } else {
+          Alert.alert(
+            'Permission Required',
+            'Please enable media library access in your settings to upload images.'
+          );
         }
-      }
-
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (permissionResult.status !== 'granted') {
-        Alert.alert(
-          'Permission Required',
-          'Please enable media library access in your settings to upload images.'
-        );
         return;
       }
 
