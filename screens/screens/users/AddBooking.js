@@ -29,7 +29,7 @@ const AddBooking = ({ navigation }) => {
   const [ServiceType, setServiceType] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-const {profile}=useAuth();
+  const { profile } = useAuth();
   const getTomorrowDate = () => {
     const today = new Date();
     today.setDate(today.getDate() + 1); // Add one day to today's date
@@ -261,142 +261,171 @@ const {profile}=useAuth();
             resizeMode="cover"
           />
 
-        {/* Chef Info */}
-        <View style={styles.chefDetails}>
-          <Text style={styles.sectionTitle}>You are hiring</Text>
-          <Text style={styles.nameText}>{chefData.FirstName} {chefData.MiddleName} {chefData.LastName}</Text>
+          {/* Chef Info */}
+          <View style={styles.chefDetails}>
+            <Text style={styles.sectionTitle}>You are hiring</Text>
+            <Text style={styles.nameText}>{chefData.FirstName} {chefData.MiddleName} {chefData.LastName}</Text>
 
-          {/* Hourly and Day Rate with icons */}
-          <View style={styles.ratesContainer}>
-            <View style={styles.rateBox}>
-              <Icon name="access-time" size={30} color="#fff" style={styles.icon} />
-              <Text style={styles.rateText}>${HourlyRate}</Text>
-              <Text style={styles.rateLabel}>Hourly Rate</Text>
-            </View>
+            {/* Hourly and Day Rate with icons */}
+            <View style={styles.ratesContainer}>
+              <View style={styles.rateBox}>
+                <Icon name="access-time" size={30} color="#fff" style={styles.icon} />
+                <Text style={styles.rateText}>${HourlyRate}</Text>
+                <Text style={styles.rateLabel}>Hourly Rate</Text>
+              </View>
 
-            <View style={styles.rateBox}>
-              <Icon name="date-range" size={30} color="#fff" style={styles.icon} />
-              <Text style={styles.rateText}>${DayRate}</Text>
-              <Text style={styles.rateLabel}>Day Rate</Text>
+              <View style={styles.rateBox}>
+                <Icon name="date-range" size={30} color="#fff" style={styles.icon} />
+                <Text style={styles.rateText}>${DayRate}</Text>
+                <Text style={styles.rateLabel}>Day Rate</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-      <Text style={styles.label}>Full Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your full name"
-        value={Name}
-        onChangeText={setName}
-      />
-      <Text style={styles.label}>Phone Number</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter phone number"
-        value={PhoneNo}
-        onChangeText={setPhoneNo}
-        keyboardType="phone-pad"
-      />
-      <Text style={styles.label}>Event Address</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter event address"
-        value={Address}
-        onChangeText={setAddress}
-      />
-      <Text style={styles.label}>Pin Code</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter pin code"
-        value={PinCode}
-        onChangeText={setPinCode}
-        keyboardType="number-pad"
-      />
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your full name"
+          value={Name}
+          onChangeText={setName}
+        />
+        <Text style={styles.label}>Phone Number</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter phone number"
+          value={PhoneNo}
+          onChangeText={setPhoneNo}
+          keyboardType="phone-pad"
+        />
+        <Text style={styles.label}>Event Address</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter event address"
+          value={Address}
+          onChangeText={setAddress}
+        />
+        <Text style={styles.label}>Pin Code</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter pin code"
+          value={PinCode}
+          onChangeText={setPinCode}
+          keyboardType="number-pad"
+        />
 
-      <View style={styles.hiringTypeContainer}>
-        <View style={styles.pickerContainer}>
-          <Text style={styles.pickerLabel}>Select Hiring Type</Text>
-          <Picker
-            selectedValue={selection}
-            style={styles.picker}
-            onValueChange={(itemValue) => setSelection(itemValue)}>
-            <Picker.Item label="Hourly Hiring" value="Hourly Hiring" />
-            <Picker.Item label="Day Hiring" value="Day Hiring" />
-          </Picker>
-        </View>
+        <View style={styles.hiringTypeContainer}>
+          <View style={styles.selectionRow}>
+            <TouchableOpacity
+              style={[styles.selectionBtn, selection === 'Hourly Hiring' && styles.selectedBtn]}
+              onPress={() => setSelection('Hourly Hiring')}
+              activeOpacity={0.8}
+            >
+              <Icon
+                name="access-time"
+                size={24}
+                color={selection === 'Hourly Hiring' ? '#fff' : '#666'}
+                style={{ marginBottom: 5 }}
+              />
+              <Text style={[styles.selectionBtnText, selection === 'Hourly Hiring' && styles.selectedBtnText]}>
+                Hourly
+              </Text>
+              <Text style={[styles.selectionBtnSubText, selection === 'Hourly Hiring' && styles.selectedBtnText]}>
+                ${HourlyRate}/hr
+              </Text>
+            </TouchableOpacity>
 
-        {/* Row for input and total calculation */}
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.inputRate}
-            value={inputValue}
-            onChangeText={setInputValue}
-            placeholder={`Enter ${selection === 'Hourly Hiring' ? 'hours' : 'days'}`}
-            keyboardType="numeric"
-          />
-
-          <View style={styles.resultContainer}>
-            <Text style={styles.resultLabel}>Total: </Text>
-            <Text style={styles.resultValue}>${calculateTotal().toFixed(2)}</Text>
-          </View>
-        </View>
-      </View>
-      <Text style={styles.label}>Service Type</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g. Dinner, Birthday"
-        value={ServiceType}
-        onChangeText={setServiceType}
-      />
-      <View style={styles.selectedDateCard}>
-        <View style={styles.selectedDateHeader}>
-          <Icon name="event" size={20} color="#cc0000" />
-          <Text style={styles.selectedDateLabel}>Event Date</Text>
-        </View>
-        <Text style={styles.selectedDateValue}>{fmtEventDate || 'Not selected'}</Text>
-        <TouchableOpacity style={styles.dateButton} onPress={openModal}>
-          <Icon name="calendar-today" size={18} color="#fff" />
-          <Text style={styles.dateButtonText}>Choose date</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalView}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Select Event Date</Text>
-            <TouchableOpacity onPress={closeModal} style={styles.modalClose}>
-              <Icon name="close" size={22} color="#111" />
+            <TouchableOpacity
+              style={[styles.selectionBtn, selection === 'Day Hiring' && styles.selectedBtn]}
+              onPress={() => setSelection('Day Hiring')}
+              activeOpacity={0.8}
+            >
+              <Icon
+                name="date-range"
+                size={24}
+                color={selection === 'Day Hiring' ? '#fff' : '#666'}
+                style={{ marginBottom: 5 }}
+              />
+              <Text style={[styles.selectionBtnText, selection === 'Day Hiring' && styles.selectedBtnText]}>
+                Daily
+              </Text>
+              <Text style={[styles.selectionBtnSubText, selection === 'Day Hiring' && styles.selectedBtnText]}>
+                ${DayRate}/day
+              </Text>
             </TouchableOpacity>
           </View>
-          <Calendar
-            onDayPress={onDayPress}
-            markedDates={{
-              ...markedDates,
-              [EventDate]: {
-                selected: true,
-                selectedColor: '#0A84FF',
-                selectedTextColor: 'white',
-              },
-            }}
-            minDate={getTomorrowDate()}
-            theme={{
-              todayTextColor: '#0A84FF',
-              arrowColor: '#0A84FF',
-              monthTextColor: '#111827',
-              textDayHeaderFontWeight: 'bold',
-            }}
-          />
-        </View>
-      </Modal>
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Book Now</Text>
-      </TouchableOpacity>
+          {/* Row for input and total calculation */}
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.inputRate}
+              value={inputValue}
+              onChangeText={setInputValue}
+              placeholder={`Enter ${selection === 'Hourly Hiring' ? 'hours' : 'days'}`}
+              keyboardType="numeric"
+            />
+
+            <View style={styles.resultContainer}>
+              <Text style={styles.resultLabel}>Total: </Text>
+              <Text style={styles.resultValue}>${calculateTotal().toFixed(2)}</Text>
+            </View>
+          </View>
+        </View>
+        <Text style={styles.label}>Service Type</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="e.g. Dinner, Birthday"
+          value={ServiceType}
+          onChangeText={setServiceType}
+        />
+        <View style={styles.selectedDateCard}>
+          <View style={styles.selectedDateHeader}>
+            <Icon name="event" size={20} color="#cc0000" />
+            <Text style={styles.selectedDateLabel}>Event Date</Text>
+          </View>
+          <Text style={styles.selectedDateValue}>{fmtEventDate || 'Not selected'}</Text>
+          <TouchableOpacity style={styles.dateButton} onPress={openModal}>
+            <Icon name="calendar-today" size={18} color="#fff" />
+            <Text style={styles.dateButtonText}>Choose date</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalView}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Event Date</Text>
+              <TouchableOpacity onPress={closeModal} style={styles.modalClose}>
+                <Icon name="close" size={22} color="#111" />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              onDayPress={onDayPress}
+              markedDates={{
+                ...markedDates,
+                [EventDate]: {
+                  selected: true,
+                  selectedColor: '#0A84FF',
+                  selectedTextColor: 'white',
+                },
+              }}
+              minDate={getTomorrowDate()}
+              theme={{
+                todayTextColor: '#0A84FF',
+                arrowColor: '#0A84FF',
+                monthTextColor: '#111827',
+                textDayHeaderFontWeight: 'bold',
+              }}
+            />
+          </View>
+        </Modal>
+
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Book Now</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -678,5 +707,38 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
+  },
+  selectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    gap: 10,
+  },
+  selectionBtn: {
+    flex: 1,
+    backgroundColor: '#f6f7fb',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  selectedBtn: {
+    backgroundColor: '#cc0000',
+    borderColor: '#cc0000',
+  },
+  selectionBtnText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 2,
+  },
+  selectedBtnText: {
+    color: '#ffffff',
+  },
+  selectionBtnSubText: {
+    fontSize: 12,
+    color: '#666',
   },
 });
