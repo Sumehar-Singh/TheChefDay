@@ -19,7 +19,7 @@ const AllBookings = ({ navigation }) => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <BookingsList UserID={profile?.Id} navigation={navigation} />
+        <BookingsList UserID={profile?.Id} navigation={navigation} showHeader={false} showViewAll={false} />
       </ScrollView>
     </SafeAreaView>
   );
