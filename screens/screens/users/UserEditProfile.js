@@ -263,6 +263,7 @@ const UserEditProfile = ({ navigation }) => {
       !lon ||
       !last
     ) {
+      setIsUpdating(false);
       Alert.alert('Error', 'Please fill in all required fields.');
       return;
     }
@@ -274,17 +275,20 @@ const UserEditProfile = ({ navigation }) => {
 
 
     if (!isCuisineSelected) {
-      alert('Please select at least one cuisine.');
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please select at least one cuisine.');
       return;
     }
 
     if (!isDietaryPrefSelected) {
-      alert('Please select at least one dietary preference.');
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please select at least one dietary preference.');
       return;
     }
 
     if (!isMealTypeSelected) {
-      alert('Please select at least one meal type.');
+      setIsUpdating(false);
+      Alert.alert('Error', 'Please select at least one meal type.');
       return;
     }
 
