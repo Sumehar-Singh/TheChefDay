@@ -50,153 +50,168 @@ const BookingsList = ({ UserID, navigation, limit }) => {
       } finally {
         setLoading(false);
       }
-    };
-    if (UserID) {
-      fetchBookings();
-    }
-  }, [UserID, limit]);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Confirmed':
-        return '#4CAF50';
-      case 'Declined':
-        return '#F44336';
-      case 'Canceled':
-        return 'red';
-      case 'Pending':
-        return '#FF9800';
-      case 'Service Completed':
-        return 'gray';
-      default:
-        return '#805500';
     }
   };
-
-  const EmptyBookings = () => (
-    <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons
-        name="calendar-clock"
-        size={isTablet ? 80 : 60}
-        color="#805500"
-      />
-      <Text style={styles.emptyTitle}>No Bookings Yet</Text>
-      <Text style={styles.emptyText}>
-        Start exploring chefs and book their services for your special
-        occasions.
-      </Text>
-      <TouchableOpacity
-        style={styles.emptyButton}
-        onPress={() => navigation.navigate('ChefsList')}
-      >
-        <Text style={styles.emptyButtonText}>Find Chefs</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  if (loading) {
-    return <ActivityIndicator size="large" color="#ff0000" />;
+  if (UserID) {
+    fetchBookings();
   }
+}, [UserID, limit]);
 
-  // Determine if we should show the list or the empty state
-  const hasBookings = bookings && bookings.length > 0;
+// Helper to handle case-insensitive or snake_case keys from API
+const normalizeBooking = (item) => {
+  if (!item) return {};
+  return {
+    BookingId: item.BookingId || item.bookingId || item.booking_id || item.id || item.ID,
+    ChefName: item.ChefName || item.chefName || item.chef_name || item.Chef_Name,
+    ChefID: item.ChefID || item.chefID || item.chef_id || item.ChefId,
+    EventDate: item.EventDate || item.eventDate || item.event_date || item.date || item.Date,
+    BookingDate: item.BookingDate || item.bookingDate || item.booking_date || item.created_at,
+    ServiceType: item.ServiceType || item.serviceType || item.service_type || item.Service,
+    Status: item.Status || item.status,
+  };
+};
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.sectionHeader}>
-        <View style={styles.sectionTitleContainer}>
-          <MaterialCommunityIcons
-            name="calendar-check"
-            size={isTablet ? 28 : 24}
-            color="#ff0000"
-          />
-          <Text style={styles.sectionTitle}>Your Bookings</Text>
-        </View>
-        {hasBookings && (
-          <TouchableOpacity
-            style={styles.seeAllButton}
-            onPress={() => navigation.navigate('AllBookings')}
-          >
-            <Text style={styles.seeAllText}>View All</Text>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={isTablet ? 24 : 20}
-              color="#209E00"
-            />
-          </TouchableOpacity>
-        )}
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'Confirmed':
+      return '#4CAF50';
+    case 'Declined':
+      return '#F44336';
+    case 'Canceled':
+      return 'red';
+    case 'Pending':
+      return '#FF9800';
+    case 'Service Completed':
+      return 'gray';
+    default:
+      return '#805500';
+  }
+};
+
+const EmptyBookings = () => (
+  <View style={styles.emptyContainer}>
+    <MaterialCommunityIcons
+      name="calendar-clock"
+      size={isTablet ? 80 : 60}
+      color="#805500"
+    />
+    <Text style={styles.emptyTitle}>No Bookings Yet</Text>
+    <Text style={styles.emptyText}>
+      Start exploring chefs and book their services for your special
+      occasions.
+    </Text>
+    <TouchableOpacity
+      style={styles.emptyButton}
+      onPress={() => navigation.navigate('ChefsList')}
+    >
+      <Text style={styles.emptyButtonText}>Find Chefs</Text>
+    </TouchableOpacity>
+  </View>
+);
+
+if (loading) {
+  return <ActivityIndicator size="large" color="#ff0000" />;
+}
+
+// Determine if we should show the list or the empty state
+const hasBookings = bookings && bookings.length > 0;
+
+return (
+  <View style={styles.container}>
+    <View style={styles.sectionHeader}>
+      <View style={styles.sectionTitleContainer}>
+        <MaterialCommunityIcons
+          name="calendar-check"
+          size={isTablet ? 28 : 24}
+          color="#ff0000"
+        />
+        <Text style={styles.sectionTitle}>Your Bookings</Text>
       </View>
-
-      {!hasBookings ? (
-        <EmptyBookings />
-      ) : (
-        <>
-          {bookings.map((item, index) => (
-            <TouchableOpacity
-              key={
-                item.BookingId?.toString() ??
-                `booking-${index}`
-              }
-              style={styles.bookingItem}
-              onPress={() =>
-                navigation.navigate('BookingDetail', {
-                  BookingID: item.BookingId,
-                })
-              }
-            >
-              <View style={styles.bookingItemLeft}>
-                <View style={styles.bookingHeader}>
-                  <Text style={styles.bookingTextCustomer}>
-                    {item.ChefName || `Chef #${item.ChefID || '?'}`}
-                  </Text>
-                </View>
-                <View style={styles.bookingDetails}>
-                  <View style={styles.detailRow}>
-                    <MaterialCommunityIcons
-                      name="calendar"
-                      size={isTablet ? 20 : 16}
-                      color="#ff0000"
-                    />
-                    <Text style={styles.bookingTextEvent}>
-                      Event: {item.EventDate ? formatDate(item.EventDate) : 'N/A'}
-                    </Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <MaterialCommunityIcons
-                      name="clock-outline"
-                      size={isTablet ? 20 : 16}
-                      color="#ff0000"
-                    />
-                    <Text style={styles.bookingText}>
-                      Booked: {item.BookingDate ? formatDate(item.BookingDate) : 'N/A'}
-                    </Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <MaterialCommunityIcons
-                      name="food"
-                      size={isTablet ? 20 : 16}
-                      color="#ff0000"
-                    />
-                    <Text style={styles.bookingTextService}>
-                      {item.ServiceType || 'Service'}
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: getStatusColor(item.Status) },
-                    ]}
-                  >
-                    <Text style={styles.statusText}>{item.Status || 'Unknown'}</Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </>
+      {hasBookings && (
+        <TouchableOpacity
+          style={styles.seeAllButton}
+          onPress={() => navigation.navigate('AllBookings')}
+        >
+          <Text style={styles.seeAllText}>View All</Text>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={isTablet ? 24 : 20}
+            color="#209E00"
+          />
+        </TouchableOpacity>
       )}
     </View>
-  );
+
+    {!hasBookings ? (
+      <EmptyBookings />
+    ) : (
+      <>
+        {bookings.map((item, index) => (
+          <TouchableOpacity
+            key={
+              item.BookingId?.toString() ??
+              `booking-${index}`
+            }
+            style={styles.bookingItem}
+            onPress={() =>
+              navigation.navigate('BookingDetail', {
+                BookingID: item.BookingId,
+              })
+            }
+          >
+            <View style={styles.bookingItemLeft}>
+              <View style={styles.bookingHeader}>
+                <Text style={styles.bookingTextCustomer}>
+                  {item.ChefName || `Chef #${item.ChefID || '?'}`}
+                </Text>
+              </View>
+              <View style={styles.bookingDetails}>
+                <View style={styles.detailRow}>
+                  <MaterialCommunityIcons
+                    name="calendar"
+                    size={isTablet ? 20 : 16}
+                    color="#ff0000"
+                  />
+                  <Text style={styles.bookingTextEvent}>
+                    Event: {item.EventDate ? formatDate(item.EventDate) : 'N/A'}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <MaterialCommunityIcons
+                    name="clock-outline"
+                    size={isTablet ? 20 : 16}
+                    color="#ff0000"
+                  />
+                  <Text style={styles.bookingText}>
+                    Booked: {item.BookingDate ? formatDate(item.BookingDate) : 'N/A'}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <MaterialCommunityIcons
+                    name="food"
+                    size={isTablet ? 20 : 16}
+                    color="#ff0000"
+                  />
+                  <Text style={styles.bookingTextService}>
+                    {item.ServiceType || 'Service'}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.statusBadge,
+                    { backgroundColor: getStatusColor(item.Status) },
+                  ]}
+                >
+                  <Text style={styles.statusText}>{item.Status || 'Unknown'}</Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </>
+    )}
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
