@@ -55,17 +55,27 @@ const BookingsList = ({ UserID, navigation, limit }) => {
     }
   }, [UserID, limit]);
 
-  // Helper to handle case-insensitive or snake_case keys from API
+  // Helper to handle any case/separator variation from API (Smart Normalizer)
   const normalizeBooking = (item) => {
     if (!item) return {};
+
+    // 1. Create a map where keys are lowercased and stripped of special chars
+    const standardized = {};
+    Object.keys(item).forEach(key => {
+      // "Booking ID" -> "bookingid", "Chef_Name" -> "chefname"
+      const cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
+      standardized[cleanKey] = item[key];
+    });
+
+    // 2. Map standard keys to our component's expected keys
     return {
-      BookingId: item.BookingId || item['Booking ID'] || item.bookingId || item.booking_id || item.bookingid || item.id || item.ID,
-      ChefName: item.ChefName || item['Chef Name'] || item.chefName || item.chef_name || item.chefname || item.Chef_Name,
-      ChefID: item.ChefID || item['Chef ID'] || item.chefID || item.chef_id || item.chefid || item.ChefId,
-      EventDate: item.EventDate || item['Event Date'] || item.eventDate || item.event_date || item.eventdate || item.date || item.Date,
-      BookingDate: item.BookingDate || item['Booking Date'] || item.bookingDate || item.booking_date || item.created_at,
-      ServiceType: item.ServiceType || item['Service Type'] || item.serviceType || item.service_type || item.Service,
-      Status: item.Status || item.status,
+      BookingId: standardized.bookingid || standardized.id,
+      ChefName: standardized.chefname || standardized.cheffullname || standardized.name,
+      ChefID: standardized.chefid,
+      EventDate: standardized.eventdate || standardized.date,
+      BookingDate: standardized.bookingdate || standardized.createdat,
+      ServiceType: standardized.servicetype || standardized.service,
+      Status: standardized.status,
     };
   };
 
