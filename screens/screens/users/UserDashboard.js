@@ -175,42 +175,39 @@ const UserDashboard = ({ navigation }) => {
 
   return (
     <View style={styles.superContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#ff0000" />
+      <StatusBar backgroundColor="transparent" barStyle="light-content" translucent={true} />
 
-      <View style={{ backgroundColor: '#ff0000', paddingTop: insets.top }}>
-        <LinearGradient
-          colors={['#ff0000', '#c90000']}
-          style={styles.headerGradient}
+      <LinearGradient
+        colors={['#ff0000', '#c90000']}
+        style={[styles.headerGradient, { paddingTop: insets.top }]}
+      >
+        <TouchableOpacity
+          style={styles.headerContainer}
+          onPress={() => navigation.navigate('UserSettings')}
         >
-          <TouchableOpacity
-            style={styles.headerContainer}
-            onPress={() => navigation.navigate('UserSettings')}
-          >
-            <View style={styles.profileContainer}>
-              <UserProfileImage
-                userId={profile.Id}
-                height={70}
-                width={70}
-                mr={15}
-                style={styles.profileImage}
-              />
-              <View style={styles.profileInfo}>
-                <Text style={styles.headerTitle}>
-                  <UserFullName userId={profile.Id} />
-                </Text>
-                <Text style={styles.headDesc}>🙋‍♂️ User Dashboard</Text>
-              </View>
+          <View style={styles.profileContainer}>
+            <UserProfileImage
+              userId={profile.Id}
+              height={70}
+              width={70}
+              mr={15}
+              style={styles.profileImage}
+            />
+            <View style={styles.profileInfo}>
+              <Text style={styles.headerTitle}>
+                <UserFullName userId={profile.Id} />
+              </Text>
+              <Text style={styles.headDesc}>🙋‍♂️ User Dashboard</Text>
             </View>
-            <View style={styles.editButton}>
-              <MaterialCommunityIcons
-                name="cog-outline"
-                size={isTablet ? 40 : 25}
-                color="#fff"
-              />
-            </View>
-          </TouchableOpacity>
-        </LinearGradient>
-      </View>
+          </View>
+          <View style={styles.editButton}>
+            <MaterialCommunityIcons
+              name="cog-outline"
+              size={isTablet ? 40 : 25}
+              color="#fff"
+            />
+        </TouchableOpacity>
+      </LinearGradient>
 
       <ScrollView
         style={styles.container}
