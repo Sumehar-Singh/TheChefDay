@@ -223,7 +223,7 @@ const UserDashboard = ({ navigation }) => {
         }
       >
 
-        <View style={{ marginTop: 15 }}>
+        <View style={{ marginTop: 25 }}>
           {sections.map((section, index) => (
             <View
               key={`section-${section.title}-${index}`}
