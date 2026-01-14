@@ -18,7 +18,7 @@ import { useAuth } from '../../../components/contexts/AuthContext';
 
 const UserEditProfile = ({ navigation }) => {
   const [geoLoading, setGeoLoading] = useState(false);
-  const {profile}=useAuth();
+  const { profile } = useAuth();
 
   const [name, setName] = useState('');
   const [middle, setMiddle] = useState('');
@@ -79,10 +79,10 @@ const UserEditProfile = ({ navigation }) => {
 
 
   useEffect(() => {
-   
 
-      getUserData();
-      getCuisineSpecialities();
+
+    getUserData();
+    getCuisineSpecialities();
   }, []);
 
   const getAssignedSpecialities = async () => {
@@ -168,7 +168,7 @@ const UserEditProfile = ({ navigation }) => {
 
 
   const getUserData = async () => {
-   
+
     try {
       const response = await axios.get(`${BASE_URL}users/get_user_data.php`, {
         params: { UserId: profile.Id }
@@ -242,12 +242,12 @@ const UserEditProfile = ({ navigation }) => {
       !pinCode ||
       !lat ||
       !lon ||
-      (!middle && !last) // Only one of these is required
+      !last
     ) {
-      alert('Please fill in all required fields. Either Middle Name or Last Name must be provided.');
+      Alert.alert('Error', 'Please fill in all required fields.');
       return;
     }
-    
+
 
     const isCuisineSelected = Object.values(cuisines).some((cuisine) => cuisine.checked);
     const isDietaryPrefSelected = Object.values(dietary).some((diet) => diet.checked);
