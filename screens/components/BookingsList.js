@@ -19,7 +19,7 @@ const { width } = Dimensions.get('window');
 const isTablet = width > 600;
 
 const BookingsList = ({ UserID, navigation, limit }) => {
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,20 +29,32 @@ const BookingsList = ({ UserID, navigation, limit }) => {
         if (limit) {
           url += `&limit=${limit}`;
         }
+        console.log('Fetching bookings from:', url);
         const response = await axios.get(url);
+        // console.log('Bookings response:', response.data);
+
         if (response.data.status === 'success') {
-          setBookings(response.data.data);
+          // Ensure we have an array
+          const bookingData = Array.isArray(response.data.data) ? response.data.data : [];
+          setBookings(bookingData);
+          if (bookingData.length > 0) {
+            console.log('Sample Booking Item:', bookingData[0]);
+          }
         } else {
-          Alert.alert('Error', response.data.message);
+          // If status is not success (e.g., no bookings found), set empty array
+          setBookings([]);
         }
       } catch (error) {
         console.error('Error fetching bookings:', error);
-        Alert.alert('Error', 'Failed to load bookings');
+        setBookings([]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-    fetchBookings();
-  }, []);
+    if (UserID) {
+      fetchBookings();
+    }
+  }, [UserID, limit]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -86,6 +98,9 @@ const BookingsList = ({ UserID, navigation, limit }) => {
     return <ActivityIndicator size="large" color="#ff0000" />;
   }
 
+  // Determine if we should show the list or the empty state
+  const hasBookings = bookings && bookings.length > 0;
+
   return (
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
@@ -97,7 +112,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
           />
           <Text style={styles.sectionTitle}>Your Bookings</Text>
         </View>
-        {bookings && (
+        {hasBookings && (
           <TouchableOpacity
             style={styles.seeAllButton}
             onPress={() => navigation.navigate('AllBookings')}
@@ -112,15 +127,15 @@ const BookingsList = ({ UserID, navigation, limit }) => {
         )}
       </View>
 
-      {!bookings ? (
+      {!hasBookings ? (
         <EmptyBookings />
       ) : (
         <>
-          {bookings.map((item) => (
+          {bookings.map((item, index) => (
             <TouchableOpacity
               key={
                 item.BookingId?.toString() ??
-                `booking-${item.ChefName}-${Math.random()}`
+                `booking-${index}`
               }
               style={styles.bookingItem}
               onPress={() =>
@@ -132,7 +147,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
               <View style={styles.bookingItemLeft}>
                 <View style={styles.bookingHeader}>
                   <Text style={styles.bookingTextCustomer}>
-                    {item.ChefName}
+                    {item.ChefName || `Chef #${item.ChefID || '?'}`}
                   </Text>
                 </View>
                 <View style={styles.bookingDetails}>
@@ -143,7 +158,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                       color="#ff0000"
                     />
                     <Text style={styles.bookingTextEvent}>
-                      Event: {formatDate(item.EventDate)}
+                      Event: {item.EventDate ? formatDate(item.EventDate) : 'N/A'}
                     </Text>
                   </View>
                   <View style={styles.detailRow}>
@@ -153,7 +168,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                       color="#ff0000"
                     />
                     <Text style={styles.bookingText}>
-                      Booked: {formatDate(item.BookingDate)}
+                      Booked: {item.BookingDate ? formatDate(item.BookingDate) : 'N/A'}
                     </Text>
                   </View>
                   <View style={styles.detailRow}>
@@ -163,7 +178,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                       color="#ff0000"
                     />
                     <Text style={styles.bookingTextService}>
-                      {item.ServiceType}
+                      {item.ServiceType || 'Service'}
                     </Text>
                   </View>
                   <View
@@ -172,7 +187,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                       { backgroundColor: getStatusColor(item.Status) },
                     ]}
                   >
-                    <Text style={styles.statusText}>{item.Status}</Text>
+                    <Text style={styles.statusText}>{item.Status || 'Unknown'}</Text>
                   </View>
                 </View>
               </View>

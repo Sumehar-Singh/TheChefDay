@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAuth } from '../../../components/contexts/AuthContext';
 import BookingsList from '../../components/BookingsList';
@@ -12,12 +12,15 @@ const AllBookings = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safe}>
-     <CustomStatusBar title="All Bookings" includeTopInset={false} />
-     
+      <CustomStatusBar title="All Bookings" includeTopInset={false} />
 
-      <View style={styles.content}>
+
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <BookingsList UserID={profile?.Id} navigation={navigation} />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -60,7 +63,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingVertical: 12,
-    marginBottom:70
+    marginBottom: 70
   },
 });
 
