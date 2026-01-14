@@ -206,455 +206,454 @@ const UserEditProfile = ({ navigation }) => {
       return;
     }
 
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
+        aspect: [4, 4],
+          quality: 0.5,
     });
 
-    console.log('Image picker result:', pickerResult);
+  console.log('Image picker result:', pickerResult);
 
-    if (!pickerResult.cancelled) {
-      setProfileImage(pickerResult.assets[0].uri); // Ensure correct property access for URI
-      setOldProfileImage(pickerResult.assets[0].uri); // Ensure correct property access for URI
-      isOldImageRemoved(false);
-      console.log(pickerResult.assets[0].uri);
+  if (!pickerResult.cancelled) {
+    setProfileImage(pickerResult.assets[0].uri);
+    setOldProfileImage(pickerResult.assets[0].uri);
+    setIsOldImageRemoved(false);
+    console.log(pickerResult.assets[0].uri);
+  }
+};
+const handleSuccessUpdate = () => {
+  navigation.replace("PopUpScreen", {
+    title: "Profile Updated!",
+    type: "success",
+    detail: "Your profile has been updated successfully.",
+    returnTo: "UserDashboard",
+  });
+};
+
+const updateProfile = async () => {
+  setIsUpdating(true);
+  // Step 1: Validation
+
+  if (
+    !name ||
+    !email ||
+    !address ||
+    !phone ||
+    !pinCode ||
+    !lat ||
+    !lon ||
+    !last
+  ) {
+    Alert.alert('Error', 'Please fill in all required fields.');
+    return;
+  }
+
+
+  const isCuisineSelected = Object.values(cuisines).some((cuisine) => cuisine.checked);
+  const isDietaryPrefSelected = Object.values(dietary).some((diet) => diet.checked);
+  const isMealTypeSelected = Object.values(mealType).some((meal) => meal.checked);
+
+
+  if (!isCuisineSelected) {
+    alert('Please select at least one cuisine.');
+    return;
+  }
+
+  if (!isDietaryPrefSelected) {
+    alert('Please select at least one dietary preference.');
+    return;
+  }
+
+  if (!isMealTypeSelected) {
+    alert('Please select at least one meal type.');
+    return;
+  }
+
+
+  const formData = new FormData();
+  const isRmvd = isOldImageRemoved ? "Yes" : "No";
+  formData.append('UserId', profile.Id);
+  formData.append('FirstName', name);
+  formData.append('MiddleName', middle);
+  formData.append('LastName', last);
+  formData.append('Email', email);
+  formData.append('Address', address);
+  formData.append('Phone', phone);
+  formData.append('IsImageRemoved', isRmvd);
+  formData.append('PinCode', pinCode);
+  formData.append('Lat', lat);
+  formData.append('Lon', lon);
+
+  if (lat && lon) {
+    storeUserCoords(lat, lon); // store if updated
+  }
+
+  const selectedSpecialities = [];
+
+
+  Object.keys(cuisines).forEach((cuisine) => {
+    if (cuisines[cuisine].checked) {
+      selectedSpecialities.push(cuisines[cuisine].Id);
     }
-  };
-  const handleSuccessUpdate = () => {
-    navigation.replace("PopUpScreen", {
-      title: "Profile Updated!",
-      type: "success",
-      detail: "Your profile has been updated successfully.",
-      returnTo: "UserDashboard",
+  });
+
+  // For dietary preferences
+  Object.keys(dietary).forEach((diet) => {
+    if (dietary[diet].checked) {
+      selectedSpecialities.push(dietary[diet].Id);
+    }
+  });
+
+  // For event types
+  Object.keys(mealType).forEach((meal) => {
+    if (mealType[meal].checked) {
+      selectedSpecialities.push(mealType[meal].Id);
+    }
+  });
+
+  // Append the selected specialities to formData
+  formData.append('SelectedSpecialities', JSON.stringify(selectedSpecialities));
+
+
+
+  if (profileImage) {
+    const uriParts = profileImage.split('.');
+    const fileType = uriParts[uriParts.length - 1];
+
+    formData.append('ProfileImage', {
+      uri: profileImage,
+      name: `profile_${profile.Id}.${fileType}`,
+      type: `image/${fileType}`
     });
-  };
+  }
 
-  const updateProfile = async () => {
-    setIsUpdating(true);
-    // Step 1: Validation
-
-    if (
-      !name ||
-      !email ||
-      !address ||
-      !phone ||
-      !pinCode ||
-      !lat ||
-      !lon ||
-      !last
-    ) {
-      Alert.alert('Error', 'Please fill in all required fields.');
-      return;
-    }
-
-
-    const isCuisineSelected = Object.values(cuisines).some((cuisine) => cuisine.checked);
-    const isDietaryPrefSelected = Object.values(dietary).some((diet) => diet.checked);
-    const isMealTypeSelected = Object.values(mealType).some((meal) => meal.checked);
-
-
-    if (!isCuisineSelected) {
-      alert('Please select at least one cuisine.');
-      return;
-    }
-
-    if (!isDietaryPrefSelected) {
-      alert('Please select at least one dietary preference.');
-      return;
-    }
-
-    if (!isMealTypeSelected) {
-      alert('Please select at least one meal type.');
-      return;
-    }
-
-
-    const formData = new FormData();
-    const isRmvd = isOldImageRemoved ? "Yes" : "No";
-    formData.append('UserId', profile.Id);
-    formData.append('FirstName', name);
-    formData.append('MiddleName', middle);
-    formData.append('LastName', last);
-    formData.append('Email', email);
-    formData.append('Address', address);
-    formData.append('Phone', phone);
-    formData.append('IsImageRemoved', isRmvd);
-    formData.append('PinCode', pinCode);
-    formData.append('Lat', lat);
-    formData.append('Lon', lon);
-
-    if (lat && lon) {
-      storeUserCoords(lat, lon); // store if updated
-    }
-
-    const selectedSpecialities = [];
-
-
-    Object.keys(cuisines).forEach((cuisine) => {
-      if (cuisines[cuisine].checked) {
-        selectedSpecialities.push(cuisines[cuisine].Id);
-      }
-    });
-
-    // For dietary preferences
-    Object.keys(dietary).forEach((diet) => {
-      if (dietary[diet].checked) {
-        selectedSpecialities.push(dietary[diet].Id);
-      }
-    });
-
-    // For event types
-    Object.keys(mealType).forEach((meal) => {
-      if (mealType[meal].checked) {
-        selectedSpecialities.push(mealType[meal].Id);
-      }
-    });
-
-    // Append the selected specialities to formData
-    formData.append('SelectedSpecialities', JSON.stringify(selectedSpecialities));
-
-
-
-    if (profileImage) {
-      const uriParts = profileImage.split('.');
-      const fileType = uriParts[uriParts.length - 1];
-
-      formData.append('ProfileImage', {
-        uri: profileImage,
-        name: `profile_${profile.Id}.${fileType}`,
-        type: `image/${fileType}`
-      });
-    }
-
-    try {
-      const response = await axios.post(
-        `${BASE_URL}users/update_user.php`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      console.log("Update response:", response.data);
-      if (response.data.success) {
-        handleSuccessUpdate();
-      } else {
-        alert('Failed to update profile: ' + response.data.message);
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      Alert.alert('Error', 'An error occurred while updating profile.');
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleDeleteImage = () => {
-    Alert.alert(
-      'Delete Profile Image',
-      'Are you sure you want to delete your profile picture?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+  try {
+    const response = await axios.post(
+      `${BASE_URL}users/update_user.php`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            // Handle image deletion logic here
-            console.log('Image deleted');
-            setOldProfileImage(null); // Reset image state
-            setIsOldImageRemoved(true);
-          },
-        },
-      ],
-      { cancelable: false }
+      }
     );
-  };
 
-  const fetchLatLon = async () => {
-    if (!pinCode) {
-      Alert.alert('Error', 'Please enter a Pin Code');
-      return;
+    console.log("Update response:", response.data);
+    if (response.data.success) {
+      handleSuccessUpdate();
+    } else {
+      alert('Failed to update profile: ' + response.data.message);
     }
-    setGeoLoading(true);
-    try {
-      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
-        params: {
-          q: pinCode,
-          key: '6bd2e50a75924061b83d8f50e760d4ef',
-          language: 'en',
-          pretty: 1,
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    Alert.alert('Error', 'An error occurred while updating profile.');
+  } finally {
+    setIsUpdating(false);
+  }
+};
+
+const handleDeleteImage = () => {
+  Alert.alert(
+    'Delete Profile Image',
+    'Are you sure you want to delete your profile picture?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          // Handle image deletion logic here
+          console.log('Image deleted');
+          setOldProfileImage(null); // Reset image state
+          setIsOldImageRemoved(true);
         },
-      });
-
-      if (response.data && response.data.results && response.data.results.length > 0) {
-        const geometry = response.data.results[0].geometry;
-        const addresss = response.data.results[0].formatted;
-        console.log(addresss);
-        setLat(geometry.lat.toString());  // <--- Convert to string
-        setLon(geometry.lng.toString());  // <--- Convert to string
-        setGeoAddress(addresss);
-        //Alert.alert('Coordinates', `Lat: ${geometry.lat}\nLon: ${geometry.lng}`);
-      } else {
-        Alert.alert('Error', 'No location found for this Pin Code.');
-      }
-    } catch (error) {
-      console.error('API Error:', error);
-      Alert.alert('Error', 'Failed to fetch location. Please try again.');
-    } finally {
-      setGeoLoading(false);
-    }
-  };
-
-  // Call the function with a UserId
-
-  return (
-
-    <LinearGradient colors={['white', '#f2f2f2', '#e6e6e6']} style={styles.superContainer}>
-      <CustomStatusBar title="Update Profile" />
-
-
-      <ScrollView contentContainerStyle={styles.container}>
-
-
-        <View style={styles.profilePictureContainer}>
-          {/* Profile Image */}
-          <TouchableOpacity onPress={handleImagePick} style={styles.imageWrapper}>
-            <Image
-              source={oldProfileImage ? { uri: oldProfileImage } : require('../../../assets/DefaultImage.jpg')}
-              style={styles.profilePicture}
-              resizeMethod='cover'
-            />
-          </TouchableOpacity>
-
-          {/* Icons Below Image in One Row */}
-          <View style={styles.iconWrapper}>
-            {/* Upload Image Icon */}
-            <TouchableOpacity style={styles.editIcon} onPress={handleImagePick}>
-              <MaterialCommunityIcons name="camera" size={isTablet ? 30 : 20} color="white" />
-            </TouchableOpacity>
-
-            {/* Delete Image Icon */}
-            {oldProfileImage && (
-              <TouchableOpacity
-                style={styles.editIcon}
-                onPress={handleDeleteImage}
-              >
-                <MaterialCommunityIcons name="delete" size={isTablet ? 30 : 20} color="white" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-
-
-        <View style={styles.section}>
-          <Text style={styles.label}>First Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter First Name"
-            value={name}
-            onChangeText={setName}
-          />
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.label}>Middle Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Middle Name"
-            value={middle}
-            onChangeText={setMiddle}
-          />
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.label}>Last Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter First Name"
-            value={last}
-            onChangeText={setLast}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your Email"
-            value={email}
-            onChangeText={setEmail}
-
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Address</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Enter your Address"
-            value={address}
-            onChangeText={setAddress}
-            multiline
-          />
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.label}>Phone</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Phone"
-            value={phone}
-            onChangeText={setPhone}
-
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Pin Code</Text>
-          <Text style={{ fontSize: 12, color: '#6c757d', marginBottom: 8 }}>
-            💡 Enter your Pin Code to become more visible to nearby users and improve your searchability.
-          </Text>
-
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TextInput
-              style={[styles.input, { flex: 1, marginRight: 8 }]} // Adjust to fit beside button
-              placeholder="Enter Pin Code"
-              value={pinCode}
-              onChangeText={setPinCode}
-            />
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#007bff',
-                paddingVertical: 10,
-                paddingHorizontal: 15,
-                borderRadius: 8,
-                marginHorizontal: 10,
-              }}
-              onPress={fetchLatLon}
-            >
-
-
-              {geoLoading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>Verify</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {/* Add a note or message below */}
-
-
-          <Text style={{ fontSize: 15, color: '#6c757d', marginTop: 8 }}>
-
-            {geoAddress && <Text style={{ fontWeight: 'bold' }}>📌</Text>}  {geoAddress}
-          </Text>
-        </View>
-
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Latitude</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Latitude"
-            value={lat}
-            onChangeText={setLat}
-          />
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.label}>Longitude</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Longitude"
-            value={lon}
-            onChangeText={setLon}
-          />
-        </View>
-
-
-
-        <View style={styles.section}>
-          <Text style={styles.heading}>Fill out the below sections to make more searchable</Text>
-
-        </View>
-
-
-
-        <View style={styles.section}>
-          <Text style={styles.label}>What type of cuisine preferences you want?</Text>
-          {Object.keys(cuisines).map((cuis) => (
-            <View key={cuis} style={styles.switchContainer}>
-              <Text style={styles.chkLabel}>{cuis}</Text>
-              <Switch
-                value={cuisines[cuis].checked}
-                onValueChange={() => toggleCuisine(cuis)}
-                trackColor={{ false: '#ccc', true: '#ff0000' }}
-                thumbColor={cuisines[cuis].checked ? '#fff' : '#f4f3f4'}
-              />
-            </View>
-          ))}
-        </View>
-
-
-        <View style={styles.section}>
-          <Text style={styles.label}>What dietary preferences can you cater to?</Text>
-          {Object.keys(dietary).map((diet) => (
-            <View key={diet} style={styles.switchContainer}>
-              <Text style={styles.chkLabel}>{diet}</Text>
-              <Switch
-                value={dietary[diet].checked}
-                onValueChange={() => toggleDietaryPreference(diet)}
-                trackColor={{ false: '#ccc', true: '#ff0000' }}
-                thumbColor={dietary[diet].checked ? '#fff' : '#f4f3f4'}
-              />
-            </View>
-          ))}
-        </View>
-
-
-
-
-        <View style={styles.section}>
-          <Text style={styles.label}>What types of meals do you want?</Text>
-          {Object.keys(mealType).map((meal) => (
-            <View key={meal} style={styles.switchContainer}>
-              <Text style={styles.chkLabel}>{meal}</Text>
-              <Switch
-                value={mealType[meal].checked}
-                onValueChange={() => toggleEventType(meal)}
-                trackColor={{ false: '#ccc', true: '#ff0000' }}
-                thumbColor={mealType[meal].checked ? '#fff' : '#f4f3f4'}
-              />
-            </View>
-          ))}
-        </View>
-
-
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={updateProfile} disabled={isUpdating}>
-            {isUpdating ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Update</Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-
-    </LinearGradient>
-
+      },
+    ],
+    { cancelable: false }
   );
+};
+
+const fetchLatLon = async () => {
+  if (!pinCode) {
+    Alert.alert('Error', 'Please enter a Pin Code');
+    return;
+  }
+  setGeoLoading(true);
+  try {
+    const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+      params: {
+        q: pinCode,
+        key: '6bd2e50a75924061b83d8f50e760d4ef',
+        language: 'en',
+        pretty: 1,
+      },
+    });
+
+    if (response.data && response.data.results && response.data.results.length > 0) {
+      const geometry = response.data.results[0].geometry;
+      const addresss = response.data.results[0].formatted;
+      console.log(addresss);
+      setLat(geometry.lat.toString());  // <--- Convert to string
+      setLon(geometry.lng.toString());  // <--- Convert to string
+      setGeoAddress(addresss);
+      //Alert.alert('Coordinates', `Lat: ${geometry.lat}\nLon: ${geometry.lng}`);
+    } else {
+      Alert.alert('Error', 'No location found for this Pin Code.');
+    }
+  } catch (error) {
+    console.error('API Error:', error);
+    Alert.alert('Error', 'Failed to fetch location. Please try again.');
+  } finally {
+    setGeoLoading(false);
+  }
+};
+
+// Call the function with a UserId
+
+return (
+
+  <LinearGradient colors={['white', '#f2f2f2', '#e6e6e6']} style={styles.superContainer}>
+    <CustomStatusBar title="Update Profile" />
+
+
+    <ScrollView contentContainerStyle={styles.container}>
+
+
+      <View style={styles.profilePictureContainer}>
+        {/* Profile Image */}
+        <TouchableOpacity onPress={handleImagePick} style={styles.imageWrapper}>
+          <Image
+            source={oldProfileImage ? { uri: oldProfileImage } : require('../../../assets/DefaultImage.jpg')}
+            style={styles.profilePicture}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
+
+        {/* Icons Below Image in One Row */}
+        <View style={styles.iconWrapper}>
+          {/* Upload Image Icon */}
+          <TouchableOpacity style={styles.editIcon} onPress={handleImagePick}>
+            <MaterialCommunityIcons name="camera" size={isTablet ? 30 : 20} color="white" />
+          </TouchableOpacity>
+
+          {/* Delete Image Icon */}
+          {oldProfileImage && (
+            <TouchableOpacity
+              style={styles.editIcon}
+              onPress={handleDeleteImage}
+            >
+              <MaterialCommunityIcons name="delete" size={isTablet ? 30 : 20} color="white" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+
+
+      <View style={styles.section}>
+        <Text style={styles.label}>First Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter First Name"
+          value={name}
+          onChangeText={setName}
+        />
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.label}>Middle Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Middle Name"
+          value={middle}
+          onChangeText={setMiddle}
+        />
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.label}>Last Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter First Name"
+          value={last}
+          onChangeText={setLast}
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your Email"
+          value={email}
+          onChangeText={setEmail}
+
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Address</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder="Enter your Address"
+          value={address}
+          onChangeText={setAddress}
+          multiline
+        />
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.label}>Phone</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Phone"
+          value={phone}
+          onChangeText={setPhone}
+
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Pin Code</Text>
+        <Text style={{ fontSize: 12, color: '#6c757d', marginBottom: 8 }}>
+          💡 Enter your Pin Code to become more visible to nearby users and improve your searchability.
+        </Text>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TextInput
+            style={[styles.input, { flex: 1, marginRight: 8 }]} // Adjust to fit beside button
+            placeholder="Enter Pin Code"
+            value={pinCode}
+            onChangeText={setPinCode}
+          />
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#007bff',
+              paddingVertical: 10,
+              paddingHorizontal: 15,
+              borderRadius: 8,
+              marginHorizontal: 10,
+            }}
+            onPress={fetchLatLon}
+          >
+
+
+            {geoLoading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>Verify</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Add a note or message below */}
+
+
+        <Text style={{ fontSize: 15, color: '#6c757d', marginTop: 8 }}>
+
+          {geoAddress && <Text style={{ fontWeight: 'bold' }}>📌</Text>}  {geoAddress}
+        </Text>
+      </View>
+
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Latitude</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Latitude"
+          value={lat}
+          onChangeText={setLat}
+        />
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.label}>Longitude</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Longitude"
+          value={lon}
+          onChangeText={setLon}
+        />
+      </View>
+
+
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>Fill out the below sections to make more searchable</Text>
+
+      </View>
+
+
+
+      <View style={styles.section}>
+        <Text style={styles.label}>What type of cuisine preferences you want?</Text>
+        {Object.keys(cuisines).map((cuis) => (
+          <View key={cuis} style={styles.switchContainer}>
+            <Text style={styles.chkLabel}>{cuis}</Text>
+            <Switch
+              value={cuisines[cuis].checked}
+              onValueChange={() => toggleCuisine(cuis)}
+              trackColor={{ false: '#ccc', true: '#ff0000' }}
+              thumbColor={cuisines[cuis].checked ? '#fff' : '#f4f3f4'}
+            />
+          </View>
+        ))}
+      </View>
+
+
+      <View style={styles.section}>
+        <Text style={styles.label}>What dietary preferences can you cater to?</Text>
+        {Object.keys(dietary).map((diet) => (
+          <View key={diet} style={styles.switchContainer}>
+            <Text style={styles.chkLabel}>{diet}</Text>
+            <Switch
+              value={dietary[diet].checked}
+              onValueChange={() => toggleDietaryPreference(diet)}
+              trackColor={{ false: '#ccc', true: '#ff0000' }}
+              thumbColor={dietary[diet].checked ? '#fff' : '#f4f3f4'}
+            />
+          </View>
+        ))}
+      </View>
+
+
+
+
+      <View style={styles.section}>
+        <Text style={styles.label}>What types of meals do you want?</Text>
+        {Object.keys(mealType).map((meal) => (
+          <View key={meal} style={styles.switchContainer}>
+            <Text style={styles.chkLabel}>{meal}</Text>
+            <Switch
+              value={mealType[meal].checked}
+              onValueChange={() => toggleEventType(meal)}
+              trackColor={{ false: '#ccc', true: '#ff0000' }}
+              thumbColor={mealType[meal].checked ? '#fff' : '#f4f3f4'}
+            />
+          </View>
+        ))}
+      </View>
+
+
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.saveButton} onPress={updateProfile} disabled={isUpdating}>
+          {isUpdating ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Update</Text>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+
+
+  </LinearGradient>
+
+);
 };
 
 const styles = StyleSheet.create({
