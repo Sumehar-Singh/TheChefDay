@@ -492,11 +492,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   seeAllCard: {
-    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
     width: isTablet ? 180 : 150,
     height: isTablet ? 180 : 150,
   },
