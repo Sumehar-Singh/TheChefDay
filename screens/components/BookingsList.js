@@ -172,6 +172,18 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                 }
               >
                 <View style={styles.bookingItemLeft}>
+                  {/* DEBUG: SHOW EVERYTHING TO FIX THIS */}
+                  <Text style={{ fontSize: 10, color: 'red', marginBottom: 5 }}>
+                    KEYS: {Object.keys(rawItem).join(', ')}
+                  </Text>
+                  <Text style={{ fontSize: 10, color: 'blue', marginBottom: 5 }}>
+                    NAME VALUES: {JSON.stringify({
+                      cn: rawItem.ChefName,
+                      Cn: rawItem.Chef_Name,
+                      name: rawItem.Name,
+                      first: rawItem.FirstName
+                    })}
+                  </Text>
                   <View style={styles.bookingHeader}>
                     <Text style={styles.bookingTextCustomer}>
                       {item.ChefName || `Booking #${item.BookingId || '?'}`}
