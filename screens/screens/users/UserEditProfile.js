@@ -199,27 +199,51 @@ const UserEditProfile = ({ navigation }) => {
   };
 
   const handleImagePick = async () => {
-    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    try {
+      if (Platform.OS === 'ios') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(
+            'Permission Required',
+            'Please enable media library access in your settings to upload images.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => Linking.openSettings() }
+            ]
+          );
+          return;
+        }
+      }
 
-    if (permissionResult.granted === false) {
-      Alert.alert('Permission to access camera roll is required!');
-      return;
-    }
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 0.5,
-    });
+      if (permissionResult.status !== 'granted') {
+        Alert.alert(
+          'Permission Required',
+          'Please enable media library access in your settings to upload images.'
+        );
+        return;
+      }
 
-    console.log('Image picker result:', pickerResult);
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 4],
+        quality: 0.8,
+        allowsMultipleSelection: false,
+      });
 
-    if (!pickerResult.cancelled) {
-      setProfileImage(pickerResult.assets[0].uri);
-      setOldProfileImage(pickerResult.assets[0].uri);
-      setIsOldImageRemoved(false);
-      console.log(pickerResult.assets[0].uri);
+      console.log('Image picker result:', pickerResult);
+
+      if (!pickerResult.canceled && pickerResult.assets && pickerResult.assets.length > 0) {
+        setProfileImage(pickerResult.assets[0].uri);
+        setOldProfileImage(pickerResult.assets[0].uri);
+        setIsOldImageRemoved(false);
+        console.log('Selected image URI:', pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
     }
   };
   const handleSuccessUpdate = () => {
