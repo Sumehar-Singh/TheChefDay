@@ -22,11 +22,100 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   const [bookings, setBookings] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ... (useEffect remains same) ...
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
+        if (limit) {
+          url += `&limit=${limit}`;
+        }
+        console.log('Fetching bookings from:', url);
+        const response = await axios.get(url);
+        // console.log('Bookings response:', response.data);
 
-  // ... (normalizeBooking remains same) ...
+        if (response.data.status === 'success') {
+          // Ensure we have an array
+          const bookingData = Array.isArray(response.data.data) ? response.data.data : [];
+          setBookings(bookingData);
+          console.log('All Bookings Data:', JSON.stringify(bookingData, null, 2));
+        } else {
+          // If status is not success (e.g., no bookings found), set empty array
+          setBookings([]);
+        }
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // ... (getStatusColor and EmptyBookings remain same) ...
+    if (UserID) {
+      fetchBookings();
+    }
+  }, [UserID, limit]);
+
+  // Helper to handle any case/separator variation from API (Smart Normalizer)
+  const normalizeBooking = (item) => {
+    if (!item) return {};
+
+    // 1. Create a map where keys are lowercased and stripped of special chars
+    const standardized = {};
+    Object.keys(item).forEach(key => {
+      // "Booking ID" -> "bookingid", "Chef_Name" -> "chefname"
+      const cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
+      standardized[cleanKey] = item[key];
+    });
+
+    // 2. Map standard keys to our component's expected keys
+    return {
+      BookingId: standardized.bookingid || standardized.id,
+      ChefName: standardized.chefname || standardized.cheffullname || standardized.name,
+      ChefID: standardized.chefid,
+      EventDate: standardized.eventdate || standardized.date,
+      BookingDate: standardized.bookingdate || standardized.createdat,
+      ServiceType: standardized.servicetype || standardized.service,
+      Status: standardized.status,
+    };
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Confirmed':
+        return '#4CAF50';
+      case 'Declined':
+        return '#F44336';
+      case 'Canceled':
+        return 'red';
+      case 'Pending':
+        return '#FF9800';
+      case 'Service Completed':
+        return 'gray';
+      default:
+        return '#805500';
+    }
+  };
+
+  const EmptyBookings = () => (
+    <View style={styles.emptyContainer}>
+      <MaterialCommunityIcons
+        name="calendar-clock"
+        size={isTablet ? 80 : 60}
+        color="#805500"
+      />
+      <Text style={styles.emptyTitle}>No Bookings Yet</Text>
+      <Text style={styles.emptyText}>
+        Start exploring chefs and book their services for your special
+        occasions.
+      </Text>
+      <TouchableOpacity
+        style={styles.emptyButton}
+        onPress={() => navigation.navigate('ChefsList')}
+      >
+        <Text style={styles.emptyButtonText}>Find Chefs</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   if (loading) {
     return <ActivityIndicator size="large" color="#ff0000" />;
