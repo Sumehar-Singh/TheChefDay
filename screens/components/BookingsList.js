@@ -68,14 +68,15 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     });
 
     // 2. Map standard keys to our component's expected keys
+    // Explicitly fallback to lowercase keys confirmed by user logs
     return {
-      BookingId: standardized.bookingid || standardized.id,
-      ChefName: standardized.chefname || standardized.cheffullname || standardized.name,
-      ChefID: standardized.chefid,
-      EventDate: standardized.eventdate || standardized.date,
-      BookingDate: standardized.bookingdate || standardized.createdat,
-      ServiceType: standardized.servicetype || standardized.service,
-      Status: standardized.status,
+      BookingId: standardized.bookingid || item.bookingid || item.id || standardized.id,
+      ChefName: standardized.chefname || item.chefname || standardized.cheffullname || standardized.name,
+      ChefID: standardized.chefid || item.chefid,
+      EventDate: standardized.eventdate || item.eventdate || standardized.date,
+      BookingDate: standardized.bookingdate || item.bookingdate || standardized.createdat,
+      ServiceType: standardized.servicetype || item.servicetype || standardized.service,
+      Status: standardized.status || item.status,
     };
   };
 
@@ -172,21 +173,9 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                 }
               >
                 <View style={styles.bookingItemLeft}>
-                  {/* DEBUG: SHOW EVERYTHING TO FIX THIS */}
-                  <Text style={{ fontSize: 10, color: 'red', marginBottom: 5 }}>
-                    KEYS: {Object.keys(rawItem).join(', ')}
-                  </Text>
-                  <Text style={{ fontSize: 10, color: 'blue', marginBottom: 5 }}>
-                    NAME VALUES: {JSON.stringify({
-                      cn: rawItem.ChefName,
-                      Cn: rawItem.Chef_Name,
-                      name: rawItem.Name,
-                      first: rawItem.FirstName
-                    })}
-                  </Text>
                   <View style={styles.bookingHeader}>
                     <Text style={styles.bookingTextCustomer}>
-                      {item.ChefName || `Booking #${item.BookingId || '?'}`}
+                      {item.ChefName || `Booking # ${item.BookingId || 'ID?'}`}
                     </Text>
                   </View>
                   <View style={styles.bookingDetails}>
