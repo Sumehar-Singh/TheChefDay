@@ -164,7 +164,7 @@ const BookingsList = ({ UserID, navigation, limit }) => {
                 <View style={styles.bookingItemLeft}>
                   <View style={styles.bookingHeader}>
                     <Text style={styles.bookingTextCustomer}>
-                      {item.ChefName || `Chef #${item.ChefID || '?'}`}
+                      {item.ChefName || (item.ChefID ? `Chef #${item.ChefID}` : JSON.stringify(rawItem))}
                     </Text>
                   </View>
                   <View style={styles.bookingDetails}>
