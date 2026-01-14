@@ -565,7 +565,12 @@ const ChefDetail = ({ navigation }) => {
             <View style={styles.detailsRow}>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Location</Text>
-                <Text style={styles.detailValue}>📍 {address}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                  <Text style={styles.detailValue}>📍 </Text>
+                  <Text style={[styles.detailValue, { flex: 1 }]}>
+                    {address}
+                  </Text>
+                </View>
               </View>
 
               <View style={styles.detailItem}>
