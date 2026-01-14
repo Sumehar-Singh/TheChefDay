@@ -319,7 +319,7 @@ const UserDashboard = ({ navigation }) => {
 
         {profile.Id && (
           <View style={styles.bookingsSection}>
-            <BookingsList UserID={profile.Id} navigation={navigation} />
+            <BookingsList UserID={profile.Id} navigation={navigation} limit={5} />
             <TouchableOpacity
               style={styles.bookingsCtaCard}
               onPress={() => navigation.navigate('AllBookings')}

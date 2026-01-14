@@ -18,16 +18,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const { width } = Dimensions.get('window');
 const isTablet = width > 600;
 
-const BookingsList = ({ UserID, navigation }) => {
+const BookingsList = ({ UserID, navigation, limit }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(
-          `${BASE_URL}/users/get_bookings.php?UserId=${UserID}&limit=5`
-        );
+        let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
+        if (limit) {
+          url += `&limit=${limit}`;
+        }
+        const response = await axios.get(url);
         if (response.data.status === 'success') {
           setBookings(response.data.data);
         } else {
@@ -114,7 +116,7 @@ const BookingsList = ({ UserID, navigation }) => {
         <EmptyBookings />
       ) : (
         <>
-          {bookings.slice(0, 5).map((item) => (
+          {bookings.map((item) => (
             <TouchableOpacity
               key={
                 item.BookingId?.toString() ??
