@@ -615,11 +615,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   emptyStateText: {
-    marginTop: 10,
-    fontSize: 14,
-    color: '#666',
+    marginTop: 15,
+    fontSize: 16,
+    color: '#333',
     fontFamily: 'Regular',
+    fontWeight: '600',
     textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 20,
   },
 });
 
