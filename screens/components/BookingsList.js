@@ -23,11 +23,13 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        // If limit is passed (Dashboard=5), use it. otherwise use 100 for All Bookings
-        const effectiveLimit = limit || 100;
-
         let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
-        url += `&limit=${effectiveLimit}`;
+
+        // Only append limit if it is explicitly passed (e.g. for Dashboard)
+        // detailed "All Bookings" view should fetch everything (no limit param)
+        if (limit) {
+          url += `&limit=${limit}`;
+        }
 
         console.log('Fetching bookings from:', url);
         const response = await axios.get(url);
