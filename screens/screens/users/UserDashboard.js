@@ -197,7 +197,7 @@ const UserDashboard = ({ navigation }) => {
               <Text style={styles.headerTitle}>
                 <UserFullName userId={profile.Id} />
               </Text>
-              <Text style={styles.headDesc}>🙋‍♂️ User Dashboard</Text>
+              <Text style={styles.headDesc}>User Dashboard</Text>
             </View>
           </View>
           <View style={styles.editButton}>
