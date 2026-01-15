@@ -137,7 +137,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                   })
                 }
               >
-                <View style={[styles.bookingItemLeft]}>
+                <View style={styles.bookingItemLeft}>
                   <View style={styles.bookingHeader}>
                     {/* Chef Image Check */}
                     {chefImage ? (
@@ -147,8 +147,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                       />
                     ) : null}
 
-                    <Text style={[styles.bookingTextCustomer, { backgroundColor: 'red', color: 'white', minHeight: 20, minWidth: 50 }]}>
-                      {chefName && chefName.trim().length > 0 ? chefName : 'MISSING_NAME'}
+                    <Text style={styles.bookingTextCustomer}>
+                      {chefName}
                     </Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
                       <Text style={styles.statusText}>{status}</Text>
@@ -158,19 +158,19 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                   <View style={styles.bookingDetails}>
                     <View style={styles.detailRow}>
                       <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
-                      <Text style={styles.bookingTextEvent}>
+                      <Text style={[styles.bookingTextEvent, { color: '#000000' }]}>
                         Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
                       <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
-                      <Text style={styles.bookingText}>
+                      <Text style={[styles.bookingText, { color: '#333333' }]}>
                         Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
                       <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
-                      <Text style={styles.bookingTextService}>
+                      <Text style={[styles.bookingTextService, { color: '#000000', fontWeight: '600' }]}>
                         {serviceType}
                       </Text>
                     </View>
