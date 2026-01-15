@@ -137,7 +137,7 @@ const ChefDashboard = ({ navigation }) => {
                                 <ChefProfileImage userId={profile?.Id} height={70} width={70} mr={15} style={styles.profileImage} />
                                 <View style={styles.profileInfo}>
                                     <Text style={styles.headerTitle}><ChefFullName userId={profile?.Id} /></Text>
-                                    <Text style={styles.headDesc}>👨‍🍳 Chef Dashboard</Text>
+                                    <Text style={styles.headDesc}>Chef Dashboard</Text>
                                 </View>
                             </View>
                             <View style={styles.editButton}>
