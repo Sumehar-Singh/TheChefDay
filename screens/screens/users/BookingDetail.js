@@ -187,9 +187,6 @@ const BookingDetail = () => {
               <Text style={styles.modalMessage}>{modalMessage}</Text>
 
               <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)}>
-                  <Text style={styles.modalCancelText}>Cancel</Text>
-                </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.modalConfirmBtn, { backgroundColor: pendingStatus === 'Cancelled' ? '#D32F2F' : '#2E7D32' }]}
                   onPress={() =>
@@ -202,6 +199,10 @@ const BookingDetail = () => {
                   }
                 >
                   <Text style={styles.modalConfirmText}>{modalConfirmText}</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.modalCancelText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -536,13 +537,15 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   modalActions: {
-    flexDirection: 'row',
+    flexDirection: 'column', // Stack vertically for better space
     width: '100%',
     gap: 12,
   },
   modalCancelBtn: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
+    width: '100%',
+    backgroundColor: '#fff', // Ghost style
+    borderColor: '#ddd',
+    borderWidth: 1,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -554,21 +557,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   modalConfirmBtn: {
-    flex: 1,
-    // Background color is handled in JSX based on status
-    paddingVertical: 14,
+    width: '100%',
+    // Background color handled in JSX
+    paddingVertical: 15, // Slightly taller
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2, // Stronger shadow
+    shadowRadius: 5,
+    elevation: 5,
   },
   modalConfirmText: {
     color: '#FFF',
-    fontSize: isTablet ? 16 : 15,
+    fontSize: isTablet ? 18 : 16, // Larger text
     fontWeight: '700',
   },
   loadingContainer: {
