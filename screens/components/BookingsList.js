@@ -137,7 +137,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                   })
                 }
               >
-                <View style={[styles.bookingItemLeft, { backgroundColor: '#ffe6f2', padding: 5 }]}>
+                <View style={[styles.bookingItemLeft]}>
                   <View style={styles.bookingHeader}>
                     {/* Chef Image Check */}
                     {chefImage ? (
@@ -147,7 +147,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                       />
                     ) : null}
 
-                    <Text style={[styles.bookingTextCustomer, { backgroundColor: 'yellow' }]}>
+                    <Text style={styles.bookingTextCustomer}>
                       {chefName || 'EMPTY NAME'}
                     </Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
