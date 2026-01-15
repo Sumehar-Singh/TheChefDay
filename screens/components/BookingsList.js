@@ -359,15 +359,15 @@ const styles = StyleSheet.create({
   },
   bookingTextEvent: {
     fontSize: isTablet ? 16 : 14,
-    color: '#209E00',
+    color: '#000',
     marginLeft: 8,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   bookingText: {
     fontSize: isTablet ? 16 : 14,
-    color: '#444', // Darker grey
+    color: '#000', // Matches uniform look
     marginLeft: 8,
-    fontWeight: '500', // Match Event weight
+    fontWeight: '600', // Match Service weight
   },
   bookingTextService: {
     fontSize: isTablet ? 16 : 14,
