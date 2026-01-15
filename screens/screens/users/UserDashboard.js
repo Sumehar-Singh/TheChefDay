@@ -110,8 +110,11 @@ const UserDashboard = ({ navigation }) => {
   });
 
   const getRecentChefs = (count) => {
+    // Convert all stored IDs to strings for safe comparison
+    const safeRecentIds = recentChefIds.map(id => String(id));
+
     const filteredChefs = visibleChefs.filter((chef) =>
-      recentChefIds.includes(chef.ChefID)
+      safeRecentIds.includes(String(chef.ChefID))
     );
     return filteredChefs.slice(0, count);
   };

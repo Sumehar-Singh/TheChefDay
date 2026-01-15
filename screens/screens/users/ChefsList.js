@@ -91,9 +91,12 @@ const ChefsList = ({ navigation, route }) => {
           // Filter by Recent Logic (requires fetching recent IDs inside this component or passing them)
           // For simplify, we might need to fetch them here.
           // Ideally Recent IDs should be passed, but let's re-fetch for robustness
-          const recentIds = await AsyncStorage.getItem('recentChefIds'); // Assuming stored
+          const recentIds = await AsyncStorage.getItem('chefIds'); // Correct key from utils.js
           const parsedIds = recentIds ? JSON.parse(recentIds) : [];
-          finalChefs = finalChefs.filter(c => parsedIds.includes(c.ChefID));
+          // Ensure type-safe comparison
+          const safeParsedIds = parsedIds.map(id => String(id));
+
+          finalChefs = finalChefs.filter(c => safeParsedIds.includes(String(c.ChefID)));
         } else if (filterType === 'Random') {
           // Shuffle
           finalChefs = finalChefs.sort(() => 0.5 - Math.random());
