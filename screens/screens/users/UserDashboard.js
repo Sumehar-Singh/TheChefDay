@@ -331,30 +331,11 @@ const UserDashboard = ({ navigation }) => {
                 color="#cc0000"
               />
             </TouchableOpacity>
-          </View>  <TouchableOpacity
-              style={styles.bookingsCtaCard}
-              onPress={() => navigation.navigate('AllBookings')}
-              activeOpacity={0.8}
-            >
-              <View style={styles.bookingsCtaLeft}>
-                <MaterialCommunityIcons
-                  name="calendar-multiple-check"
-                  size={22}
-                  color="#cc0000"
-                />
-                <Text style={styles.bookingsCtaText}>View All Bookings</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={24}
-                color="#cc0000"
-              />
-            </TouchableOpacity>
           </View>
-  )
-}
+        )
+        }
       </ScrollView >
-  { isLoading && <CenterLoading />}
+      {isLoading && <CenterLoading />}
     </View >
   );
 };
