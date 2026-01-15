@@ -68,6 +68,8 @@ const ChefsList = ({ navigation, route }) => {
 
       // 2. Apply Specific Category Filters (Sorting/Filtering)
       if (filterType === 'Popular') {
+        // Show ONLY popular chefs (Popularity > 0)
+        result = result.filter(c => c.Popularity > 0);
         result.sort((a, b) => (b.Popularity || 0) - (a.Popularity || 0));
       } else if (filterType === 'Nearby') {
         if (coords) {
