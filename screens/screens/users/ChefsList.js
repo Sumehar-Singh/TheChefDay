@@ -502,8 +502,7 @@ const styles = StyleSheet.create({
     color: '#666',
     fontFamily: 'Regular',
     textAlign: 'center',
-  }, fontWeight: '500',
-},
+  },
 });
 
 export default ChefsList;
