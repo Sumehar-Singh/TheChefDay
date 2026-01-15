@@ -137,7 +137,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     switch (status) {
       case 'Confirmed': return '#4CAF50';
       case 'Declined': return '#F44336';
-      case 'Canceled': return 'red';
+      case 'Canceled': return '#F44336'; // Red
+      case 'Cancelled': return '#F44336'; // Red (handle both spellings)
       case 'Pending': return '#FF9800';
       case 'Service Completed': return 'gray';
       default: return '#805500';
