@@ -160,6 +160,14 @@ const AddBooking = ({ navigation }) => {
       Alert.alert('Error', 'Please enter a Pin Code');
       return;
     }
+
+    // Client-side check: updates for "00000" or similar invalid patterns
+    if (/^0+$/.test(PinCode) || PinCode.length < 5) {
+      setIsValidPin(false);
+      Alert.alert('Error', 'Invalid Pin Code. Please enter a valid code.');
+      return;
+    }
+
     setGeoLoading(true);
     setIsValidPin(false);
     try {
@@ -173,9 +181,19 @@ const AddBooking = ({ navigation }) => {
       });
 
       if (response.data && response.data.results && response.data.results.length > 0) {
-        // Success - Pincode is valid
-        setIsValidPin(true);
-        // Alert.alert('Success', 'Pin Code Verified!'); // Optional: Silent success or checkmark
+        const result = response.data.results[0];
+        // Strict check: Ensure the API actually found a postcode component
+        const foundPostcode = result.components.postcode || result.components.postal_code;
+
+        if (foundPostcode) {
+          // Optional: You could compare foundPostcode with PinCode here for partial matching if strictness varies
+          setIsValidPin(true);
+        } else {
+          // API found a place, but it wasn't a postcode (e.g. a street number match)
+          setIsValidPin(false);
+          Alert.alert('Error', 'Invalid Pin Code. No postal region found.');
+        }
+
       } else {
         setIsValidPin(false);
         Alert.alert('Error', 'Invalid Pin Code. Please check and try again.');
