@@ -162,7 +162,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         </View>
                       )}
 
-                      <Text style={[styles.bookingTextCustomer, { minHeight: 20 }]}>
+                      <Text style={styles.bookingTextCustomer}>
                         {chefName}
                       </Text>
                       <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
@@ -173,19 +173,19 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                     <View style={styles.bookingDetails}>
                       <View style={styles.detailRow}>
                         <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
-                        <Text style={[styles.bookingTextEvent, { color: '#000000', minHeight: 18 }]}>
+                        <Text style={[styles.bookingTextEvent, { color: '#000000' }]}>
                           Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
                         </Text>
                       </View>
                       <View style={styles.detailRow}>
                         <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
-                        <Text style={[styles.bookingText, { color: '#333333', minHeight: 18 }]}>
+                        <Text style={[styles.bookingText, { color: '#333333' }]}>
                           Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
                         </Text>
                       </View>
                       <View style={styles.detailRow}>
                         <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
-                        <Text style={[styles.bookingTextService, { color: '#000000', fontWeight: '600', minHeight: 18 }]}>
+                        <Text style={[styles.bookingTextService, { color: '#000000', fontWeight: '600' }]}>
                           {serviceType}
                         </Text>
                       </View>
@@ -244,6 +244,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: isTablet ? 15 : 12,
     marginBottom: 10,
+    minHeight: 120, // Ensure card has substance
+    justifyContent: 'center', // Center content vertically if sparse
   },
   bookingItemLeft: {
     flex: 1,
@@ -251,12 +253,12 @@ const styles = StyleSheet.create({
   bookingHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12, // Explicit separation from details
   },
   bookingTextCustomer: {
     fontSize: isTablet ? 18 : 16,
     fontWeight: '700',
-    color: '#000', // Explicit black
+    color: '#000',
     flex: 1,
   },
   statusBadge: {
@@ -273,11 +275,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bookingDetails: {
-    gap: 8,
+    // Removed 'gap' as it causes overlap in older RN versions
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 6, // Explicit margin between rows
   },
   bookingTextEvent: {
     fontSize: isTablet ? 16 : 14,
