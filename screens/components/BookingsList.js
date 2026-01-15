@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 import { BASE_URL } from '../../config';
 import { formatDate } from './utils';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -25,67 +26,74 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
+  useFocusEffect(
+    useCallback(() => {
+      const fetchBookings = async () => {
+        try {
+          let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
 
-        // Strategy: Always fetch a decent number of items (e.g. 50) even if we only need 5 (limit).
-        // This allows us to sort client-side and ensure purely "Newest" items are shown, 
-        // preventing the server from hiding Pending items if it uses a weird sort.
-        // If it's "All Bookings" (no limit prop), we don't send limit param (fetch all).
-        if (limit) {
-          url += `&limit=50`;
-        }
-
-        console.log('Fetching bookings from:', url);
-        const response = await axios.get(url);
-
-        if (response.data.status === 'success') {
-          const rawData = Array.isArray(response.data.data) ? response.data.data : [];
-
-          // Filter valid items immediately
-          const validData = rawData.filter(item => {
-            const id = item.bookingid || item.BookingId || item.id || item.ID;
-            return id !== undefined && id !== null && id !== '';
-          });
-
-          // Sort by Booking ID Descending (Newest First)
-          // This ensures newly created 'Pending' bookings are at the top
-          validData.sort((a, b) => {
-            const idA = parseInt(a.bookingid || a.BookingId || a.id || a.ID || 0);
-            const idB = parseInt(b.bookingid || b.BookingId || b.id || b.ID || 0);
-            return idB - idA;
-          });
-
-          setAllBookings(validData);
-
-          // Initial Load: If limit is set (Dashboard), slice to that limit (5).
-          // If 'All Bookings', show first PAGE_SIZE.
+          // Strategy: Always fetch a decent number of items (e.g. 50) even if we only need 5 (limit).
+          // This allows us to sort client-side and ensure purely "Newest" items are shown, 
+          // preventing the server from hiding Pending items if it uses a weird sort.
+          // If it's "All Bookings" (no limit prop), we don't send limit param (fetch all).
           if (limit) {
-            setDisplayedBookings(validData.slice(0, limit));
-          } else {
-            setDisplayedBookings(validData.slice(0, PAGE_SIZE));
-            setPage(1);
+            url += `&limit=50`;
           }
 
-        } else {
+          console.log('Fetching bookings from:', url);
+          const response = await axios.get(url);
+
+          if (response.data.status === 'success') {
+            const rawData = Array.isArray(response.data.data) ? response.data.data : [];
+
+            // Filter valid items immediately
+            const validData = rawData.filter(item => {
+              const id = item.bookingid || item.BookingId || item.id || item.ID;
+              return id !== undefined && id !== null && id !== '';
+            });
+
+            // Sort by Booking ID Descending (Newest First)
+            // This ensures newly created 'Pending' bookings are at the top
+            validData.sort((a, b) => {
+              const idA = parseInt(a.bookingid || a.BookingId || a.id || a.ID || 0);
+              const idB = parseInt(b.bookingid || b.BookingId || b.id || b.ID || 0);
+              return idB - idA;
+            });
+
+            setAllBookings(validData);
+
+            // Initial Load: If limit is set (Dashboard), slice to that limit (5).
+            // If 'All Bookings', show first PAGE_SIZE.
+            if (limit) {
+              setDisplayedBookings(validData.slice(0, limit));
+            } else {
+              setDisplayedBookings(validData.slice(0, PAGE_SIZE));
+              setPage(1);
+            }
+
+          } else {
+            setAllBookings([]);
+            setDisplayedBookings([]);
+          }
+        } catch (error) {
+          console.error('Error fetching bookings:', error);
           setAllBookings([]);
           setDisplayedBookings([]);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error('Error fetching bookings:', error);
-        setAllBookings([]);
-        setDisplayedBookings([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    if (UserID) {
-      fetchBookings();
-    }
-  }, [UserID, limit]);
+      if (UserID) {
+        // Optional: Set loading to true if you want the spinner to show on every focus
+        // setLoading(true); 
+        fetchBookings();
+      }
+
+      // Cleanup function if needed (not needed for simple fetch)
+      return () => { };
+    }, [UserID, limit])
+  );
 
   const loadMoreData = () => {
     // Only load more if we are NOT in "Dashboard Mode" (limit exists) and we have more data
