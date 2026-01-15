@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView, Image } from 'react-native';
+import { SafeAreaView, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
@@ -18,6 +18,9 @@ const AddBooking = ({ navigation }) => {
   const [PhoneNo, setPhoneNo] = useState('');
   const [Address, setAddress] = useState('');
   const [PinCode, setPinCode] = useState('');
+  const [isValidPin, setIsValidPin] = useState(false); // Track verification status
+  const [geoLoading, setGeoLoading] = useState(false); // Track API loading status
+  const [markedDates, setMarkedDates] = useState({});
   const [chefData, setChefData] = useState([]);
 
   const [selection, setSelection] = useState('Hourly Hiring');
@@ -150,6 +153,40 @@ const AddBooking = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error fetching chef data:", error);
+    }
+  };
+
+  const verifyPinCode = async () => {
+    if (!PinCode) {
+      Alert.alert('Error', 'Please enter a Pin Code');
+      return;
+    }
+    setGeoLoading(true);
+    setIsValidPin(false);
+    try {
+      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+        params: {
+          q: PinCode,
+          key: '6bd2e50a75924061b83d8f50e760d4ef',
+          language: 'en',
+          pretty: 1,
+        },
+      });
+
+      if (response.data && response.data.results && response.data.results.length > 0) {
+        // Success - Pincode is valid
+        setIsValidPin(true);
+        // Alert.alert('Success', 'Pin Code Verified!'); // Optional: Silent success or checkmark
+      } else {
+        setIsValidPin(false);
+        Alert.alert('Error', 'Invalid Pin Code. Please check and try again.');
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      Alert.alert('Error', 'Failed to verify Pin Code. Please try again.');
+      setIsValidPin(false);
+    } finally {
+      setGeoLoading(false);
     }
   };
 
@@ -305,13 +342,51 @@ const AddBooking = ({ navigation }) => {
           onChangeText={setAddress}
         />
         <Text style={styles.label}>Pin Code</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter pin code"
-          value={PinCode}
-          onChangeText={setPinCode}
-          keyboardType="number-pad"
-        />
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+          <View style={{ flex: 1, position: 'relative' }}>
+            <TextInput
+              style={[styles.input, { marginBottom: 0 }]}
+              placeholder="Enter pin code"
+              value={PinCode}
+              onChangeText={(text) => {
+                setPinCode(text);
+                setIsValidPin(false); // Reset verification on change
+              }}
+              keyboardType="number-pad"
+            />
+            {isValidPin && (
+              <View style={{ position: 'absolute', right: 15, top: 15 }}>
+                <Icon name="check-circle" size={24} color="#4CAF50" />
+              </View>
+            )}
+          </View>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#007bff',
+              paddingVertical: 15,
+              paddingHorizontal: 20,
+              borderRadius: 12,
+              marginLeft: 10,
+              height: 55,
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: '#007bff',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 4,
+            }}
+            onPress={verifyPinCode}
+            disabled={geoLoading}
+          >
+            {geoLoading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Verify</Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.hiringTypeContainer}>
           <View style={styles.selectionRow}>
