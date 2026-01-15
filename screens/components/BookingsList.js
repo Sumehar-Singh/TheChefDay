@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
@@ -18,9 +19,6 @@ const isTablet = width > 600;
 const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAll = true }) => {
   const [bookings, setBookings] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Debug flag: if no limit is passed (AllBookings page), show debug info
-  const isDebug = !limit;
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -57,8 +55,14 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   const getField = (item, keys, fallback = '') => {
     if (!item) return fallback;
     for (const key of keys) {
+      // Check for exact key
       if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
         return item[key];
+      }
+      // Check for key with spaces removed (e.g. "booking id" -> "bookingid")
+      const strippedKey = key.replace(/\s/g, '');
+      if (item[strippedKey] !== undefined && item[strippedKey] !== null && item[strippedKey] !== '') {
+        return item[strippedKey];
       }
     }
     return fallback;
@@ -102,6 +106,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
               onPress={() => navigation.navigate('AllBookings')}
             >
               <Text style={styles.seeAllText}>View All</Text>
+              <MaterialCommunityIcons name="chevron-right" size={20} color="#209E00" />
             </TouchableOpacity>
           )}
         </View>
@@ -111,23 +116,16 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         <EmptyBookings />
       ) : (
         <>
-          {/* DEBUG DUMP FOR ALL BOOKINGS PAGE ONLY */}
-          {isDebug && (
-            <View style={{ padding: 10, backgroundColor: '#ffeebb', marginBottom: 10, borderWidth: 2, borderColor: 'red' }}>
-              <Text style={{ fontWeight: 'bold', color: 'red', marginBottom: 5 }}>DEBUG DATA DUMP (First Item):</Text>
-              <Text style={{ fontSize: 10, color: '#000', fontFamily: 'monospace' }}>
-                {JSON.stringify(bookings[0], null, 2)}
-              </Text>
-            </View>
-          )}
-
           {bookings.map((item, index) => {
-            const bookingId = getField(item, ['BookingId', 'bookingid', 'id', 'ID'], '');
-            const chefName = getField(item, ['ChefName', 'chefname', 'Chef_Name', 'chef_name', 'name', 'Name'], 'Unknown Chef');
-            const eventDate = getField(item, ['EventDate', 'eventdate', 'event_date', 'date'], 'N/A');
-            const bookingDate = getField(item, ['BookingDate', 'bookingdate', 'booking_date', 'created_at'], 'N/A');
-            const serviceType = getField(item, ['ServiceType', 'servicetype', 'service_type', 'service'], 'Service');
-            const status = getField(item, ['Status', 'status'], 'Pending');
+            // Updated keys based on user's debug output: 
+            // booking id, servicetype, eventdate, status, bookingdate, chefname, chefimage
+            const bookingId = getField(item, ['booking id', 'bookingid', 'BookingId', 'id', 'ID'], '');
+            const chefName = getField(item, ['chefname', 'chef name', 'Chefname', 'ChefName', 'name'], 'Unknown Chef');
+            const chefImage = getField(item, ['chefimage', 'chef image', 'ChefImage', 'image'], null);
+            const eventDate = getField(item, ['eventdate', 'event date', 'EventDate', 'date'], 'N/A');
+            const bookingDate = getField(item, ['bookingdate', 'booking date', 'BookingDate', 'created_at'], 'N/A');
+            const serviceType = getField(item, ['servicetype', 'service type', 'ServiceType', 'service'], 'Service');
+            const status = getField(item, ['status', 'Status'], 'Pending');
 
             return (
               <TouchableOpacity
@@ -141,7 +139,15 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
               >
                 <View style={styles.bookingItemLeft}>
                   <View style={styles.bookingHeader}>
-                    <Text style={[styles.bookingTextCustomer, { color: 'black' }]}>
+                    {/* Chef Image Check */}
+                    {chefImage ? (
+                      <Image
+                        source={{ uri: chefImage }}
+                        style={{ width: 30, height: 30, borderRadius: 15, marginRight: 8, backgroundColor: '#eee' }}
+                      />
+                    ) : null}
+
+                    <Text style={styles.bookingTextCustomer}>
                       {chefName}
                     </Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
@@ -152,19 +158,19 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                   <View style={styles.bookingDetails}>
                     <View style={styles.detailRow}>
                       <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
-                      <Text style={[styles.bookingTextEvent, { color: 'black' }]}>
+                      <Text style={styles.bookingTextEvent}>
                         Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
                       <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
-                      <Text style={[styles.bookingText, { color: 'black' }]}>
+                      <Text style={styles.bookingText}>
                         Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
                       <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
-                      <Text style={[styles.bookingTextService, { color: 'black' }]}>
+                      <Text style={styles.bookingTextService}>
                         {serviceType}
                       </Text>
                     </View>
@@ -229,14 +235,14 @@ const styles = StyleSheet.create({
   },
   bookingHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
   },
   bookingTextCustomer: {
     fontSize: isTablet ? 18 : 16,
     fontWeight: '700',
-    color: '#262626',
+    color: '#000', // Explicit black
+    flex: 1,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -244,6 +250,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 5,
   },
   statusText: {
     color: '#fff',
@@ -261,10 +268,11 @@ const styles = StyleSheet.create({
     fontSize: isTablet ? 16 : 14,
     color: '#209E00',
     marginLeft: 8,
+    fontWeight: '500',
   },
   bookingText: {
     fontSize: isTablet ? 16 : 14,
-    color: '#666',
+    color: '#444', // Darker grey
     marginLeft: 8,
   },
   bookingTextService: {
