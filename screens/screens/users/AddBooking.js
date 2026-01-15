@@ -487,31 +487,33 @@ const AddBooking = ({ navigation }) => {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <View style={styles.modalView}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Event Date</Text>
-              <TouchableOpacity onPress={closeModal} style={styles.modalClose}>
-                <Icon name="close" size={22} color="#111" />
-              </TouchableOpacity>
+          <View style={styles.centeredModalView}>
+            <View style={styles.modalView}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Select Event Date</Text>
+                <TouchableOpacity onPress={closeModal} style={styles.modalClose}>
+                  <Icon name="close" size={22} color="#111" />
+                </TouchableOpacity>
+              </View>
+              <Calendar
+                onDayPress={onDayPress}
+                markedDates={{
+                  ...markedDates,
+                  [EventDate]: {
+                    selected: true,
+                    selectedColor: '#0A84FF',
+                    selectedTextColor: 'white',
+                  },
+                }}
+                minDate={getTomorrowDate()}
+                theme={{
+                  todayTextColor: '#0A84FF',
+                  arrowColor: '#0A84FF',
+                  monthTextColor: '#111827',
+                  textDayHeaderFontWeight: 'bold',
+                }}
+              />
             </View>
-            <Calendar
-              onDayPress={onDayPress}
-              markedDates={{
-                ...markedDates,
-                [EventDate]: {
-                  selected: true,
-                  selectedColor: '#0A84FF',
-                  selectedTextColor: 'white',
-                },
-              }}
-              minDate={getTomorrowDate()}
-              theme={{
-                todayTextColor: '#0A84FF',
-                arrowColor: '#0A84FF',
-                monthTextColor: '#111827',
-                textDayHeaderFontWeight: 'bold',
-              }}
-            />
           </View>
         </Modal>
 
@@ -760,9 +762,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 8,
   },
+  centeredModalView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
   modalView: {
     backgroundColor: 'white',
     borderRadius: 20,
+    width: '90%',
     padding: 25,
     alignItems: 'center',
     shadowColor: '#000',
@@ -770,7 +779,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    margin: 20,
   },
   modalHeader: {
     width: '100%',
