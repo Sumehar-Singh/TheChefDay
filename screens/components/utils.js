@@ -1,11 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-export const storeChefId = async (chefId) => {
+export const storeChefId = async (chefId, userId = null) => {
   try {
     const idStr = String(chefId); // Normalize to string
+    const storageKey = userId ? `chefIds_${userId}` : 'chefIds';
+
     // Get stored chefIds from AsyncStorage
-    const storedChefIds = await AsyncStorage.getItem('chefIds');
+    const storedChefIds = await AsyncStorage.getItem(storageKey);
     let chefIdsArray = storedChefIds ? JSON.parse(storedChefIds) : [];
 
     // Remove it if it exists (so we can move it to the end/newest position)
@@ -20,7 +22,7 @@ export const storeChefId = async (chefId) => {
     chefIdsArray.push(idStr);
 
     // Save the updated array back to AsyncStorage
-    await AsyncStorage.setItem('chefIds', JSON.stringify(chefIdsArray));
+    await AsyncStorage.setItem(storageKey, JSON.stringify(chefIdsArray));
   } catch (error) {
     console.error('Error storing ChefId:', error);
   }
@@ -28,10 +30,10 @@ export const storeChefId = async (chefId) => {
 
 
 
-export const getStoredChefIds = async () => {
+export const getStoredChefIds = async (userId = null) => {
   try {
-    //AsyncStorage.removeItem('chefIds');
-    const storedChefIds = await AsyncStorage.getItem('chefIds');
+    const storageKey = userId ? `chefIds_${userId}` : 'chefIds';
+    const storedChefIds = await AsyncStorage.getItem(storageKey);
     return storedChefIds ? JSON.parse(storedChefIds) : [];
   } catch (error) {
     console.error('Error retrieving ChefIds:', error);

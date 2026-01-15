@@ -19,7 +19,7 @@ import axios from 'axios';
 import { BASE_URL } from '../../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import getDistanceInMiles from '../../components/DistanceCalculator';
-import { getUserCoords } from '../../components/utils';
+import { getUserCoords, getStoredChefIds } from '../../components/utils';
 import { useAuth } from '../../../components/contexts/AuthContext';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
@@ -40,8 +40,8 @@ const ChefsList = ({ navigation, route }) => {
   useEffect(() => {
     const initData = async () => {
       // Fetch Recent IDs
-      const rIds = await AsyncStorage.getItem('chefIds');
-      setRecentChefIds(rIds ? JSON.parse(rIds) : []);
+      const rIds = await getStoredChefIds(profile?.Id);
+      setRecentChefIds(rIds);
 
       // Fetch User Coords
       const dimensions = await getUserCoords();

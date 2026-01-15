@@ -54,7 +54,7 @@ const UserDashboard = ({ navigation }) => {
   };
 
   const fetchRecentChefIds = async () => {
-    const storedIds = await getStoredChefIds(); // Call the utility function to fetch ChefIds
+    const storedIds = await getStoredChefIds(profile?.Id); // Pass UserId for user-specific storage
     console.log('all Stored', storedIds);
 
     setRecentChefIds(storedIds);
