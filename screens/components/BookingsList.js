@@ -55,29 +55,15 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     }
   }, [UserID, limit]);
 
-  // Helper to handle any case/separator variation from API (Smart Normalizer)
-  const normalizeBooking = (item) => {
-    if (!item) return {};
-
-    // 1. Create a map where keys are lowercased and stripped of special chars
-    const standardized = {};
-    Object.keys(item).forEach(key => {
-      // "Booking ID" -> "bookingid", "Chef_Name" -> "chefname"
-      const cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
-      standardized[cleanKey] = item[key];
-    });
-
-    // 2. Map standard keys to our component's expected keys
-    // Explicitly fallback to lowercase keys confirmed by user logs
-    return {
-      BookingId: standardized.bookingid || item.bookingid || item.id || standardized.id,
-      ChefName: standardized.chefname || item.chefname || standardized.cheffullname || standardized.name,
-      ChefID: standardized.chefid || item.chefid,
-      EventDate: standardized.eventdate || item.eventdate || standardized.date,
-      BookingDate: standardized.bookingdate || item.bookingdate || standardized.createdat,
-      ServiceType: standardized.servicetype || item.servicetype || standardized.service,
-      Status: standardized.status || item.status,
-    };
+  // Direct helper to safely extract data regardless of casing and missing values
+  const getField = (item, keys, fallback = '') => {
+    if (!item) return fallback;
+    for (const key of keys) {
+      if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
+        return item[key];
+      }
+    }
+    return fallback;
   };
 
   const getStatusColor = (status) => {
@@ -157,27 +143,32 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         <EmptyBookings />
       ) : (
         <>
-          {bookings.map((rawItem, index) => {
-            const item = normalizeBooking(rawItem);
+          {bookings.map((item, index) => {
+            // Explicitly look for the keys we know exist using the helper
+            const bookingId = getField(item, ['BookingId', 'bookingid', 'id', 'ID'], '');
+            const chefName = getField(item, ['ChefName', 'chefname', 'Chef_Name', 'chef_name', 'name', 'Name'], 'Unknown Chef');
+            const eventDate = getField(item, ['EventDate', 'eventdate', 'event_date', 'date'], 'N/A');
+            const bookingDate = getField(item, ['BookingDate', 'bookingdate', 'booking_date', 'created_at'], 'N/A');
+            const serviceType = getField(item, ['ServiceType', 'servicetype', 'service_type', 'service'], 'Service');
+            const status = getField(item, ['Status', 'status'], 'Pending');
+
             return (
               <TouchableOpacity
-                key={
-                  item.BookingId?.toString() ??
-                  `booking-${index}`
-                }
+                key={bookingId ? bookingId.toString() : `booking-${index}`}
                 style={styles.bookingItem}
                 onPress={() =>
                   navigation.navigate('BookingDetail', {
-                    BookingID: item.BookingId,
+                    BookingID: bookingId,
                   })
                 }
               >
                 <View style={styles.bookingItemLeft}>
                   <View style={styles.bookingHeader}>
                     <Text style={styles.bookingTextCustomer}>
-                      {item.ChefName || `Booking # ${item.BookingId || 'ID?'}`}
+                      {chefName}
                     </Text>
                   </View>
+
                   <View style={styles.bookingDetails}>
                     <View style={styles.detailRow}>
                       <MaterialCommunityIcons
@@ -186,7 +177,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         color="#ff0000"
                       />
                       <Text style={styles.bookingTextEvent}>
-                        Event: {item.EventDate ? formatDate(item.EventDate) : 'N/A'}
+                        Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
@@ -196,7 +187,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         color="#ff0000"
                       />
                       <Text style={styles.bookingText}>
-                        Booked: {item.BookingDate ? formatDate(item.BookingDate) : 'N/A'}
+                        Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
@@ -206,16 +197,16 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         color="#ff0000"
                       />
                       <Text style={styles.bookingTextService}>
-                        {item.ServiceType || 'Service'}
+                        {serviceType}
                       </Text>
                     </View>
                     <View
                       style={[
                         styles.statusBadge,
-                        { backgroundColor: getStatusColor(item.Status) },
+                        { backgroundColor: getStatusColor(status) },
                       ]}
                     >
-                      <Text style={styles.statusText}>{item.Status || 'Unknown'}</Text>
+                      <Text style={styles.statusText}>{status}</Text>
                     </View>
                   </View>
                 </View>
