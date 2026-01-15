@@ -23,9 +23,10 @@ import { getUserCoords } from '../../components/utils';
 import { useAuth } from '../../../components/contexts/AuthContext';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
-const radiusMiles = 2500;
+const radiusMiles = 200; // Global limit
 
-const ChefsList = ({ navigation }) => {
+const ChefsList = ({ navigation, route }) => {
+  const { filterType } = route.params || { filterType: 'All' };
   const [chefs, setChefs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredChefs, setFilteredChefs] = useState([]);
@@ -62,8 +63,44 @@ const ChefsList = ({ navigation }) => {
       );
 
       if (response.data.status === 'success') {
-        setChefs(response.data.data);
-        setFilteredChefs(response.data.data);
+        let fetchedChefs = response.data.data;
+
+        // 1. Global Filter: Enforce 200-mile radius if coords exist
+        if (coords) {
+          fetchedChefs = fetchedChefs.filter(chef =>
+            getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= 200
+          );
+        }
+
+        // 2. Apply Specific Category Filters
+        let finalChefs = [...fetchedChefs];
+
+        if (filterType === 'Popular') {
+          // Sort by Popularity Descending
+          finalChefs.sort((a, b) => (b.Popularity || 0) - (a.Popularity || 0));
+        } else if (filterType === 'Nearby') {
+          // Sort by Distance Ascending
+          if (coords) {
+            finalChefs.sort((a, b) => {
+              const distA = getDistanceInMiles(coords.lat, coords.lon, a.Lat, a.Lon);
+              const distB = getDistanceInMiles(coords.lat, coords.lon, b.Lat, b.Lon);
+              return distA - distB;
+            });
+          }
+        } else if (filterType === 'Recent') {
+          // Filter by Recent Logic (requires fetching recent IDs inside this component or passing them)
+          // For simplify, we might need to fetch them here.
+          // Ideally Recent IDs should be passed, but let's re-fetch for robustness
+          const recentIds = await AsyncStorage.getItem('recentChefIds'); // Assuming stored
+          const parsedIds = recentIds ? JSON.parse(recentIds) : [];
+          finalChefs = finalChefs.filter(c => parsedIds.includes(c.ChefID));
+        } else if (filterType === 'Random') {
+          // Shuffle
+          finalChefs = finalChefs.sort(() => 0.5 - Math.random());
+        }
+
+        setChefs(finalChefs);
+        setFilteredChefs(finalChefs);
       }
     } catch (error) {
       console.error('Error fetching chefs:', error);
@@ -111,7 +148,7 @@ const ChefsList = ({ navigation }) => {
       colors={['white', '#f2f2f2', '#e6e6e6']}
       style={styles.container}
     >
-      <CustomStatusBar title="Chefs List" />
+      <CustomStatusBar title={`${filterType === 'All' ? 'Chefs List' : filterType + ' Chefs'}`} />
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
           <MaterialCommunityIcons
@@ -172,8 +209,8 @@ const ChefsList = ({ navigation }) => {
                   {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()
                     .length > 13
                     ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`
-                        .trim()
-                        .slice(0, 13)}...`
+                      .trim()
+                      .slice(0, 13)}...`
                     : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
                 </Text>
               </TouchableOpacity>
@@ -209,8 +246,8 @@ const ChefsList = ({ navigation }) => {
                   {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()
                     .length > 25
                     ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`
-                        .trim()
-                        .slice(0, 25)}...`
+                      .trim()
+                      .slice(0, 25)}...`
                     : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
                 </Text>
 
@@ -227,13 +264,13 @@ const ChefsList = ({ navigation }) => {
                       item.Lon
                     ) < radiusMiles &&
                     '~' +
-                      getDistanceInMiles(
-                        coords.lat,
-                        coords.lon,
-                        item.Lat,
-                        item.Lon
-                      ).toFixed(2) +
-                      ' mi'}
+                    getDistanceInMiles(
+                      coords.lat,
+                      coords.lon,
+                      item.Lat,
+                      item.Lon
+                    ).toFixed(2) +
+                    ' mi'}
                 </Text>
                 {item.HourlyRate || item.DayRate ? (
                   <View style={styles.hourDayRateContainer}>

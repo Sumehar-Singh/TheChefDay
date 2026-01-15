@@ -41,10 +41,8 @@ const UserDashboard = ({ navigation }) => {
   const { profile } = useAuth();
 
   const [coords, setCoords] = useState(null);
-  const [coords, setCoords] = useState(null);
   const nearByMiles = 200; // Updated to 200 miles as per requirement
-  const radiusMiles = 200;
-  const radiusMiles = 200;
+
 
   const removeItemFromStorage = async (key) => {
     try {
@@ -247,7 +245,15 @@ const UserDashboard = ({ navigation }) => {
                 </View>
                 <TouchableOpacity
                   style={styles.seeAllButton}
-                  onPress={() => navigation.navigate('ChefsList')}
+                  onPress={() => {
+                    let filterType = 'All';
+                    if (section.title.includes('Recently')) filterType = 'Recent';
+                    else if (section.title.includes('Random')) filterType = 'Random';
+                    else if (section.title.includes('Nearby')) filterType = 'Nearby';
+                    else if (section.title.includes('Popular')) filterType = 'Popular';
+
+                    navigation.navigate('ChefsList', { filterType });
+                  }}
                 >
                   <Text style={styles.seeAllText}>View All</Text>
                   <MaterialCommunityIcons
