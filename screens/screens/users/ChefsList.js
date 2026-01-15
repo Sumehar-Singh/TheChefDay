@@ -248,81 +248,103 @@ const ChefsList = ({ navigation, route }) => {
             }
           })()}
         </Text>
-        <FlatList
-          data={filteredChefs}
-          keyExtractor={(item) =>
-            item.ChefID
-              ? item.ChefID.toString()
-              : `${item.id || 'chef'}-${Math.random()}`
-          }
-          scrollEnabled={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.chefCard}
-              onPress={() => navigateToChefDetail(item.ChefID)}
-            >
-              <Image
-                source={
-                  item.Image
-                    ? { uri: item.Image }
-                    : require('../../../assets/userImage.jpg')
-                }
-                style={styles.chefCardImage}
-              />
-              <View style={styles.chefInfo}>
-                <Text style={styles.chefCardName}>
-                  {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()
-                    .length > 25
-                    ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`
-                      .trim()
-                      .slice(0, 25)}...`
-                    : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
-                </Text>
+        {filteredChefs.length > 0 ? (
+          <FlatList
+            data={filteredChefs}
+            keyExtractor={(item) =>
+              item.ChefID
+                ? item.ChefID.toString()
+                : `${item.id || 'chef'}-${Math.random()}`
+            }
+            scrollEnabled={false}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.chefCard}
+                onPress={() => navigateToChefDetail(item.ChefID)}
+              >
+                <Image
+                  source={
+                    item.Image
+                      ? { uri: item.Image }
+                      : require('../../../assets/userImage.jpg')
+                  }
+                  style={styles.chefCardImage}
+                />
+                <View style={styles.chefInfo}>
+                  <Text style={styles.chefCardName}>
+                    {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()
+                      .length > 25
+                      ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`
+                        .trim()
+                        .slice(0, 25)}...`
+                      : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
+                  </Text>
 
-                <Text style={styles.chefDetails}>
-                  Exp -{item.ExperienceYears} Years
-                </Text>
-                {/* <Text style={styles.chefRating}>⭐ {item.rating} | 📍 {item.location}</Text> */}
-                <Text style={styles.chefRating}>
-                  {coords &&
-                    getDistanceInMiles(
-                      coords.lat,
-                      coords.lon,
-                      item.Lat,
-                      item.Lon
-                    ) < radiusMiles &&
-                    '~' +
-                    getDistanceInMiles(
-                      coords.lat,
-                      coords.lon,
-                      item.Lat,
-                      item.Lon
-                    ).toFixed(2) +
-                    ' mi'}
-                </Text>
-                {item.HourlyRate || item.DayRate ? (
-                  <View style={styles.hourDayRateContainer}>
-                    <View style={[styles.rateBadge, styles.hourRateBadge]}>
-                      <Text style={styles.rateText}>H: ${item.HourlyRate}</Text>
+                  <Text style={styles.chefDetails}>
+                    Exp -{item.ExperienceYears} Years
+                  </Text>
+                  {/* <Text style={styles.chefRating}>⭐ {item.rating} | 📍 {item.location}</Text> */}
+                  <Text style={styles.chefRating}>
+                    {coords &&
+                      getDistanceInMiles(
+                        coords.lat,
+                        coords.lon,
+                        item.Lat,
+                        item.Lon
+                      ) < radiusMiles &&
+                      '~' +
+                      getDistanceInMiles(
+                        coords.lat,
+                        coords.lon,
+                        item.Lat,
+                        item.Lon
+                      ).toFixed(2) +
+                      ' mi'}
+                    {item.Popularity ? ` • 🔥 ${item.Popularity}` : ''}
+                  </Text>
+                  {item.HourlyRate || item.DayRate ? (
+                    <View style={styles.hourDayRateContainer}>
+                      <View style={[styles.rateBadge, styles.hourRateBadge]}>
+                        <Text style={styles.rateText}>H: ${item.HourlyRate}</Text>
+                      </View>
+                      <View style={[styles.rateBadge, styles.dayRateBadge]}>
+                        <Text style={styles.rateText}>D: ${item.DayRate}</Text>
+                      </View>
                     </View>
-                    <View style={[styles.rateBadge, styles.dayRateBadge]}>
-                      <Text style={styles.rateText}>D: ${item.DayRate}</Text>
+                  ) : (
+                    <View style={styles.hourDayRateContainer}>
+                      <View style={[styles.rateBadge, styles.dayRateBadge]}>
+                        <Text style={styles.rateText}>
+                          Rates are not mentioned
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                ) : (
-                  <View style={styles.hourDayRateContainer}>
-                    <View style={[styles.rateBadge, styles.dayRateBadge]}>
-                      <Text style={styles.rateText}>
-                        Rates are not mentioned
-                      </Text>
-                    </View>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={styles.allChefsList}
-        />
+                  )}
+                </View>
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={styles.allChefsList}
+          />
+        ) : (
+          <View style={styles.emptyStateContainer}>
+            <MaterialCommunityIcons
+              name={
+                filterType === 'Popular'
+                  ? 'trophy-broken'
+                  : 'information-outline'
+              }
+              size={40}
+              color="#888"
+            />
+            <Text style={styles.emptyStateText}>
+              {filterType === 'Popular'
+                ? 'No popular chefs found nearby yet! 🌟\nBe the first to book one.'
+                : filterType === 'Recent'
+                  ? "Your history is empty! 🕒\nStart exploring chefs now."
+                  : 'No chefs found in this category.'}
+            </Text>
+          </View>
+        )}
       </ScrollView>
       {isLoading && <CenterLoading />}
     </LinearGradient>
