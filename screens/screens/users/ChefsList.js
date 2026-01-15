@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     color: '#805500',
   },
   emptyStateContainer: {
-    height: 180,
+    height: isTablet ? 250 : 200,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',

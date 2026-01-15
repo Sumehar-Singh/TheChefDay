@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   emptyStateContainer: {
-    height: 180, // Match typical card height
+    height: isTablet ? 250 : 200, // Exact match to chefCard height
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff', // White background
