@@ -343,7 +343,8 @@ const UserDashboard = ({ navigation }) => {
                   contentContainerStyle={styles.chefListContent}
                 />
               </View>
-            ))}
+            );
+          })}
         </View>
 
         {profile.Id && (
