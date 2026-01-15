@@ -23,8 +23,8 @@ const BookingDetail = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [modalConfirmText, setModalConfirmText] = useState("Confirm");
   const [pendingStatus, setPendingStatus] = useState("");
- 
-  const [modalOnSuccess, setModalOnSuccess] = useState(() => () => {});
+
+  const [modalOnSuccess, setModalOnSuccess] = useState(() => () => { });
   const fetchBookingDetail = async () => {
     const form = new FormData();
     form.append('BookingID', BookingID);
@@ -45,7 +45,7 @@ const BookingDetail = () => {
     }
   };
   useEffect(() => {
-   
+
     fetchBookingDetail();
   }, [BookingID]);
 
@@ -68,7 +68,7 @@ const BookingDetail = () => {
       </View>
     );
   }
-  const updateBookingStatus = async (status, onSuccess = () => {}) => {
+  const updateBookingStatus = async (status, onSuccess = () => { }) => {
     // Configure modal content based on target status
     let title = 'Confirm Action';
     let message = 'Are you sure you want to proceed?';
@@ -91,23 +91,23 @@ const BookingDetail = () => {
     setModalOnSuccess(() => onSuccess);
     setModalVisible(true);
   };
-  
+
   // This function actually performs the API call
   const proceedUpdateStatus = async (status, onSuccess) => {
     const form = new FormData();
     form.append('BookingID', BookingID);
     form.append('Status', status);
-  
+
     try {
       const response = await axios.post(`${BASE_URL}shared/update_booking.php`, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-  
+
       if (response.data.success) {
         setBookingStatus(status);
         onSuccess();
-       
-      //  Alert.alert('Success', response.data.message);
+
+        //  Alert.alert('Success', response.data.message);
         // callback after success (optional)
       } else {
         Alert.alert('Error', response.data.message);
@@ -118,175 +118,178 @@ const BookingDetail = () => {
     }
   };
   return (
-    <ScrollView 
-      contentContainerStyle={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={['#805500']}
-          tintColor="#805500"
-        />
-      }
-    >
+    <View style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
       <CustomStatusBar title="Booking Details" />
-      {/* Header Section */}
-     
-      
-  
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#805500']}
+            tintColor="#805500"
+            progressViewOffset={10}
+          />
+        }
+      >
+        {/* Header Section */}
 
-      {/* Chef Image */}
-      {booking.Image && (
-        <View style={styles.imageContainer}>
-          <View style={styles.imageWrapper}>
-            <Image source={{ uri: booking.Image }} style={styles.chefImage} />
+
+
+
+        {/* Chef Image */}
+        {booking.Image && (
+          <View style={styles.imageContainer}>
+            <View style={styles.imageWrapper}>
+              <Image source={{ uri: booking.Image }} style={styles.chefImage} />
+            </View>
+          </View>
+        )}
+
+        {/* Chef Info */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="person-circle" size={24} color="#805500" />
+            <Text style={styles.cardTitle}>Chef Details</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Name</Text>
+            <Text style={styles.value}>{booking.ChefName}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Experience</Text>
+            <Text style={styles.value}>{booking.ExperienceYears} Years</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Bio</Text>
+            <Text style={[styles.value, styles.multiline]}>{booking.Bio}</Text>
           </View>
         </View>
-      )}
 
-      {/* Chef Info */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Ionicons name="person-circle" size={24} color="#805500" />
-          <Text style={styles.cardTitle}>Chef Details</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Name</Text>
-          <Text style={styles.value}>{booking.ChefName}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Experience</Text>
-          <Text style={styles.value}>{booking.ExperienceYears} Years</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Bio</Text>
-          <Text style={[styles.value, styles.multiline]}>{booking.Bio}</Text>
-        </View>
-      </View>
+        {/* Confirmation Modal */}
+        <Modal
+          transparent
+          visible={modalVisible}
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>{modalTitle}</Text>
+              <Text style={styles.modalMessage}>{modalMessage}</Text>
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.modalCancelText}>No</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalConfirmBtn}
+                  onPress={() =>
+                    proceedUpdateStatus(pendingStatus, () => {
+                      // update both bookingStatus and booking.Status locally so UI updates immediately
+                      setBooking((prev) => (prev ? { ...prev, Status: pendingStatus } : prev));
+                      setBookingStatus(pendingStatus);
+                      setModalVisible(false);
+                      modalOnSuccess();
+                    })
+                  }
+                >
+                  <Text style={styles.modalConfirmText}>{modalConfirmText}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
-      {/* Confirmation Modal */}
-      <Modal
-        transparent
-        visible={modalVisible}
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{modalTitle}</Text>
-            <Text style={styles.modalMessage}>{modalMessage}</Text>
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)}>
-                <Text style={styles.modalCancelText}>No</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalConfirmBtn}
-                onPress={() =>
-                  proceedUpdateStatus(pendingStatus, () => {
-                    // update both bookingStatus and booking.Status locally so UI updates immediately
-                    setBooking((prev) => (prev ? { ...prev, Status: pendingStatus } : prev));
-                    setBookingStatus(pendingStatus);
-                    setModalVisible(false);
-                    modalOnSuccess();
-                  })
-                }
+        {/* Booking Info */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="calendar" size={24} color="#805500" />
+            <Text style={styles.cardTitle}>Booking Info</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Booked By</Text>
+            <Text style={styles.value}>{booking.Name}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Phone No</Text>
+            <Text style={styles.value}>{booking.PhoneNo}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Address</Text>
+            <Text style={styles.value}>{booking.Address}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Pin Code</Text>
+            <Text style={styles.value}>{booking.PinCode}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Booking Date</Text>
+            <Text style={styles.value}>{formatDate(booking.BookingDate)}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Event Date</Text>
+            <Text style={styles.valueevent}>{formatDate(booking.EventDate)}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Service Type</Text>
+            <Text style={styles.value}>{booking.ServiceType}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Total Price</Text>
+            <Text style={styles.value}>${booking.TotalPrice}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Status</Text>
+            <View style={[
+              styles.statusBadge,
+              booking.Status === 'Confirmed' ? styles.statusConfirmedBadge :
+                booking.Status === 'Cancelled' ? styles.statusCancelledBadge :
+                  styles.statusPendingBadge
+            ]}>
+              {/* <Text style={styles.statusText}>{booking.Status}</Text> */}
+
+              <Text
+                style={styles.statusText}
               >
-                <Text style={styles.modalConfirmText}>{modalConfirmText}</Text>
-              </TouchableOpacity>
+                {bookingStatus === "Canceled" ? "Canceled by You" : bookingStatus}
+              </Text>
+
             </View>
           </View>
         </View>
-      </Modal>
 
-      {/* Booking Info */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Ionicons name="calendar" size={24} color="#805500" />
-          <Text style={styles.cardTitle}>Booking Info</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Booked By</Text>
-          <Text style={styles.value}>{booking.Name}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Phone No</Text>
-          <Text style={styles.value}>{booking.PhoneNo}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Address</Text>
-          <Text style={styles.value}>{booking.Address}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Pin Code</Text>
-          <Text style={styles.value}>{booking.PinCode}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Booking Date</Text>
-          <Text style={styles.value}>{formatDate(booking.BookingDate)}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Event Date</Text>
-          <Text style={styles.valueevent}>{formatDate(booking.EventDate)}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Service Type</Text>
-          <Text style={styles.value}>{booking.ServiceType}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Total Price</Text>
-          <Text style={styles.value}>${booking.TotalPrice}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.label}>Status</Text>
-          <View style={[
-            styles.statusBadge,
-            booking.Status === 'Confirmed' ? styles.statusConfirmedBadge :
-            booking.Status === 'Cancelled' ? styles.statusCancelledBadge :
-            styles.statusPendingBadge
-          ]}>
-            {/* <Text style={styles.statusText}>{booking.Status}</Text> */}
-
-            <Text
-              style={styles.statusText}
-            >
-              {bookingStatus === "Canceled" ? "Canceled by You" : bookingStatus}
-            </Text>
-
+        {booking.Status === "Service Completed" ? (
+          <View style={styles.completedNotice}>
+            <Ionicons name="checkmark-done-circle" size={24} color="#2E7D32" />
+            <Text style={styles.completedNoticeText}>Your service was completed by this chef.</Text>
           </View>
-        </View>
-      </View>
-
-      {booking.Status === "Service Completed" ? (
-        <View style={styles.completedNotice}>
-          <Ionicons name="checkmark-done-circle" size={24} color="#2E7D32" />
-          <Text style={styles.completedNoticeText}>Your service was completed by this chef.</Text>
-        </View>
-      ) : booking.Status === "Cancelled" ? (
-        <View style={styles.cancelledNotice}>
-          <Ionicons name="close-circle" size={24} color="#B00020" />
-          <Text style={styles.cancelledNoticeText}>This booking was cancelled.</Text>
-        </View>
-      ) : booking.Status === "Confirmed" ? (
-        <TouchableOpacity 
-          style={styles.completedButton}
-          onPress={() => updateBookingStatus("Service Completed")}
-        >
-          <Ionicons name="checkmark-done-circle" size={24} color="#FFF" />
-          <Text style={styles.completedText}>Mark as Service Completed</Text>
-        </TouchableOpacity>
-      ) : (
-        booking.Status !== "Cancelled" && (
-          <TouchableOpacity 
-            style={styles.cancelButton}
-            onPress={() => updateBookingStatus("Cancelled")}
+        ) : booking.Status === "Cancelled" ? (
+          <View style={styles.cancelledNotice}>
+            <Ionicons name="close-circle" size={24} color="#B00020" />
+            <Text style={styles.cancelledNoticeText}>This booking was cancelled.</Text>
+          </View>
+        ) : booking.Status === "Confirmed" ? (
+          <TouchableOpacity
+            style={styles.completedButton}
+            onPress={() => updateBookingStatus("Service Completed")}
           >
-            <Ionicons name="close-circle" size={24} color="#FFF" />
-            <Text style={styles.cancelText}>Cancel Booking</Text>
+            <Ionicons name="checkmark-done-circle" size={24} color="#FFF" />
+            <Text style={styles.completedText}>Mark as Service Completed</Text>
           </TouchableOpacity>
-        )
-      )}
+        ) : (
+          booking.Status !== "Cancelled" && (
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => updateBookingStatus("Cancelled")}
+            >
+              <Ionicons name="close-circle" size={24} color="#FFF" />
+              <Text style={styles.cancelText}>Cancel Booking</Text>
+            </TouchableOpacity>
+          )
+        )}
 
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
