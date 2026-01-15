@@ -35,110 +35,115 @@ const ChefsList = ({ navigation, route }) => {
   const [coords, setCoords] = useState(null);
   const { profile } = useAuth();
 
+  const [recentChefIds, setRecentChefIds] = useState([]);
+
   useEffect(() => {
-    const getUserId = async () => {
-      fetchChefs(profile.Id);
+    const initData = async () => {
+      // Fetch Recent IDs
+      const rIds = await AsyncStorage.getItem('chefIds');
+      setRecentChefIds(rIds ? JSON.parse(rIds) : []);
+
+      // Fetch User Coords
       const dimensions = await getUserCoords();
       setCoords(dimensions);
+
+      // Fetch Chefs
+      if (profile) fetchChefs(profile.Id);
+      else fetchChefsForGuest();
+    };
+    initData();
+  }, []);
+
+  // Reactive Effect: Re-run filtering/sorting whenever dependencies change
+  useEffect(() => {
+    const applyFiltersAndSort = () => {
+      let result = [...chefs];
+
+      // 1. Global Filter: Enforce 200-mile radius if coords exist
+      if (coords) {
+        result = result.filter(chef =>
+          getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= 200
+        );
+      }
+
+      // 2. Apply Specific Category Filters (Sorting/Filtering)
+      if (filterType === 'Popular') {
+        result.sort((a, b) => (b.Popularity || 0) - (a.Popularity || 0));
+      } else if (filterType === 'Nearby') {
+        if (coords) {
+          result.sort((a, b) => {
+            const distA = getDistanceInMiles(coords.lat, coords.lon, a.Lat, a.Lon);
+            const distB = getDistanceInMiles(coords.lat, coords.lon, b.Lat, b.Lon);
+            return distA - distB;
+          });
+        }
+      } else if (filterType === 'Recent') {
+        const safeParsedIds = recentChefIds.map(id => String(id));
+        result = result.filter(c => safeParsedIds.includes(String(c.ChefID)));
+        // Sort by Recency
+        result.sort((a, b) => {
+          const indexA = safeParsedIds.indexOf(String(a.ChefID));
+          const indexB = safeParsedIds.indexOf(String(b.ChefID));
+          return indexB - indexA;
+        });
+      } else if (filterType === 'Random') {
+        // Shuffle (simple sort)
+        result.sort(() => 0.5 - Math.random());
+      }
+
+      // 3. Apply Search Filter
+      if (searchQuery) {
+        const lowerQ = searchQuery.toLowerCase();
+        result = result.filter(chef =>
+          chef.FirstName.toLowerCase().includes(lowerQ)
+        );
+      }
+
+      setFilteredChefs(result);
     };
 
-    if (profile) getUserId();
-    else fetchChefsForGuest();
-  }, []);
+    applyFiltersAndSort();
+  }, [chefs, coords, filterType, searchQuery, recentChefIds]);
+
   const navigateToChefDetail = (chefId) => {
     navigation.navigate('ChefDetail', {
-      ChefId: chefId, // Pass the ChefId as a param (INT)
-
-      // Passed these two because ChefId will be stored in Recent
-      // UserId will get the chef data in ChefDetail screen
+      ChefId: chefId,
     });
   };
+
   const fetchChefs = async (userId) => {
     try {
       const response = await axios.get(
         `${BASE_URL}chefs/get_chefs_list_with_booked.php`,
-        {
-          params: { UserID: userId },
-        }
+        { params: { UserID: userId } }
       );
-
       if (response.data.status === 'success') {
-        let fetchedChefs = response.data.data;
-
-        // 1. Global Filter: Enforce 200-mile radius if coords exist
-        if (coords) {
-          fetchedChefs = fetchedChefs.filter(chef =>
-            getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= 200
-          );
-        }
-
-        // 2. Apply Specific Category Filters
-        let finalChefs = [...fetchedChefs];
-
-        if (filterType === 'Popular') {
-          // Sort by Popularity Descending
-          finalChefs.sort((a, b) => (b.Popularity || 0) - (a.Popularity || 0));
-        } else if (filterType === 'Nearby') {
-          // Sort by Distance Ascending
-          if (coords) {
-            finalChefs.sort((a, b) => {
-              const distA = getDistanceInMiles(coords.lat, coords.lon, a.Lat, a.Lon);
-              const distB = getDistanceInMiles(coords.lat, coords.lon, b.Lat, b.Lon);
-              return distA - distB;
-            });
-          }
-        } else if (filterType === 'Recent') {
-          // Filter by Recent Logic (requires fetching recent IDs inside this component or passing them)
-          // For simplify, we might need to fetch them here.
-          // Ideally Recent IDs should be passed, but let's re-fetch for robustness
-          const recentIds = await AsyncStorage.getItem('chefIds'); // Correct key from utils.js
-          const parsedIds = recentIds ? JSON.parse(recentIds) : [];
-          // Ensure type-safe comparison
-          const safeParsedIds = parsedIds.map(id => String(id));
-
-          finalChefs = finalChefs.filter(c => safeParsedIds.includes(String(c.ChefID)));
-
-          // Sort by Recency: Newest viewed (last in safeParsedIds) comes first
-          finalChefs.sort((a, b) => {
-            const indexA = safeParsedIds.indexOf(String(a.ChefID));
-            const indexB = safeParsedIds.indexOf(String(b.ChefID));
-            return indexB - indexA; // Descending order
-          });
-        } else if (filterType === 'Random') {
-          // Shuffle
-          finalChefs = finalChefs.sort(() => 0.5 - Math.random());
-        }
-
-        setChefs(finalChefs);
-        setFilteredChefs(finalChefs);
+        setChefs(response.data.data); // Just set raw data
       }
     } catch (error) {
       console.error('Error fetching chefs:', error);
+    } finally {
+      setRefreshing(false);
+      setIsLoading(false);
     }
   };
 
   const fetchChefsForGuest = async () => {
     try {
       const response = await axios.get(`${BASE_URL}guest/get_chefs_list.php`);
-
       if (response.data.status === 'success') {
         setChefs(response.data.data);
-        setFilteredChefs(response.data.data);
       }
     } catch (error) {
       console.error('Error fetching chefs:', error);
+    } finally {
+      setRefreshing(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSearch = () => {
-    const filtered = chefs.filter(
-      (chef) => chef.FirstName.toLowerCase().includes(searchQuery.toLowerCase())
-      //||
-      // chef.cuisine.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      // chef.location.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredChefs(filtered);
-  };
+  // Note: handleSearch is now redundant as effect handles it
+  const handleSearch = () => { };
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
