@@ -175,17 +175,25 @@ const BookingDetail = () => {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
+              <View style={[styles.modalIconContainer, { backgroundColor: pendingStatus === 'Cancelled' ? '#FFEBEE' : '#E8F5E9' }]}>
+                <Ionicons
+                  name={pendingStatus === 'Cancelled' ? "alert-circle" : "checkmark-circle"}
+                  size={40}
+                  color={pendingStatus === 'Cancelled' ? "#D32F2F" : "#2E7D32"}
+                />
+              </View>
+
               <Text style={styles.modalTitle}>{modalTitle}</Text>
               <Text style={styles.modalMessage}>{modalMessage}</Text>
+
               <View style={styles.modalActions}>
                 <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)}>
-                  <Text style={styles.modalCancelText}>No</Text>
+                  <Text style={styles.modalCancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.modalConfirmBtn}
+                  style={[styles.modalConfirmBtn, { backgroundColor: pendingStatus === 'Cancelled' ? '#D32F2F' : '#2E7D32' }]}
                   onPress={() =>
                     proceedUpdateStatus(pendingStatus, () => {
-                      // update both bookingStatus and booking.Status locally so UI updates immediately
                       setBooking((prev) => (prev ? { ...prev, Status: pendingStatus } : prev));
                       setBookingStatus(pendingStatus);
                       setModalVisible(false);
@@ -488,62 +496,79 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 30,
   },
   modalContent: {
     width: '100%',
     backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center', // Center everything
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 20,
+  },
+  modalIconContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   modalTitle: {
-    fontSize: isTablet ? 20 : 18,
+    fontSize: isTablet ? 22 : 20,
     fontWeight: '700',
-    color: '#333',
+    color: '#1a1a1a',
     marginBottom: 8,
     textAlign: 'center',
   },
   modalMessage: {
-    fontSize: isTablet ? 16 : 14,
-    color: '#555',
+    fontSize: isTablet ? 16 : 15,
+    color: '#666',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
+    lineHeight: 22,
   },
   modalActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    width: '100%',
     gap: 12,
   },
   modalCancelBtn: {
     flex: 1,
-    backgroundColor: '#EEE',
-    paddingVertical: 12,
-    borderRadius: 10,
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   modalCancelText: {
-    color: '#333',
-    fontSize: isTablet ? 16 : 14,
+    color: '#666',
+    fontSize: isTablet ? 16 : 15,
     fontWeight: '600',
   },
   modalConfirmBtn: {
     flex: 1,
-    backgroundColor: '#805500',
-    paddingVertical: 12,
-    borderRadius: 10,
+    // Background color is handled in JSX based on status
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   modalConfirmText: {
     color: '#FFF',
-    fontSize: isTablet ? 16 : 14,
+    fontSize: isTablet ? 16 : 15,
     fontWeight: '700',
   },
   loadingContainer: {
