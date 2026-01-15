@@ -577,6 +577,24 @@ const styles = StyleSheet.create({
     color: '#cc0000',
     marginLeft: 10,
   },
+  emptyStateContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f9f9f9',
+    marginHorizontal: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eee',
+    marginTop: 10,
+  },
+  emptyStateText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#888',
+    fontFamily: 'Regular',
+    textAlign: 'center',
+  },
 });
 
 export default UserDashboard;
