@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   completedNotice: {
     backgroundColor: '#E8F5E9',
     paddingVertical: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     marginHorizontal: 16,
     borderRadius: 12,
     marginTop: 10,
@@ -466,19 +466,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    gap: 6, // Reduced gap
+    borderWidth: 1,
+    borderColor: '#C8E6C9', // Subtle border
   },
   completedNoticeText: {
     color: '#2E7D32',
     fontSize: isTablet ? 18 : 16,
     fontWeight: '600',
-    marginLeft: 8,
+    // Removed marginLeft
     textAlign: 'center',
+    flexShrink: 1, // Ensure text wraps properly if long
   },
   cancelledNotice: {
     backgroundColor: '#FFEBEE',
     paddingVertical: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     marginHorizontal: 16,
     borderRadius: 12,
     marginTop: 10,
@@ -486,14 +489,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#FFCDD2',
   },
   cancelledNoticeText: {
     color: '#B00020',
     fontSize: isTablet ? 18 : 16,
     fontWeight: '600',
-    marginLeft: 8,
+    // Removed marginLeft
     textAlign: 'center',
+    flexShrink: 1,
   },
   modalOverlay: {
     flex: 1,
