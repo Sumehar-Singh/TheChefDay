@@ -103,25 +103,32 @@ const UserDashboard = ({ navigation }) => {
   };
 
   // const getRandomChefs = (count) => allChefs.sort(() => 0.5 - Math.random()).slice(0, count);
-  // Global Filter: Only show chefs within 200 miles (if coords exist)
-  const visibleChefs = allChefs.filter((chef) => {
-    if (!coords) return true; // detailed location not yet found, show all
-    return getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= nearByMiles;
-  });
+  // Optimize: Memoize safeRecentIds to prevent re-creation
+  const safeRecentIds = React.useMemo(() => {
+    return recentChefIds.map(id => String(id));
+  }, [recentChefIds]);
+
+  // Optimize: Memoize visibleChefs to prevent expensive filtering on every render
+  const visibleChefs = React.useMemo(() => {
+    return allChefs.filter((chef) => {
+      if (!coords) return true; // detailed location not yet found, show all
+      // Safety check for coordinates
+      if (!chef.Lat || !chef.Lon) return false;
+      return getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= nearByMiles;
+    });
+  }, [allChefs, coords, nearByMiles]);
 
   const getRecentChefs = (count) => {
-    // Convert all stored IDs to strings for safe comparison
-    const safeRecentIds = recentChefIds.map(id => String(id));
-
     const filteredChefs = visibleChefs.filter((chef) =>
       safeRecentIds.includes(String(chef.ChefID))
     );
     return filteredChefs.slice(0, count);
   };
 
-  function getPopularChefs(count) {
-    return visibleChefs.sort((a, b) => b.Popularity - a.Popularity).slice(0, count);
-  }
+  const getPopularChefs = (count) => {
+    // IMPORTANT: Create a copy before sorting to avoid mutating the memoized array
+    return [...visibleChefs].sort((a, b) => b.Popularity - a.Popularity).slice(0, count);
+  };
 
   const shuffleArray = (array) => {
     const shuffled = [...array];
@@ -143,8 +150,7 @@ const UserDashboard = ({ navigation }) => {
     },
     {
       title: 'Nearby Chefs',
-      // Since visibleChefs is already filtered by nearByMiles (200), we just use it.
-      // We might want to sort by distance for "Nearby" specifically.
+      // Sort by distance
       data: [...visibleChefs].sort((a, b) => {
         if (!coords) return 0;
         const distA = getDistanceInMiles(coords.lat, coords.lon, a.Lat, a.Lon);
