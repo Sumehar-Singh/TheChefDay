@@ -60,9 +60,9 @@ const styles = StyleSheet.create({
     width: 40,
   },
   content: {
-    flexGrow: 1, // Changed from flex: 1 to allow scrolling for long lists
+    flex: 1, // Changed to flex: 1 ensure it fills the screen height
     paddingVertical: 12,
-    marginBottom: 70
+    marginBottom: 10 // Reduced margin to bring it closer to bottom
   },
 });
 

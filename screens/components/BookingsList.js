@@ -231,7 +231,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   const hasBookings = displayedBookings && displayedBookings.length > 0;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, !limit && { flex: 1, marginBottom: 10 }]}>
       {showHeader && (
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleContainer}>
