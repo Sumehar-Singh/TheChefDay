@@ -456,10 +456,10 @@ const styles = StyleSheet.create({
     marginHorizontal: isTablet ? 8 : 8,
     marginBottom: isTablet ? 10 : 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06, // Very light
+    shadowRadius: 6,
+    elevation: 3, // Subtle lift
     borderWidth: 1,
     borderColor: '#f0f0f0',
   },
