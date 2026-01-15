@@ -296,52 +296,70 @@ const UserDashboard = ({ navigation }) => {
                   </TouchableOpacity>
                 </View>
 
-                <FlatList
-                  horizontal
-                  data={section.data}
-                  keyExtractor={(item, idx) =>
-                    item.ChefID.toString()
-                  }
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={styles.chefCard}
-                      onPress={() => navigateToChefDetail(item.ChefID)}
-                    >
-                      <Image
-                        source={
-                          item.Image
-                            ? { uri: item.Image }
-                            : require('../../../assets/userImage.jpg')
-                        }
-                        style={styles.chefImage}
-                      />
-                      <Text style={styles.chefName}>{item.FirstName}</Text>
-                      <Text style={styles.chefExperience}>
-                        {item.ExperienceYears} yrs
-                      </Text>
-                      <Text style={styles.chefDistance}>
-                        {coords &&
-                          getDistanceInMiles(
-                            coords.lat,
-                            coords.lon,
-                            item.Lat,
-                            item.Lon
-                          ) < nearByMiles &&
-                          '~' +
-                          getDistanceInMiles(
-                            coords.lat,
-                            coords.lon,
-                            item.Lat,
-                            item.Lon
-                          ).toFixed(2) +
-                          ' mi'}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                  }
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.chefListContent}
-                />
+                {section.data.length > 0 ? (
+                  <FlatList
+                    horizontal
+                    data={section.data}
+                    keyExtractor={(item, idx) => item.ChefID.toString()}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.chefCard}
+                        onPress={() => navigateToChefDetail(item.ChefID)}
+                      >
+                        <Image
+                          source={
+                            item.Image
+                              ? { uri: item.Image }
+                              : require('../../../assets/userImage.jpg')
+                          }
+                          style={styles.chefImage}
+                        />
+                        <Text style={styles.chefName}>{item.FirstName}</Text>
+                        <Text style={styles.chefExperience}>
+                          {item.ExperienceYears} yrs
+                        </Text>
+                        <Text style={styles.chefDistance}>
+                          {coords &&
+                            getDistanceInMiles(
+                              coords.lat,
+                              coords.lon,
+                              item.Lat,
+                              item.Lon
+                            ) < nearByMiles &&
+                            '~' +
+                            getDistanceInMiles(
+                              coords.lat,
+                              coords.lon,
+                              item.Lat,
+                              item.Lon
+                            ).toFixed(2) +
+                            ' mi'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.chefListContent}
+                  />
+                ) : (
+                  <View style={styles.emptyStateContainer}>
+                    <MaterialCommunityIcons
+                      name={
+                        section.title.includes('Popular')
+                          ? 'trophy-broken'
+                          : 'information-outline'
+                      }
+                      size={30}
+                      color="#ccc"
+                    />
+                    <Text style={styles.emptyStateText}>
+                      {section.title.includes('Popular')
+                        ? 'There are currently no popular chefs in your region.'
+                        : section.title.includes('Recently')
+                          ? "You haven't recently viewed any chefs."
+                          : 'No chefs found in this category.'}
+                    </Text>
+                  </View>
+                )}
               </View>
             );
           })}
