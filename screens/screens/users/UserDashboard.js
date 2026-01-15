@@ -597,20 +597,27 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   emptyStateContainer: {
-    padding: 20,
+    height: 180, // Match typical card height
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff', // White background
     marginHorizontal: 15,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#eee',
+    // Add Shadow
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
     marginTop: 10,
   },
   emptyStateText: {
     marginTop: 10,
     fontSize: 14,
-    color: '#888',
+    color: '#666',
     fontFamily: 'Regular',
     textAlign: 'center',
   },
