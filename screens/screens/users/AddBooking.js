@@ -157,14 +157,14 @@ const AddBooking = ({ navigation }) => {
 
   const verifyPinCode = async () => {
     if (!PinCode) {
-      Alert.alert('Error', 'Please enter a Pin Code');
+      Alert.alert('Error', 'Please enter a Zip Code');
       return;
     }
 
     // Client-side check: updates for "00000" or similar invalid patterns
     if (/^0+$/.test(PinCode) || PinCode.length < 5) {
       setIsValidPin(false);
-      Alert.alert('Error', 'Invalid Pin Code. Please enter a valid code.');
+      Alert.alert('Error', 'Invalid Zip Code. Please enter a valid code.');
       return;
     }
 
@@ -191,16 +191,16 @@ const AddBooking = ({ navigation }) => {
         } else {
           // API found a place, but it wasn't a postcode (e.g. a street number match)
           setIsValidPin(false);
-          Alert.alert('Error', 'Invalid Pin Code. No postal region found.');
+          Alert.alert('Error', 'Invalid Zip Code. No postal region found.');
         }
 
       } else {
         setIsValidPin(false);
-        Alert.alert('Error', 'Invalid Pin Code. Please check and try again.');
+        Alert.alert('Error', 'Invalid Zip Code. Please check and try again.');
       }
     } catch (error) {
       console.error('API Error:', error);
-      Alert.alert('Error', 'Failed to verify Pin Code. Please try again.');
+      Alert.alert('Error', 'Failed to verify Zip Code. Please try again.');
       setIsValidPin(false);
     } finally {
       setGeoLoading(false);
@@ -358,12 +358,12 @@ const AddBooking = ({ navigation }) => {
           value={Address}
           onChangeText={setAddress}
         />
-        <Text style={styles.label}>Pin Code</Text>
+        <Text style={styles.label}>Zip Code</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
           <View style={{ flex: 1, position: 'relative' }}>
             <TextInput
               style={[styles.input, { marginBottom: 0 }]}
-              placeholder="Enter pin code"
+              placeholder="Enter Zip Code"
               value={PinCode}
               onChangeText={(text) => {
                 setPinCode(text);

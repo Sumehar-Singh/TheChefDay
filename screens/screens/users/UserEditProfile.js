@@ -280,7 +280,7 @@ const UserEditProfile = ({ navigation }) => {
     }
     if (!pinCode) {
       setIsUpdating(false);
-      Alert.alert('Error', 'Please enter your Pin Code.');
+      Alert.alert('Error', 'Please enter your Zip Code.');
       return;
     }
     if (!lat || !lon) {
@@ -422,13 +422,13 @@ const UserEditProfile = ({ navigation }) => {
 
   const fetchLatLon = async () => {
     if (!pinCode) {
-      Alert.alert('Error', 'Please enter a Pin Code');
+      Alert.alert('Error', 'Please enter a Zip Code');
       return;
     }
 
     // Strict Validation: Reject "00000" and short codes
     if (/^0+$/.test(pinCode) || pinCode.length < 5) {
-      Alert.alert('Error', 'Invalid Pin Code. Please enter a valid code.');
+      Alert.alert('Error', 'Invalid Zip Code. Please enter a valid code.');
       return;
     }
 
@@ -456,11 +456,11 @@ const UserEditProfile = ({ navigation }) => {
           setLon(geometry.lng.toString());
           setGeoAddress(addresss);
         } else {
-          Alert.alert('Error', 'Invalid Pin Code. No postal region found.');
+          Alert.alert('Error', 'Invalid Zip Code. No postal region found.');
         }
 
       } else {
-        Alert.alert('Error', 'No location found for this Pin Code.');
+        Alert.alert('Error', 'No location found for this Zip Code.');
       }
     } catch (error) {
       console.error('API Error:', error);
@@ -573,15 +573,15 @@ const UserEditProfile = ({ navigation }) => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Pin Code</Text>
+          <Text style={styles.label}>Zip Code</Text>
           <Text style={{ fontSize: 12, color: '#6c757d', marginBottom: 8 }}>
-            💡 Enter your Pin Code to become more visible to nearby users and improve your searchability.
+            💡 Enter your Zip Code to become more visible to nearby users and improve your searchability.
           </Text>
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TextInput
               style={[styles.input, { flex: 1, marginRight: 8 }]} // Adjust to fit beside button
-              placeholder="Enter Pin Code"
+              placeholder="Enter Zip Code"
               value={pinCode}
               onChangeText={setPinCode}
             />
