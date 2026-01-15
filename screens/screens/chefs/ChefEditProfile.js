@@ -605,9 +605,12 @@ const ChefEditProfile = ({ navigation }) => {
         </View>
         <View style={styles.section}>
           <Text style={styles.label}>Zip Code</Text>
-          <Text style={{ fontSize: 12, color: '#6c757d', marginBottom: 8 }}>
-            💡 Enter your Zip Code to become more visible to nearby users and improve your searchability.
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
+            <Text style={{ fontSize: 14, marginRight: 5 }}>💡</Text>
+            <Text style={{ fontSize: 12, color: '#6c757d', flex: 1, marginTop: 2 }}>
+              Enter your Zip Code to become more visible to nearby users and improve your searchability.
+            </Text>
+          </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TextInput
