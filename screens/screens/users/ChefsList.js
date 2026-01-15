@@ -331,7 +331,9 @@ const ChefsList = ({ navigation, route }) => {
               name={
                 filterType === 'Popular'
                   ? 'trophy-broken'
-                  : 'information-outline'
+                  : filterType === 'Recent'
+                    ? 'clock-time-three-outline'
+                    : 'information-outline'
               }
               size={40}
               color="#999"

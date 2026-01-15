@@ -346,7 +346,9 @@ const UserDashboard = ({ navigation }) => {
                       name={
                         section.title.includes('Popular')
                           ? 'trophy-broken'
-                          : 'information-outline'
+                          : section.title.includes('Recently')
+                            ? 'clock-time-three-outline'
+                            : 'information-outline'
                       }
                       size={40}
                       color="#999"
