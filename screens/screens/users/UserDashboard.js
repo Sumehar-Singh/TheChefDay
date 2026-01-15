@@ -312,7 +312,6 @@ const UserDashboard = ({ navigation }) => {
                           coords.lon,
                           item.Lat,
                           item.Lon
-                          item.Lon
                         ) < nearByMiles &&
                         '~' +
                         getDistanceInMiles(
