@@ -2,32 +2,30 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export const storeChefId = async (chefId) => {
-    try {
-      // Get stored chefIds from AsyncStorage
-      const storedChefIds = await AsyncStorage.getItem('chefIds');
-      const chefIdsArray = storedChefIds ? JSON.parse(storedChefIds) : [];
-  
-      // Check if chefId is already in the list
-      if (!chefIdsArray.includes(chefId)) {
-        
-        // If there are already 10 items, remove the oldest (first item)
-        if (chefIdsArray.length >= 15) {
-          chefIdsArray.shift(); // Remove the oldest item (first item)
-        }
-  
-        // Add the new chefId to the array
-        chefIdsArray.push(chefId);
-  
-        // Save the updated array back to AsyncStorage
-        await AsyncStorage.setItem('chefIds', JSON.stringify(chefIdsArray));
-      } else {
-        console.log('ChefId is already in storage');
-      }
-    } catch (error) {
-      console.error('Error storing ChefId:', error);
+  try {
+    const idStr = String(chefId); // Normalize to string
+    // Get stored chefIds from AsyncStorage
+    const storedChefIds = await AsyncStorage.getItem('chefIds');
+    let chefIdsArray = storedChefIds ? JSON.parse(storedChefIds) : [];
+
+    // Remove it if it exists (so we can move it to the end/newest position)
+    chefIdsArray = chefIdsArray.filter(id => String(id) !== idStr);
+
+    // If there are already 15 items, remove the oldest (first item)
+    if (chefIdsArray.length >= 15) {
+      chefIdsArray.shift();
     }
-  };
-  
+
+    // Add the new chefId to the array (Newest at the end)
+    chefIdsArray.push(idStr);
+
+    // Save the updated array back to AsyncStorage
+    await AsyncStorage.setItem('chefIds', JSON.stringify(chefIdsArray));
+  } catch (error) {
+    console.error('Error storing ChefId:', error);
+  }
+};
+
 
 
 export const getStoredChefIds = async () => {
