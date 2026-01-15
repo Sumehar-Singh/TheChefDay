@@ -162,12 +162,16 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                   })
                 }
               >
-                <View style={styles.bookingItemLeft}>
-                  <View style={styles.bookingHeader}>
-                    <Text style={styles.bookingTextCustomer}>
+                <View style={[styles.bookingItemLeft, { borderWidth: 2, borderColor: 'orange' }]}>
+                  <View style={[styles.bookingHeader, { backgroundColor: '#FFEEBB', minHeight: 30 }]}>
+                    <Text style={[styles.bookingTextCustomer, { backgroundColor: 'yellow', color: 'black' }]}>
                       {chefName}
                     </Text>
                   </View>
+
+                  <Text style={{ fontSize: 9, color: 'red', marginTop: 4, marginBottom: 4 }}>
+                    RAW: {JSON.stringify(item)}
+                  </Text>
 
                   <View style={styles.bookingDetails}>
                     <View style={styles.detailRow}>
