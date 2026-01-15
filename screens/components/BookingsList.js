@@ -56,13 +56,18 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     if (!item) return fallback;
     for (const key of keys) {
       // Check for exact key
-      if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
-        return item[key];
+      let val = item[key];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
       }
+
       // Check for key with spaces removed (e.g. "booking id" -> "bookingid")
       const strippedKey = key.replace(/\s/g, '');
-      if (item[strippedKey] !== undefined && item[strippedKey] !== null && item[strippedKey] !== '') {
-        return item[strippedKey];
+      val = item[strippedKey];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
       }
     }
     return fallback;
@@ -116,69 +121,79 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         <EmptyBookings />
       ) : (
         <>
-          {bookings.map((item, index) => {
-            // Updated keys based on user's debug output: 
-            // booking id, servicetype, eventdate, status, bookingdate, chefname, chefimage
-            const bookingId = getField(item, ['booking id', 'bookingid', 'BookingId', 'id', 'ID'], '');
-            const chefName = getField(item, ['chefname', 'chef name', 'Chefname', 'ChefName', 'name'], 'Unknown Chef');
-            const chefImage = getField(item, ['chefimage', 'chef image', 'ChefImage', 'image'], null);
-            const eventDate = getField(item, ['eventdate', 'event date', 'EventDate', 'date'], 'N/A');
-            const bookingDate = getField(item, ['bookingdate', 'booking date', 'BookingDate', 'created_at'], 'N/A');
-            const serviceType = getField(item, ['servicetype', 'service type', 'ServiceType', 'service'], 'Service');
-            const status = getField(item, ['status', 'Status'], 'Pending');
+          {bookings
+            .filter(item => {
+              // Filter out ghost items (no valid ID)
+              const id = item.bookingid || item.BookingId || item.id || item.ID;
+              return id !== undefined && id !== null && id !== '';
+            })
+            .map((item, index) => {
+              // Updated keys based on user's debug output: 
+              // booking id, servicetype, eventdate, status, bookingdate, chefname, chefimage
+              const bookingId = getField(item, ['booking id', 'bookingid', 'BookingId', 'id', 'ID'], '');
+              const chefName = getField(item, ['chefname', 'chef name', 'Chefname', 'ChefName', 'name'], 'Unknown Chef');
+              const chefImage = getField(item, ['chefimage', 'chef image', 'ChefImage', 'image'], null);
+              const eventDate = getField(item, ['eventdate', 'event date', 'EventDate', 'date'], 'N/A');
+              const bookingDate = getField(item, ['bookingdate', 'booking date', 'BookingDate', 'created_at'], 'N/A');
+              const serviceType = getField(item, ['servicetype', 'service type', 'ServiceType', 'service'], 'Service');
+              const status = getField(item, ['status', 'Status'], 'Pending');
 
-            return (
-              <TouchableOpacity
-                key={bookingId ? bookingId.toString() : `booking-${index}`}
-                style={styles.bookingItem}
-                onPress={() =>
-                  navigation.navigate('BookingDetail', {
-                    BookingID: bookingId,
-                  })
-                }
-              >
-                <View style={styles.bookingItemLeft}>
-                  <View style={styles.bookingHeader}>
-                    {/* Chef Image Check */}
-                    {chefImage ? (
-                      <Image
-                        source={{ uri: chefImage }}
-                        style={{ width: 30, height: 30, borderRadius: 15, marginRight: 8, backgroundColor: '#eee' }}
-                      />
-                    ) : null}
+              return (
+                <TouchableOpacity
+                  key={bookingId ? bookingId.toString() : `booking-${index}`}
+                  style={styles.bookingItem}
+                  onPress={() =>
+                    navigation.navigate('BookingDetail', {
+                      BookingID: bookingId,
+                    })
+                  }
+                >
+                  <View style={styles.bookingItemLeft}>
+                    <View style={styles.bookingHeader}>
+                      {/* Chef Image Check */}
+                      {chefImage ? (
+                        <Image
+                          source={{ uri: chefImage }}
+                          style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10, backgroundColor: '#eee' }}
+                        />
+                      ) : (
+                        <View style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10, backgroundColor: '#eee', alignItems: 'center', justifyContent: 'center' }}>
+                          <MaterialCommunityIcons name="chef-hat" size={20} color="#666" />
+                        </View>
+                      )}
 
-                    <Text style={styles.bookingTextCustomer}>
-                      {chefName}
-                    </Text>
-                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
-                      <Text style={styles.statusText}>{status}</Text>
+                      <Text style={[styles.bookingTextCustomer, { minHeight: 20 }]}>
+                        {chefName}
+                      </Text>
+                      <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
+                        <Text style={styles.statusText}>{status}</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.bookingDetails}>
+                      <View style={styles.detailRow}>
+                        <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
+                        <Text style={[styles.bookingTextEvent, { color: '#000000', minHeight: 18 }]}>
+                          Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
+                        </Text>
+                      </View>
+                      <View style={styles.detailRow}>
+                        <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
+                        <Text style={[styles.bookingText, { color: '#333333', minHeight: 18 }]}>
+                          Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
+                        </Text>
+                      </View>
+                      <View style={styles.detailRow}>
+                        <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
+                        <Text style={[styles.bookingTextService, { color: '#000000', fontWeight: '600', minHeight: 18 }]}>
+                          {serviceType}
+                        </Text>
+                      </View>
                     </View>
                   </View>
-
-                  <View style={styles.bookingDetails}>
-                    <View style={styles.detailRow}>
-                      <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
-                      <Text style={[styles.bookingTextEvent, { color: '#000000' }]}>
-                        Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
-                      </Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
-                      <Text style={[styles.bookingText, { color: '#333333' }]}>
-                        Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
-                      </Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
-                      <Text style={[styles.bookingTextService, { color: '#000000', fontWeight: '600' }]}>
-                        {serviceType}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+                </TouchableOpacity>
+              );
+            })}
         </>
       )}
     </View>
