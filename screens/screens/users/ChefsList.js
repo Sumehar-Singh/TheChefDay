@@ -333,14 +333,14 @@ const ChefsList = ({ navigation, route }) => {
                   ? 'trophy-broken'
                   : 'information-outline'
               }
-              size={40}
-              color="#888"
+              size={30}
+              color="#ccc"
             />
             <Text style={styles.emptyStateText}>
               {filterType === 'Popular'
-                ? 'No popular chefs found nearby yet! 🌟\nBe the first to book one.'
+                ? 'There are currently no popular chefs in your region.'
                 : filterType === 'Recent'
-                  ? "Your history is empty! 🕒\nStart exploring chefs now."
+                  ? "You haven't recently viewed any chefs."
                   : 'No chefs found in this category.'}
             </Text>
           </View>
