@@ -360,6 +360,18 @@ const UserDashboard = ({ navigation }) => {
                           ? "You haven't recently viewed any chefs."
                           : 'No chefs found in this category.'}
                     </Text>
+                    {section.title.includes('Recently') && (
+                      <TouchableOpacity
+                        style={styles.emptyStateButton}
+                        onPress={() =>
+                          navigation.navigate('ChefsList', { filterType: 'All' })
+                        }
+                      >
+                        <Text style={styles.emptyStateButtonText}>
+                          View All Chefs
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )}
               </View>
