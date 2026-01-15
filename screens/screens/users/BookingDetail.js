@@ -253,7 +253,8 @@ const BookingDetail = () => {
               styles.statusBadge,
               booking.Status === 'Confirmed' ? styles.statusConfirmedBadge :
                 booking.Status === 'Cancelled' ? styles.statusCancelledBadge :
-                  styles.statusPendingBadge
+                  booking.Status === 'Service Completed' ? styles.statusCompletedBadge :
+                    styles.statusPendingBadge
             ]}>
               {/* <Text style={styles.statusText}>{booking.Status}</Text> */}
 
@@ -406,6 +407,9 @@ const styles = StyleSheet.create({
   },
   statusPendingBadge: {
     backgroundColor: '#FFF3E0',
+  },
+  statusCompletedBadge: {
+    backgroundColor: '#e0e0e0', // Grey for Completed
   },
   statusText: {
     fontSize: isTablet ? 16 : 14,
