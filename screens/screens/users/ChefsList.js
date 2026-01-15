@@ -478,8 +478,32 @@ const styles = StyleSheet.create({
   chefRating: {
     fontSize: isTablet ? 15 : 13,
     color: '#805500',
-    fontWeight: '500',
   },
+  emptyStateContainer: {
+    height: 180,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  emptyStateText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#666',
+    fontFamily: 'Regular',
+    textAlign: 'center',
+  }, fontWeight: '500',
+},
 });
 
 export default ChefsList;
