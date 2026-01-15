@@ -274,7 +274,7 @@ const UserDashboard = ({ navigation }) => {
                   onPress={() => {
                     let filterType = 'All';
                     if (section.title.includes('Recently')) filterType = 'Recent';
-                    else if (section.title.includes('Random')) filterType = 'All'; // User wants full list for Random view
+                    else if (section.title.includes('Random')) filterType = 'Random';
                     else if (section.title.includes('Nearby')) filterType = 'Nearby';
                     else if (section.title.includes('Popular')) filterType = 'Popular';
 
