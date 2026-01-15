@@ -453,82 +453,102 @@ const styles = StyleSheet.create({
     width: isTablet ? 180 : 150,
     height: isTablet ? 240 : 180,
     alignItems: 'center',
-    marginHorizontal: isTablet ? 8 : 6,
-    marginBottom: isTablet ? 10 : 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  chefImage: {
-    width: isTablet ? 100 : 80,
-    height: isTablet ? 100 : 80,
-    borderRadius: isTablet ? 50 : 40,
-    marginBottom: isTablet ? 10 : 8,
-  },
-  chefName: {
-    fontSize: isTablet ? 18 : 14,
-    fontWeight: '600',
-    marginTop: isTablet ? 8 : 6,
-    color: '#333',
-    textAlign: 'center',
-  },
-  chefExperience: {
-    fontSize: isTablet ? 14 : 12,
-    color: '#666',
-    marginTop: isTablet ? 6 : 4,
-  },
-  chefDistance: {
-    fontSize: isTablet ? 13 : 11,
-    color: '#ff0000',
-    marginTop: isTablet ? 6 : 4,
-    fontWeight: '500',
-  },
-  seeAllCard: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: isTablet ? 180 : 150,
-    height: isTablet ? 240 : 180,
-    backgroundColor: '#f6f6f6',
-  },
-  seeAllCardText: {
-    fontSize: isTablet ? 16 : 14,
-    fontWeight: '600',
-    color: '#209E00',
-  },
-  bookingsSection: {
-    marginTop: 10,
-  },
-  bookingsCtaCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingVertical: isTablet ? 16 : 14,
-    paddingHorizontal: isTablet ? 18 : 16,
-    marginTop: 8,
-    marginHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#eaeaea',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-    marginBottom: 50,
-  },
-  bookingsCtaLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  bookingsCtaText: {
-    fontSize: isTablet ? 18 : 16,
-    fontWeight: '700',
-    color: '#cc0000',
-    marginLeft: 10,
-  },
-});
+    chefCard: {
+      backgroundColor: 'white',
+      borderRadius: 16, // More rounded
+      padding: isTablet ? 15 : 12,
+      width: isTablet ? 180 : 160, // Slightly wider
+      height: isTablet ? 250 : 200, // Taller for breathing room
+      alignItems: 'center',
+      marginHorizontal: isTablet ? 8 : 8,
+      marginBottom: isTablet ? 10 : 10,
+      // Enhanced Shadow
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 6,
+      // Border for subtle definition
+      borderWidth: 1,
+      borderColor: '#f0f0f0',
+    },
+    chefImage: {
+      width: isTablet ? 100 : 90, // Bigger image
+      height: isTablet ? 100 : 90,
+      borderRadius: isTablet ? 50 : 45,
+      marginBottom: isTablet ? 12 : 10,
+      borderWidth: 2,
+      borderColor: '#f8f8f8', // Subtle ring around image
+    },
+    chefName: {
+      fontSize: isTablet ? 18 : 15,
+      fontWeight: '700', // Bolder
+      marginTop: 4,
+      color: '#1a1a1a', // Darker black
+      textAlign: 'center',
+      numberOfLines: 1,
+    },
+    chefExperience: {
+      fontSize: isTablet ? 14 : 12,
+      color: '#666',
+      marginTop: 4,
+      fontWeight: '500',
+    },
+    chefDistance: {
+      fontSize: isTablet ? 13 : 11,
+      color: '#e63946', // Modern red
+      marginTop: 6,
+      fontWeight: '600',
+      backgroundColor: '#fff0f0',
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 8,
+      overflow: 'hidden',
+    },
+    seeAllCard: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: isTablet ? 180 : 150,
+      height: isTablet ? 240 : 180,
+      backgroundColor: '#f6f6f6',
+    },
+    seeAllCardText: {
+      fontSize: isTablet ? 16 : 14,
+      fontWeight: '600',
+      color: '#209E00',
+    },
+    bookingsSection: {
+      marginTop: 10,
+    },
+    bookingsCtaCard: {
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      paddingVertical: isTablet ? 16 : 14,
+      paddingHorizontal: isTablet ? 18 : 16,
+      marginTop: 8,
+      marginHorizontal: 15,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderWidth: 1,
+      borderColor: '#eaeaea',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 2,
+      marginBottom: 50,
+    },
+    bookingsCtaLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    bookingsCtaText: {
+      fontSize: isTablet ? 18 : 16,
+      fontWeight: '700',
+      color: '#cc0000',
+      marginLeft: 10,
+    },
+  });
 
 export default UserDashboard;
