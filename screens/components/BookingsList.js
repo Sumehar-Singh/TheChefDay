@@ -367,6 +367,7 @@ const styles = StyleSheet.create({
     fontSize: isTablet ? 16 : 14,
     color: '#444', // Darker grey
     marginLeft: 8,
+    fontWeight: '700', // Made bold
   },
   bookingTextService: {
     fontSize: isTablet ? 16 : 14,
