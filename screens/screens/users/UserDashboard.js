@@ -261,54 +261,46 @@ const UserDashboard = ({ navigation }) => {
 
               <FlatList
                 horizontal
-                data={[...section.data, { id: 'seeAll' }]}
+                data={section.data}
                 keyExtractor={(item, idx) =>
-                  item.ChefID ?? `seeAll-${index}-${idx}`
+                  item.ChefID.toString()
                 }
-                renderItem={({ item }) =>
-                  item.id !== 'seeAll' ? (
-                    <TouchableOpacity
-                      style={styles.chefCard}
-                      onPress={() => navigateToChefDetail(item.ChefID)}
-                    >
-                      <Image
-                        source={
-                          item.Image
-                            ? { uri: item.Image }
-                            : require('../../../assets/userImage.jpg')
-                        }
-                        style={styles.chefImage}
-                      />
-                      <Text style={styles.chefName}>{item.FirstName}</Text>
-                      <Text style={styles.chefExperience}>
-                        {item.ExperienceYears} yrs
-                      </Text>
-                      <Text style={styles.chefDistance}>
-                        {coords &&
-                          getDistanceInMiles(
-                            coords.lat,
-                            coords.lon,
-                            item.Lat,
-                            item.Lon
-                          ) < radiusMiles &&
-                          '~' +
-                          getDistanceInMiles(
-                            coords.lat,
-                            coords.lon,
-                            item.Lat,
-                            item.Lon
-                          ).toFixed(2) +
-                          ' mi'}
-                      </Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      style={[styles.chefCard, styles.seeAllCard]}
-                      onPress={() => navigation.navigate('ChefsList')}
-                    >
-                      <Text style={styles.seeAllCardText}>View All</Text>
-                    </TouchableOpacity>
-                  )
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.chefCard}
+                    onPress={() => navigateToChefDetail(item.ChefID)}
+                  >
+                    <Image
+                      source={
+                        item.Image
+                          ? { uri: item.Image }
+                          : require('../../../assets/userImage.jpg')
+                      }
+                      style={styles.chefImage}
+                    />
+                    <Text style={styles.chefName}>{item.FirstName}</Text>
+                    <Text style={styles.chefExperience}>
+                      {item.ExperienceYears} yrs
+                    </Text>
+                    <Text style={styles.chefDistance}>
+                      {coords &&
+                        getDistanceInMiles(
+                          coords.lat,
+                          coords.lon,
+                          item.Lat,
+                          item.Lon
+                        ) < radiusMiles &&
+                        '~' +
+                        getDistanceInMiles(
+                          coords.lat,
+                          coords.lon,
+                          item.Lat,
+                          item.Lon
+                        ).toFixed(2) +
+                        ' mi'}
+                    </Text>
+                  </TouchableOpacity>
+                )
                 }
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.chefListContent}
@@ -339,11 +331,31 @@ const UserDashboard = ({ navigation }) => {
                 color="#cc0000"
               />
             </TouchableOpacity>
+          </View>  <TouchableOpacity
+              style={styles.bookingsCtaCard}
+              onPress={() => navigation.navigate('AllBookings')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.bookingsCtaLeft}>
+                <MaterialCommunityIcons
+                  name="calendar-multiple-check"
+                  size={22}
+                  color="#cc0000"
+                />
+                <Text style={styles.bookingsCtaText}>View All Bookings</Text>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={24}
+                color="#cc0000"
+              />
+            </TouchableOpacity>
           </View>
-        )}
-      </ScrollView>
-      {isLoading && <CenterLoading />}
-    </View>
+  )
+}
+      </ScrollView >
+  { isLoading && <CenterLoading />}
+    </View >
   );
 };
 
