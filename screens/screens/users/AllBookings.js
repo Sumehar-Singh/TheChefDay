@@ -61,8 +61,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1, // Changed to flex: 1 ensure it fills the screen height
-    paddingVertical: 12,
-    marginBottom: 10 // Reduced margin to bring it closer to bottom
+    paddingTop: 12,
+    paddingBottom: 0,
+    marginBottom: 0 // Remove margin completely
   },
 });
 
