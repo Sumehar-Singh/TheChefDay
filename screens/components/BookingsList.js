@@ -25,21 +25,21 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   useEffect(() => {
     const fetchBookings = async () => {
       try {
+        // HACK: Always force a limit to ensure API behaves consistently with Dashboard
+        // If Dashboard (limit=5) works, maybe limit=100 will get the same data structure
+        const effectiveLimit = limit || 100;
+
         let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
-        if (limit) {
-          url += `&limit=${limit}`;
-        }
+        url += `&limit=${effectiveLimit}`;
+
         console.log('Fetching bookings from:', url);
         const response = await axios.get(url);
-        // console.log('Bookings response:', response.data);
 
         if (response.data.status === 'success') {
-          // Ensure we have an array
           const bookingData = Array.isArray(response.data.data) ? response.data.data : [];
           setBookings(bookingData);
           console.log('All Bookings Data:', JSON.stringify(bookingData, null, 2));
         } else {
-          // If status is not success (e.g., no bookings found), set empty array
           setBookings([]);
         }
       } catch (error) {
@@ -68,28 +68,18 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Confirmed':
-        return '#4CAF50';
-      case 'Declined':
-        return '#F44336';
-      case 'Canceled':
-        return 'red';
-      case 'Pending':
-        return '#FF9800';
-      case 'Service Completed':
-        return 'gray';
-      default:
-        return '#805500';
+      case 'Confirmed': return '#4CAF50';
+      case 'Declined': return '#F44336';
+      case 'Canceled': return 'red';
+      case 'Pending': return '#FF9800';
+      case 'Service Completed': return 'gray';
+      default: return '#805500';
     }
   };
 
   const EmptyBookings = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons
-        name="calendar-clock"
-        size={isTablet ? 80 : 60}
-        color="#805500"
-      />
+      <MaterialCommunityIcons name="calendar-clock" size={isTablet ? 80 : 60} color="#805500" />
       <Text style={styles.emptyTitle}>No Bookings Yet</Text>
       <Text style={styles.emptyText}>
         Start exploring chefs and book their services for your special
@@ -108,7 +98,6 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     return <ActivityIndicator size="large" color="#ff0000" />;
   }
 
-  // Determine if we should show the list or the empty state
   const hasBookings = bookings && bookings.length > 0;
 
   return (
@@ -116,11 +105,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
       {showHeader && (
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleContainer}>
-            <MaterialCommunityIcons
-              name="calendar-check"
-              size={isTablet ? 28 : 24}
-              color="#ff0000"
-            />
+            <MaterialCommunityIcons name="calendar-check" size={isTablet ? 28 : 24} color="#ff0000" />
             <Text style={styles.sectionTitle}>Your Bookings</Text>
           </View>
           {hasBookings && showViewAll && (
@@ -129,11 +114,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
               onPress={() => navigation.navigate('AllBookings')}
             >
               <Text style={styles.seeAllText}>View All</Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={isTablet ? 24 : 20}
-                color="#209E00"
-              />
+              <MaterialCommunityIcons name="chevron-right" size={isTablet ? 24 : 20} color="#209E00" />
             </TouchableOpacity>
           )}
         </View>
@@ -167,6 +148,14 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                     <Text style={styles.bookingTextCustomer}>
                       {chefName}
                     </Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: getStatusColor(status) },
+                      ]}
+                    >
+                      <Text style={styles.statusText}>{status}</Text>
+                    </View>
                   </View>
 
                   <View style={styles.bookingDetails}>
@@ -176,7 +165,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         size={isTablet ? 20 : 16}
                         color="#ff0000"
                       />
-                      <Text style={[styles.bookingTextEvent, { color: '#209E00' }]}>
+                      <Text style={styles.bookingTextEvent}>
                         Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
                       </Text>
                     </View>
@@ -186,7 +175,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         size={isTablet ? 20 : 16}
                         color="#ff0000"
                       />
-                      <Text style={[styles.bookingText, { color: '#666' }]}>
+                      <Text style={styles.bookingText}>
                         Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
                       </Text>
                     </View>
@@ -199,14 +188,6 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                       <Text style={styles.bookingTextService}>
                         {serviceType}
                       </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        { backgroundColor: getStatusColor(status) },
-                      ]}
-                    >
-                      <Text style={styles.statusText}>{status}</Text>
                     </View>
                   </View>
                 </View>
