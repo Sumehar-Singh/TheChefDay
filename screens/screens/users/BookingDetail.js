@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, Dimensions, Alert, TouchableOpacity, RefreshControl, Modal } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, Dimensions, Alert, TouchableOpacity, RefreshControl, Modal, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
 import { useRoute } from '@react-navigation/native';
@@ -64,7 +64,7 @@ const BookingDetail = () => {
   if (!booking) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={{ fontSize: isTablet ? 20 : 16 }}>Loading...</Text>
+        <ActivityIndicator size="large" color="#805500" />
       </View>
     );
   }
