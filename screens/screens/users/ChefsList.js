@@ -230,7 +230,15 @@ const ChefsList = ({ navigation, route }) => {
         )}
 
         <Text style={styles.sectionTitle}>
-          {filterType === 'Recent' ? 'Recently Viewed Chefs' : filterType === 'All' ? 'All Chefs' : filterType + ' Chefs'}
+          {(() => {
+            switch (filterType) {
+              case 'Recent': return 'Recently Viewed Chefs';
+              case 'Popular': return 'Popular Chefs';
+              case 'Nearby': return 'Nearby Chefs';
+              case 'Random': return 'Random Chefs';
+              default: return 'All Chefs';
+            }
+          })()}
         </Text>
         <FlatList
           data={filteredChefs}
