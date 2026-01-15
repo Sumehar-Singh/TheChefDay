@@ -252,7 +252,7 @@ const UserDashboard = ({ navigation }) => {
 
         <View style={{ marginTop: 25 }}>
           {sections.map((section, index) => {
-            if (section.data.length === 0) return null; // Hide empty sections
+
             return (
               <View
                 key={`section-${section.title}-${index}`}
