@@ -23,8 +23,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        // Force limit to 100 on All Bookings to ensure similar data shape to Dashboard
-        const effectiveLimit = limit || 100;
+        // DEBUG: Force limit to 5 even on All Bookings to see if data appears
+        const effectiveLimit = 5;
 
         let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
         url += `&limit=${effectiveLimit}`;
@@ -137,7 +137,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                   })
                 }
               >
-                <View style={styles.bookingItemLeft}>
+                <View style={[styles.bookingItemLeft, { backgroundColor: '#ffe6f2', padding: 5 }]}>
                   <View style={styles.bookingHeader}>
                     {/* Chef Image Check */}
                     {chefImage ? (
@@ -147,8 +147,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                       />
                     ) : null}
 
-                    <Text style={styles.bookingTextCustomer}>
-                      {chefName}
+                    <Text style={[styles.bookingTextCustomer, { backgroundColor: 'yellow' }]}>
+                      {chefName || 'EMPTY NAME'}
                     </Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
                       <Text style={styles.statusText}>{status}</Text>
