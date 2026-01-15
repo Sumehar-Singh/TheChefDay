@@ -348,8 +348,8 @@ const UserDashboard = ({ navigation }) => {
                           ? 'trophy-broken'
                           : 'information-outline'
                       }
-                      size={30}
-                      color="#ccc"
+                      size={40}
+                      color="#999"
                     />
                     <Text style={styles.emptyStateText}>
                       {section.title.includes('Popular')
