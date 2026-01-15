@@ -10,7 +10,10 @@ import { formatDate } from '../../components/utils';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import Material Icons
 import { useAuth } from '../../../components/contexts/AuthContext';
 import CustomStatusBar from '../../components/CustomStatusBar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 const AddBooking = ({ navigation }) => {
+  const insets = useSafeAreaInsets(); // Hook for safe offsets
   // Define individual states for each field
   const [UserID, setUserID] = useState(0);
   const [ChefID, setChefID] = useState(0);
@@ -487,7 +490,8 @@ const AddBooking = ({ navigation }) => {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <View style={styles.centeredModalView}>
+          {/* Dynamic padding to clear header + status bar */}
+          <View style={[styles.centeredModalView, { paddingTop: insets.top + 60 }]}>
             <View style={styles.modalView}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Select Event Date</Text>
@@ -766,7 +770,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 100, // Push down below the red header
+    // paddingTop is now handled dynamically in JSX
   },
   modalView: {
     backgroundColor: 'white',
