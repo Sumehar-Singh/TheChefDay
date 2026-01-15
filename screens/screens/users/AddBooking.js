@@ -764,9 +764,9 @@ const styles = StyleSheet.create({
   },
   centeredModalView: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingTop: 100, // Push down below the red header
   },
   modalView: {
     backgroundColor: 'white',
