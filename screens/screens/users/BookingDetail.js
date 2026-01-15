@@ -461,8 +461,8 @@ const styles = StyleSheet.create({
   },
   completedNotice: {
     backgroundColor: '#E8F5E9',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: 14, // Slightly reduced
+    paddingHorizontal: 12, // Reduced to give text more space
     marginHorizontal: 16,
     borderRadius: 12,
     marginTop: 10,
@@ -470,22 +470,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 6, // Reduced gap
+    gap: 4, // Very tight gap
     borderWidth: 1,
-    borderColor: '#C8E6C9', // Subtle border
+    borderColor: '#C8E6C9',
   },
   completedNoticeText: {
     color: '#2E7D32',
-    fontSize: isTablet ? 18 : 16,
+    fontSize: isTablet ? 16 : 14, // Smaller font to fit one line
     fontWeight: '600',
-    // Removed marginLeft
     textAlign: 'center',
-    flexShrink: 1, // Ensure text wraps properly if long
+    // flexShrink: 1, // Removed to encourage single line natural flow
   },
   cancelledNotice: {
     backgroundColor: '#FFEBEE',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
     marginHorizontal: 16,
     borderRadius: 12,
     marginTop: 10,
@@ -493,17 +492,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
     borderWidth: 1,
     borderColor: '#FFCDD2',
   },
   cancelledNoticeText: {
     color: '#B00020',
-    fontSize: isTablet ? 18 : 16,
+    fontSize: isTablet ? 16 : 14,
     fontWeight: '600',
-    // Removed marginLeft
     textAlign: 'center',
-    flexShrink: 1,
   },
   modalOverlay: {
     flex: 1,
