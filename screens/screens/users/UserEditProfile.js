@@ -425,6 +425,13 @@ const UserEditProfile = ({ navigation }) => {
       Alert.alert('Error', 'Please enter a Pin Code');
       return;
     }
+
+    // Strict Validation: Reject "00000" and short codes
+    if (/^0+$/.test(pinCode) || pinCode.length < 5) {
+      Alert.alert('Error', 'Invalid Pin Code. Please enter a valid code.');
+      return;
+    }
+
     setGeoLoading(true);
     try {
       const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -437,13 +444,21 @@ const UserEditProfile = ({ navigation }) => {
       });
 
       if (response.data && response.data.results && response.data.results.length > 0) {
-        const geometry = response.data.results[0].geometry;
-        const addresss = response.data.results[0].formatted;
-        console.log(addresss);
-        setLat(geometry.lat.toString());  // <--- Convert to string
-        setLon(geometry.lng.toString());  // <--- Convert to string
-        setGeoAddress(addresss);
-        //Alert.alert('Coordinates', `Lat: ${geometry.lat}\nLon: ${geometry.lng}`);
+        const result = response.data.results[0];
+        // Strict check: Ensure the API actually found a postcode component
+        const foundPostcode = result.components.postcode || result.components.postal_code;
+
+        if (foundPostcode) {
+          const geometry = result.geometry;
+          const addresss = result.formatted;
+          console.log(addresss);
+          setLat(geometry.lat.toString());
+          setLon(geometry.lng.toString());
+          setGeoAddress(addresss);
+        } else {
+          Alert.alert('Error', 'Invalid Pin Code. No postal region found.');
+        }
+
       } else {
         Alert.alert('Error', 'No location found for this Pin Code.');
       }
