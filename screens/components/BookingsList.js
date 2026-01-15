@@ -23,8 +23,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        // DEBUG: Force limit to 5 even on All Bookings to see if data appears
-        const effectiveLimit = 5;
+        // If limit is passed (Dashboard=5), use it. otherwise use 100 for All Bookings
+        const effectiveLimit = limit || 100;
 
         let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
         url += `&limit=${effectiveLimit}`;
