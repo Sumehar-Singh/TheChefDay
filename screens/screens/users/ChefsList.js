@@ -158,13 +158,7 @@ const ChefsList = ({ navigation, route }) => {
       colors={['white', '#f2f2f2', '#e6e6e6']}
       style={styles.container}
     >
-      <CustomStatusBar
-        title={
-          filterType === 'All' ? 'Chefs List' :
-            filterType === 'Recent' ? 'Recently Viewed Chefs' :
-              filterType + ' Chefs'
-        }
-      />
+      <CustomStatusBar title={`${filterType === 'All' ? 'Chefs List' : filterType + ' Chefs'}`} />
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
           <MaterialCommunityIcons
