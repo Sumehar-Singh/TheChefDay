@@ -162,16 +162,12 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                   })
                 }
               >
-                <View style={[styles.bookingItemLeft, { borderWidth: 2, borderColor: 'orange' }]}>
-                  <View style={[styles.bookingHeader, { backgroundColor: '#FFEEBB', minHeight: 30 }]}>
-                    <Text style={[styles.bookingTextCustomer, { backgroundColor: 'yellow', color: 'black' }]}>
+                <View style={styles.bookingItemLeft}>
+                  <View style={styles.bookingHeader}>
+                    <Text style={styles.bookingTextCustomer}>
                       {chefName}
                     </Text>
                   </View>
-
-                  <Text style={{ fontSize: 9, color: 'red', marginTop: 4, marginBottom: 4 }}>
-                    RAW: {JSON.stringify(item)}
-                  </Text>
 
                   <View style={styles.bookingDetails}>
                     <View style={styles.detailRow}>
@@ -180,7 +176,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         size={isTablet ? 20 : 16}
                         color="#ff0000"
                       />
-                      <Text style={styles.bookingTextEvent}>
+                      <Text style={[styles.bookingTextEvent, { color: '#209E00' }]}>
                         Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
                       </Text>
                     </View>
@@ -190,7 +186,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                         size={isTablet ? 20 : 16}
                         color="#ff0000"
                       />
-                      <Text style={styles.bookingText}>
+                      <Text style={[styles.bookingText, { color: '#666' }]}>
                         Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
                       </Text>
                     </View>
