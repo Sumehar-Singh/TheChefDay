@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF3E0',
   },
   statusCompletedBadge: {
-    backgroundColor: '#e0e0e0', // Grey for Completed
+    backgroundColor: '#F5F5F5', // Lighter Grey (matches other pastel badges)
   },
   statusText: {
     fontSize: isTablet ? 16 : 14,
