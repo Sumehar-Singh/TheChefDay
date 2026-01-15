@@ -244,8 +244,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: isTablet ? 15 : 12,
     marginBottom: 10,
-    minHeight: 120, // Ensure card has substance
-    justifyContent: 'center', // Center content vertically if sparse
+    // Removed minHeight/justifyContent to let content drive the height naturally
   },
   bookingItemLeft: {
     flex: 1,

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   content: {
-    flex: 1,
+    flexGrow: 1, // Changed from flex: 1 to allow scrolling for long lists
     paddingVertical: 12,
     marginBottom: 70
   },
