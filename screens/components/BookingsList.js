@@ -199,7 +199,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
             </View>
             <View style={styles.detailRow}>
               <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
-              <Text style={[styles.bookingText, { color: '#333333' }]}>
+              <Text style={styles.bookingText}>
                 Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
               </Text>
             </View>
