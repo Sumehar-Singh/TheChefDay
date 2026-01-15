@@ -147,8 +147,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
                       />
                     ) : null}
 
-                    <Text style={styles.bookingTextCustomer}>
-                      {chefName || 'EMPTY NAME'}
+                    <Text style={[styles.bookingTextCustomer, { backgroundColor: 'red', color: 'white', minHeight: 20, minWidth: 50 }]}>
+                      {chefName && chefName.trim().length > 0 ? chefName : 'MISSING_NAME'}
                     </Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
                       <Text style={styles.statusText}>{status}</Text>
