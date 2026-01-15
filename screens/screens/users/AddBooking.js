@@ -20,7 +20,6 @@ const AddBooking = ({ navigation }) => {
   const [PinCode, setPinCode] = useState('');
   const [isValidPin, setIsValidPin] = useState(false); // Track verification status
   const [geoLoading, setGeoLoading] = useState(false); // Track API loading status
-  const [markedDates, setMarkedDates] = useState({});
   const [chefData, setChefData] = useState([]);
 
   const [selection, setSelection] = useState('Hourly Hiring');
