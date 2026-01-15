@@ -30,9 +30,12 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
       try {
         let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
 
-        // Only append limit if it is explicitly passed (e.g. for Dashboard)
+        // Strategy: Always fetch a decent number of items (e.g. 50) even if we only need 5 (limit).
+        // This allows us to sort client-side and ensure purely "Newest" items are shown, 
+        // preventing the server from hiding Pending items if it uses a weird sort.
+        // If it's "All Bookings" (no limit prop), we don't send limit param (fetch all).
         if (limit) {
-          url += `&limit=${limit}`;
+          url += `&limit=50`;
         }
 
         console.log('Fetching bookings from:', url);
@@ -47,11 +50,20 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
             return id !== undefined && id !== null && id !== '';
           });
 
+          // Sort by Booking ID Descending (Newest First)
+          // This ensures newly created 'Pending' bookings are at the top
+          validData.sort((a, b) => {
+            const idA = parseInt(a.bookingid || a.BookingId || a.id || a.ID || 0);
+            const idB = parseInt(b.bookingid || b.BookingId || b.id || b.ID || 0);
+            return idB - idA;
+          });
+
           setAllBookings(validData);
 
-          // Initial Load: If limit is set, show all (it's small). If 'All Bookings', show first PAGE_SIZE.
+          // Initial Load: If limit is set (Dashboard), slice to that limit (5).
+          // If 'All Bookings', show first PAGE_SIZE.
           if (limit) {
-            setDisplayedBookings(validData);
+            setDisplayedBookings(validData.slice(0, limit));
           } else {
             setDisplayedBookings(validData.slice(0, PAGE_SIZE));
             setPage(1);
