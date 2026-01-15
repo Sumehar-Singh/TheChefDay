@@ -97,6 +97,13 @@ const ChefsList = ({ navigation, route }) => {
           const safeParsedIds = parsedIds.map(id => String(id));
 
           finalChefs = finalChefs.filter(c => safeParsedIds.includes(String(c.ChefID)));
+
+          // Sort by Recency: Newest viewed (last in safeParsedIds) comes first
+          finalChefs.sort((a, b) => {
+            const indexA = safeParsedIds.indexOf(String(a.ChefID));
+            const indexB = safeParsedIds.indexOf(String(b.ChefID));
+            return indexB - indexA; // Descending order
+          });
         } else if (filterType === 'Random') {
           // Shuffle
           finalChefs = finalChefs.sort(() => 0.5 - Math.random());
