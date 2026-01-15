@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  FlatList,
 } from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
@@ -15,10 +16,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const { width } = Dimensions.get('window');
 const isTablet = width > 600;
+const PAGE_SIZE = 20;
 
 const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAll = true }) => {
-  const [bookings, setBookings] = useState(null);
+  const [allBookings, setAllBookings] = useState([]); // Store ALL fetched data
+  const [displayedBookings, setDisplayedBookings] = useState([]); // Store currently visible data
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -26,7 +31,6 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
 
         // Only append limit if it is explicitly passed (e.g. for Dashboard)
-        // detailed "All Bookings" view should fetch everything (no limit param)
         if (limit) {
           url += `&limit=${limit}`;
         }
@@ -35,14 +39,32 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         const response = await axios.get(url);
 
         if (response.data.status === 'success') {
-          const bookingData = Array.isArray(response.data.data) ? response.data.data : [];
-          setBookings(bookingData);
+          const rawData = Array.isArray(response.data.data) ? response.data.data : [];
+
+          // Filter valid items immediately
+          const validData = rawData.filter(item => {
+            const id = item.bookingid || item.BookingId || item.id || item.ID;
+            return id !== undefined && id !== null && id !== '';
+          });
+
+          setAllBookings(validData);
+
+          // Initial Load: If limit is set, show all (it's small). If 'All Bookings', show first PAGE_SIZE.
+          if (limit) {
+            setDisplayedBookings(validData);
+          } else {
+            setDisplayedBookings(validData.slice(0, PAGE_SIZE));
+            setPage(1);
+          }
+
         } else {
-          setBookings([]);
+          setAllBookings([]);
+          setDisplayedBookings([]);
         }
       } catch (error) {
         console.error('Error fetching bookings:', error);
-        setBookings([]);
+        setAllBookings([]);
+        setDisplayedBookings([]);
       } finally {
         setLoading(false);
       }
@@ -53,18 +75,34 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     }
   }, [UserID, limit]);
 
+  const loadMoreData = () => {
+    // Only load more if we are NOT in "Dashboard Mode" (limit exists) and we have more data
+    if (limit) return;
+    if (loadingMore) return;
+    if (displayedBookings.length >= allBookings.length) return;
+
+    setLoadingMore(true);
+
+    // Simulate network delay for effect (optional, enables 'loading' spinner at bottom)
+    setTimeout(() => {
+      const nextPage = page + 1;
+      const nextBatch = allBookings.slice(0, nextPage * PAGE_SIZE);
+      setDisplayedBookings(nextBatch);
+      setPage(nextPage);
+      setLoadingMore(false);
+    }, 500);
+  };
+
   // Direct helper to safely extract data regardless of casing and missing values
   const getField = (item, keys, fallback = '') => {
     if (!item) return fallback;
     for (const key of keys) {
-      // Check for exact key
       let val = item[key];
       if (val !== undefined && val !== null) {
         if (typeof val === 'string') val = val.trim();
         if (val !== '') return val;
       }
 
-      // Check for key with spaces removed (e.g. "booking id" -> "bookingid")
       const strippedKey = key.replace(/\s/g, '');
       val = item[strippedKey];
       if (val !== undefined && val !== null) {
@@ -93,11 +131,84 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     </View>
   );
 
+  const renderItem = ({ item, index }) => {
+    const bookingId = getField(item, ['booking id', 'bookingid', 'BookingId', 'id', 'ID'], '');
+    const chefName = getField(item, ['chefname', 'chef name', 'Chefname', 'ChefName', 'name'], 'Unknown Chef');
+    const chefImage = getField(item, ['chefimage', 'chef image', 'ChefImage', 'image'], null);
+    const eventDate = getField(item, ['eventdate', 'event date', 'EventDate', 'date'], 'N/A');
+    const bookingDate = getField(item, ['bookingdate', 'booking date', 'BookingDate', 'created_at'], 'N/A');
+    const serviceType = getField(item, ['servicetype', 'service type', 'ServiceType', 'service'], 'Service');
+    const status = getField(item, ['status', 'Status'], 'Pending');
+
+    return (
+      <TouchableOpacity
+        style={styles.bookingItem}
+        onPress={() =>
+          navigation.navigate('BookingDetail', {
+            BookingID: bookingId,
+          })
+        }
+      >
+        <View style={styles.bookingItemLeft}>
+          <View style={styles.bookingHeader}>
+            {chefImage ? (
+              <Image
+                source={{ uri: chefImage }}
+                style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10, backgroundColor: '#eee' }}
+              />
+            ) : (
+              <View style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10, backgroundColor: '#eee', alignItems: 'center', justifyContent: 'center' }}>
+                <MaterialCommunityIcons name="chef-hat" size={20} color="#666" />
+              </View>
+            )}
+
+            <Text style={styles.bookingTextCustomer}>
+              {chefName}
+            </Text>
+            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
+              <Text style={styles.statusText}>{status}</Text>
+            </View>
+          </View>
+
+          <View style={styles.bookingDetails}>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
+              <Text style={[styles.bookingTextEvent, { color: '#000000' }]}>
+                Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
+              <Text style={[styles.bookingText, { color: '#333333' }]}>
+                Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
+              <Text style={[styles.bookingTextService, { color: '#000000', fontWeight: '600' }]}>
+                {serviceType}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator size="small" color="#cc0000" />
+      </View>
+    );
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#ff0000" />;
   }
 
-  const hasBookings = bookings && bookings.length > 0;
+  const hasBookings = displayedBookings && displayedBookings.length > 0;
 
   return (
     <View style={styles.container}>
@@ -122,81 +233,21 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
       {!hasBookings ? (
         <EmptyBookings />
       ) : (
-        <>
-          {bookings
-            .filter(item => {
-              // Filter out ghost items (no valid ID)
-              const id = item.bookingid || item.BookingId || item.id || item.ID;
-              return id !== undefined && id !== null && id !== '';
-            })
-            .map((item, index) => {
-              // Updated keys based on user's debug output: 
-              // booking id, servicetype, eventdate, status, bookingdate, chefname, chefimage
-              const bookingId = getField(item, ['booking id', 'bookingid', 'BookingId', 'id', 'ID'], '');
-              const chefName = getField(item, ['chefname', 'chef name', 'Chefname', 'ChefName', 'name'], 'Unknown Chef');
-              const chefImage = getField(item, ['chefimage', 'chef image', 'ChefImage', 'image'], null);
-              const eventDate = getField(item, ['eventdate', 'event date', 'EventDate', 'date'], 'N/A');
-              const bookingDate = getField(item, ['bookingdate', 'booking date', 'BookingDate', 'created_at'], 'N/A');
-              const serviceType = getField(item, ['servicetype', 'service type', 'ServiceType', 'service'], 'Service');
-              const status = getField(item, ['status', 'Status'], 'Pending');
-
-              return (
-                <TouchableOpacity
-                  key={bookingId ? bookingId.toString() : `booking-${index}`}
-                  style={styles.bookingItem}
-                  onPress={() =>
-                    navigation.navigate('BookingDetail', {
-                      BookingID: bookingId,
-                    })
-                  }
-                >
-                  <View style={styles.bookingItemLeft}>
-                    <View style={styles.bookingHeader}>
-                      {/* Chef Image Check */}
-                      {chefImage ? (
-                        <Image
-                          source={{ uri: chefImage }}
-                          style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10, backgroundColor: '#eee' }}
-                        />
-                      ) : (
-                        <View style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10, backgroundColor: '#eee', alignItems: 'center', justifyContent: 'center' }}>
-                          <MaterialCommunityIcons name="chef-hat" size={20} color="#666" />
-                        </View>
-                      )}
-
-                      <Text style={styles.bookingTextCustomer}>
-                        {chefName}
-                      </Text>
-                      <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
-                        <Text style={styles.statusText}>{status}</Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.bookingDetails}>
-                      <View style={styles.detailRow}>
-                        <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
-                        <Text style={[styles.bookingTextEvent, { color: '#000000' }]}>
-                          Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
-                        </Text>
-                      </View>
-                      <View style={styles.detailRow}>
-                        <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
-                        <Text style={[styles.bookingText, { color: '#333333' }]}>
-                          Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
-                        </Text>
-                      </View>
-                      <View style={styles.detailRow}>
-                        <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
-                        <Text style={[styles.bookingTextService, { color: '#000000', fontWeight: '600' }]}>
-                          {serviceType}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-        </>
+        <FlatList
+          data={displayedBookings}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => {
+            const id = item.bookingid || item.BookingId || item.id || item.ID;
+            return id ? id.toString() : `booking-${index}`;
+          }}
+          // If limit is set (UserDashboard), disable scroll because parent scrolls.
+          // If limit is NOT set (AllBookings), enable scroll and pagination.
+          scrollEnabled={!limit}
+          onEndReached={loadMoreData}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          showsVerticalScrollIndicator={false}
+        />
       )}
     </View>
   );
@@ -204,6 +255,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
 
 const styles = StyleSheet.create({
   container: {
+    // If limit is set (Dashboard style), keep card container style. 
+    // If infinite list (AllBookings), we want it to fill fetching area, but sharing styles is fine.
     backgroundColor: '#fff',
     borderRadius: 15,
     marginHorizontal: 15,
@@ -213,6 +266,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 20, // Add bottom margin for safe spacing
   },
   sectionHeader: {
     flexDirection: 'row',

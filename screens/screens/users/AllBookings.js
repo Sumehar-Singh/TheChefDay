@@ -15,12 +15,11 @@ const AllBookings = ({ navigation }) => {
       <CustomStatusBar title="All Bookings" includeTopInset={false} />
 
 
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+      <View
+        style={styles.content}
       >
         <BookingsList UserID={profile?.Id} navigation={navigation} showHeader={false} showViewAll={false} />
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
