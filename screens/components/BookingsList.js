@@ -2,17 +2,14 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  FlatList,
   ActivityIndicator,
-  Alert,
   StyleSheet,
-  Image,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
-import { formatDate, getEventDayLabel } from './utils';
+import { formatDate } from './utils';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
@@ -22,11 +19,13 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
   const [bookings, setBookings] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Debug flag: if no limit is passed (AllBookings page), show debug info
+  const isDebug = !limit;
+
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        // HACK: Always force a limit to ensure API behaves consistently with Dashboard
-        // If Dashboard (limit=5) works, maybe limit=100 will get the same data structure
+        // Force limit to 100 on All Bookings to ensure similar data shape to Dashboard
         const effectiveLimit = limit || 100;
 
         let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
@@ -38,7 +37,6 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         if (response.data.status === 'success') {
           const bookingData = Array.isArray(response.data.data) ? response.data.data : [];
           setBookings(bookingData);
-          console.log('All Bookings Data:', JSON.stringify(bookingData, null, 2));
         } else {
           setBookings([]);
         }
@@ -79,18 +77,8 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
 
   const EmptyBookings = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="calendar-clock" size={isTablet ? 80 : 60} color="#805500" />
+      <MaterialCommunityIcons name="calendar-clock" size={60} color="#805500" />
       <Text style={styles.emptyTitle}>No Bookings Yet</Text>
-      <Text style={styles.emptyText}>
-        Start exploring chefs and book their services for your special
-        occasions.
-      </Text>
-      <TouchableOpacity
-        style={styles.emptyButton}
-        onPress={() => navigation.navigate('ChefsList')}
-      >
-        <Text style={styles.emptyButtonText}>Find Chefs</Text>
-      </TouchableOpacity>
     </View>
   );
 
@@ -105,7 +93,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
       {showHeader && (
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleContainer}>
-            <MaterialCommunityIcons name="calendar-check" size={isTablet ? 28 : 24} color="#ff0000" />
+            <MaterialCommunityIcons name="calendar-check" size={24} color="#ff0000" />
             <Text style={styles.sectionTitle}>Your Bookings</Text>
           </View>
           {hasBookings && showViewAll && (
@@ -114,7 +102,6 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
               onPress={() => navigation.navigate('AllBookings')}
             >
               <Text style={styles.seeAllText}>View All</Text>
-              <MaterialCommunityIcons name="chevron-right" size={isTablet ? 24 : 20} color="#209E00" />
             </TouchableOpacity>
           )}
         </View>
@@ -124,8 +111,17 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         <EmptyBookings />
       ) : (
         <>
+          {/* DEBUG DUMP FOR ALL BOOKINGS PAGE ONLY */}
+          {isDebug && (
+            <View style={{ padding: 10, backgroundColor: '#ffeebb', marginBottom: 10, borderWidth: 2, borderColor: 'red' }}>
+              <Text style={{ fontWeight: 'bold', color: 'red', marginBottom: 5 }}>DEBUG DATA DUMP (First Item):</Text>
+              <Text style={{ fontSize: 10, color: '#000', fontFamily: 'monospace' }}>
+                {JSON.stringify(bookings[0], null, 2)}
+              </Text>
+            </View>
+          )}
+
           {bookings.map((item, index) => {
-            // Explicitly look for the keys we know exist using the helper
             const bookingId = getField(item, ['BookingId', 'bookingid', 'id', 'ID'], '');
             const chefName = getField(item, ['ChefName', 'chefname', 'Chef_Name', 'chef_name', 'name', 'Name'], 'Unknown Chef');
             const eventDate = getField(item, ['EventDate', 'eventdate', 'event_date', 'date'], 'N/A');
@@ -145,47 +141,30 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
               >
                 <View style={styles.bookingItemLeft}>
                   <View style={styles.bookingHeader}>
-                    <Text style={styles.bookingTextCustomer}>
+                    <Text style={[styles.bookingTextCustomer, { color: 'black' }]}>
                       {chefName}
                     </Text>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        { backgroundColor: getStatusColor(status) },
-                      ]}
-                    >
+                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
                       <Text style={styles.statusText}>{status}</Text>
                     </View>
                   </View>
 
                   <View style={styles.bookingDetails}>
                     <View style={styles.detailRow}>
-                      <MaterialCommunityIcons
-                        name="calendar"
-                        size={isTablet ? 20 : 16}
-                        color="#ff0000"
-                      />
-                      <Text style={styles.bookingTextEvent}>
+                      <MaterialCommunityIcons name="calendar" size={16} color="#ff0000" />
+                      <Text style={[styles.bookingTextEvent, { color: 'black' }]}>
                         Event: {eventDate !== 'N/A' ? formatDate(eventDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <MaterialCommunityIcons
-                        name="clock-outline"
-                        size={isTablet ? 20 : 16}
-                        color="#ff0000"
-                      />
-                      <Text style={styles.bookingText}>
+                      <MaterialCommunityIcons name="clock-outline" size={16} color="#ff0000" />
+                      <Text style={[styles.bookingText, { color: 'black' }]}>
                         Booked: {bookingDate !== 'N/A' ? formatDate(bookingDate) : 'N/A'}
                       </Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <MaterialCommunityIcons
-                        name="food"
-                        size={isTablet ? 20 : 16}
-                        color="#ff0000"
-                      />
-                      <Text style={styles.bookingTextService}>
+                      <MaterialCommunityIcons name="food" size={16} color="#ff0000" />
+                      <Text style={[styles.bookingTextService, { color: 'black' }]}>
                         {serviceType}
                       </Text>
                     </View>
@@ -313,42 +292,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 10,
     textAlign: 'center',
-  },
-  emptyText: {
-    fontSize: isTablet ? 16 : 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-    lineHeight: isTablet ? 24 : 18,
-  },
-  emptyButton: {
-    backgroundColor: '#ff0000',
-    paddingVertical: isTablet ? 12 : 10,
-    paddingHorizontal: isTablet ? 25 : 20,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  emptyButtonText: {
-    color: '#fff',
-    fontSize: isTablet ? 16 : 14,
-    fontWeight: '600',
-  },
-  seeAllCard: {
-    backgroundColor: '#f5f5f5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    marginTop: 5,
-  },
-  seeAllCardText: {
-    fontSize: isTablet ? 16 : 14,
-    fontWeight: '600',
-    color: '#ff0000',
   },
 });
 
