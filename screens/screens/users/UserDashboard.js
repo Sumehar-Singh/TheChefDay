@@ -135,7 +135,11 @@ const UserDashboard = ({ navigation }) => {
 
   const getPopularChefs = (count) => {
     // IMPORTANT: Create a copy before sorting to avoid mutating the memoized array
-    return [...visibleChefs].sort((a, b) => b.Popularity - a.Popularity).slice(0, count);
+    // Strict Filter: Only show chefs with Popularity > 0
+    return [...visibleChefs]
+      .filter(c => (parseFloat(c.Popularity) || 0) > 0)
+      .sort((a, b) => (parseFloat(b.Popularity) || 0) - (parseFloat(a.Popularity) || 0))
+      .slice(0, count);
   };
 
   const shuffleArray = (array) => {
@@ -247,97 +251,99 @@ const UserDashboard = ({ navigation }) => {
       >
 
         <View style={{ marginTop: 25 }}>
-          {sections.map((section, index) => (
-            <View
-              key={`section-${section.title}-${index}`}
-              style={styles.sectionContainer}
-            >
-              <View style={styles.sectionHeader}>
-                <View style={styles.sectionTitleContainer}>
-                  <MaterialCommunityIcons
-                    name={
-                      section.title.includes('Recently')
-                        ? 'clock-outline'
-                        : section.title.includes('Random')
-                          ? 'dice-multiple'
-                          : section.title.includes('Nearby')
-                            ? 'map-marker'
-                            : 'fire'
-                    }
-                    size={isTablet ? 28 : 24}
-                    color="#ff0000"
-                  />
-                  <Text style={styles.sectionTitle}>{section.title}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.seeAllButton}
-                  onPress={() => {
-                    let filterType = 'All';
-                    if (section.title.includes('Recently')) filterType = 'Recent';
-                    else if (section.title.includes('Random')) filterType = 'Random';
-                    else if (section.title.includes('Nearby')) filterType = 'Nearby';
-                    else if (section.title.includes('Popular')) filterType = 'Popular';
-
-                    navigation.navigate('ChefsList', { filterType });
-                  }}
-                >
-                  <Text style={styles.seeAllText}>View All</Text>
-                  <MaterialCommunityIcons
-                    name="chevron-right"
-                    size={isTablet ? 24 : 20}
-                    color="#209E00"
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <FlatList
-                horizontal
-                data={section.data}
-                keyExtractor={(item, idx) =>
-                  item.ChefID.toString()
-                }
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.chefCard}
-                    onPress={() => navigateToChefDetail(item.ChefID)}
-                  >
-                    <Image
-                      source={
-                        item.Image
-                          ? { uri: item.Image }
-                          : require('../../../assets/userImage.jpg')
+          {sections.map((section, index) => {
+            if (section.data.length === 0) return null; // Hide empty sections
+            return (
+              <View
+                key={`section-${section.title}-${index}`}
+                style={styles.sectionContainer}
+              >
+                <View style={styles.sectionHeader}>
+                  <View style={styles.sectionTitleContainer}>
+                    <MaterialCommunityIcons
+                      name={
+                        section.title.includes('Recently')
+                          ? 'clock-outline'
+                          : section.title.includes('Random')
+                            ? 'dice-multiple'
+                            : section.title.includes('Nearby')
+                              ? 'map-marker'
+                              : 'fire'
                       }
-                      style={styles.chefImage}
+                      size={isTablet ? 28 : 24}
+                      color="#ff0000"
                     />
-                    <Text style={styles.chefName}>{item.FirstName}</Text>
-                    <Text style={styles.chefExperience}>
-                      {item.ExperienceYears} yrs
-                    </Text>
-                    <Text style={styles.chefDistance}>
-                      {coords &&
-                        getDistanceInMiles(
-                          coords.lat,
-                          coords.lon,
-                          item.Lat,
-                          item.Lon
-                        ) < nearByMiles &&
-                        '~' +
-                        getDistanceInMiles(
-                          coords.lat,
-                          coords.lon,
-                          item.Lat,
-                          item.Lon
-                        ).toFixed(2) +
-                        ' mi'}
-                    </Text>
+                    <Text style={styles.sectionTitle}>{section.title}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.seeAllButton}
+                    onPress={() => {
+                      let filterType = 'All';
+                      if (section.title.includes('Recently')) filterType = 'Recent';
+                      else if (section.title.includes('Random')) filterType = 'Random';
+                      else if (section.title.includes('Nearby')) filterType = 'Nearby';
+                      else if (section.title.includes('Popular')) filterType = 'Popular';
+
+                      navigation.navigate('ChefsList', { filterType });
+                    }}
+                  >
+                    <Text style={styles.seeAllText}>View All</Text>
+                    <MaterialCommunityIcons
+                      name="chevron-right"
+                      size={isTablet ? 24 : 20}
+                      color="#209E00"
+                    />
                   </TouchableOpacity>
-                )
-                }
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.chefListContent}
-              />
-            </View>
-          ))}
+                </View>
+
+                <FlatList
+                  horizontal
+                  data={section.data}
+                  keyExtractor={(item, idx) =>
+                    item.ChefID.toString()
+                  }
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.chefCard}
+                      onPress={() => navigateToChefDetail(item.ChefID)}
+                    >
+                      <Image
+                        source={
+                          item.Image
+                            ? { uri: item.Image }
+                            : require('../../../assets/userImage.jpg')
+                        }
+                        style={styles.chefImage}
+                      />
+                      <Text style={styles.chefName}>{item.FirstName}</Text>
+                      <Text style={styles.chefExperience}>
+                        {item.ExperienceYears} yrs
+                      </Text>
+                      <Text style={styles.chefDistance}>
+                        {coords &&
+                          getDistanceInMiles(
+                            coords.lat,
+                            coords.lon,
+                            item.Lat,
+                            item.Lon
+                          ) < nearByMiles &&
+                          '~' +
+                          getDistanceInMiles(
+                            coords.lat,
+                            coords.lon,
+                            item.Lat,
+                            item.Lon
+                          ).toFixed(2) +
+                          ' mi'}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                  }
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.chefListContent}
+                />
+              </View>
+            ))}
         </View>
 
         {profile.Id && (
