@@ -257,7 +257,7 @@ const BookingDetail = () => {
           </View>
         </Modal>
 
-        {/* Review Modal */}
+        {/* Review Modal - Modern Design matching ChefDetail */}
         <Modal
           transparent
           visible={reviewModalVisible}
@@ -266,47 +266,65 @@ const BookingDetail = () => {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <View style={[styles.modalIconContainer, { backgroundColor: '#FFF3E0' }]}>
-                <Ionicons name="star" size={40} color="#FF9800" />
+              <View style={[styles.modalIconContainer, { backgroundColor: '#FFFBEB' }]}>
+                {/* Amber-50 bg for star */}
+                <Text style={{ fontSize: 40 }}>⭐</Text>
               </View>
 
-              <Text style={styles.modalTitle}>How was your experience?</Text>
+              <Text style={styles.modalTitle}>Share Your Experience</Text>
               <Text style={styles.modalMessage}>Rate your service with Chef {booking.ChefName}</Text>
 
-              {/* Star Rating */}
-              <View style={styles.starsContainer}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <TouchableOpacity key={star} onPress={() => setRating(star)}>
-                    <Ionicons
-                      name={star <= rating ? "star" : "star-outline"}
-                      size={36}
-                      color="#FF9800"
-                      style={{ marginHorizontal: 4 }}
-                    />
-                  </TouchableOpacity>
-                ))}
+              {/* Rating Section */}
+              <View style={styles.ratingSection}>
+                <Text style={styles.ratingLabel}>Rate your experience</Text>
+                <View style={styles.modernStarContainer}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <TouchableOpacity
+                      key={star}
+                      onPress={() => setRating(star === rating ? 0 : star)} // Logic: Toggle to 0 if same
+                    >
+                      <Ionicons
+                        name={star <= rating ? "star" : "star-outline"}
+                        size={40}
+                        color="#FFD700" // Gold
+                        style={{ marginHorizontal: 6 }}
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                {rating > 0 && (
+                  <Text style={styles.ratingText}>
+                    {rating === 1 ? 'Poor' : rating === 2 ? 'Fair' : rating === 3 ? 'Good' : rating === 4 ? 'Very Good' : 'Excellent'}
+                  </Text>
+                )}
               </View>
 
-              <TextInput
-                style={styles.reviewInput}
-                placeholder="Write a review... (Optional)"
-                placeholderTextColor="#999"
-                multiline
-                numberOfLines={3}
-                value={reviewText}
-                onChangeText={setReviewText}
-              />
+              {/* Text Input Section */}
+              <View style={styles.textSection}>
+                <Text style={styles.textLabel}>Tell us more</Text>
+                <View style={styles.modernTextInputContainer}>
+                  <TextInput
+                    style={styles.modernTextInput}
+                    placeholder="Share details about food quality, service, etc..."
+                    placeholderTextColor="#9CA3AF"
+                    multiline
+                    numberOfLines={4}
+                    value={reviewText}
+                    onChangeText={setReviewText}
+                  />
+                </View>
+              </View>
 
               <View style={styles.modalActions}>
                 <TouchableOpacity
-                  style={[styles.modalConfirmBtn, { backgroundColor: '#2E7D32' }]} // Green for submit
+                  style={styles.modernSubmitButton} // Red button
                   onPress={submitReview}
                   disabled={submittingReview}
                 >
                   {submittingReview ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
-                    <Text style={styles.modalConfirmText}>Submit Review</Text>
+                    <Text style={styles.modernSubmitButtonText}>Submit Review</Text>
                   )}
                 </TouchableOpacity>
 
@@ -711,6 +729,86 @@ const styles = StyleSheet.create({
     minHeight: 80,
     marginBottom: 20,
   },
+  // Modern Review Styles for Modal
+  ratingSection: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    width: '100%',
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  ratingLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 12,
+  },
+  modernStarContainer: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  ratingText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#059669',
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginTop: 8,
+  },
+  textSection: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    width: '100%',
+    marginBottom: 20,
+  },
+  textLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  modernTextInputContainer: {
+    width: '100%',
+  },
+  modernTextInput: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 14,
+    color: '#111827',
+    textAlignVertical: 'top',
+    minHeight: 100,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  modernSubmitButton: {
+    backgroundColor: '#ff0000',
+    width: '100%',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modernSubmitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  // End Modern Styles
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
