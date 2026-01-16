@@ -78,6 +78,25 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
     </View>
   );
 
+  // Helper to safely extract data (Same as ChefBookingList)
+  const getField = (item, keys, fallback = '') => {
+    if (!item) return fallback;
+    for (const key of keys) {
+      let val = item[key];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
+      }
+      const lowerKey = key.toLowerCase();
+      val = item[lowerKey];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
+      }
+    }
+    return fallback;
+  };
+
   const renderStars = (rating) => {
     return (
       <View style={styles.starsContainer}>
@@ -86,7 +105,7 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
             key={`star-${rating}-${index}`}
             name={index < rating ? 'star' : 'star-outline'}
             size={isTablet ? 20 : 16}
-            color="#ff0000"
+            color="#ff9900" // Updated to Orange (Match User Side)
             style={styles.star}
           />
         ))}
@@ -128,28 +147,55 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
         <EmptyReviews />
       ) : (
         <View style={styles.reviewsList}>
-          {reviews.map((review, index) => (
-            <View
-              key={review.id ?? `review-${index}`}
-              style={styles.reviewItem}
-            >
-              <View style={styles.reviewHeader}>
-                <View style={styles.reviewerInfo}>
-                  <MaterialCommunityIcons
-                    name="account-circle"
-                    size={isTablet ? 40 : 32}
-                    color="#ff0000"
-                  />
-                  <Text style={styles.reviewUser}>{review.UserName}</Text>
+          {reviews.map((review, index) => {
+            // Robust lookup for User Image
+            let userImage = getField(review, [
+              'UserImage', 'userimage',
+              'Image', 'image',
+              'ProfileImage', 'profileimage',
+              'ClientImage', 'clientimage',
+              'CustomerImage', 'customerimage',
+              'user_image', 'profile_image'
+            ], null);
+
+            // Nested check
+            if (!userImage && review.User && review.User.Image) userImage = review.User.Image;
+            if (!userImage && review.user && review.user.image) userImage = review.user.image;
+
+            // Relative URL fix
+            if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
+              userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
+            }
+
+            const userName = getField(review, ['UserName', 'username', 'Name', 'name'], 'Valued Customer');
+
+            return (
+              <View
+                key={review.id ?? `review-${index}`}
+                style={styles.reviewItem}
+              >
+                <View style={styles.reviewHeader}>
+                  <View style={styles.reviewerInfo}>
+                    {userImage ? (
+                      <Image source={{ uri: userImage }} style={styles.userImage} />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="account-circle"
+                        size={isTablet ? 40 : 32}
+                        color="#ccc" // Placeholder icon color
+                      />
+                    )}
+                    <Text style={styles.reviewUser}>{userName}</Text>
+                  </View>
+                  <Text style={styles.reviewDate}>
+                    {formatDate(review.CreatedAt)}
+                  </Text>
                 </View>
-                <Text style={styles.reviewDate}>
-                  {formatDate(review.CreatedAt)}
-                </Text>
+                {renderStars(review.Rating)}
+                <Text style={styles.reviewComment}>{review.ReviewText}</Text>
               </View>
-              {renderStars(review.Rating)}
-              <Text style={styles.reviewComment}>{review.ReviewText}</Text>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
     </View>
@@ -197,15 +243,15 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   reviewsList: {
-    gap: 10,
+    gap: 15,
   },
   reviewItem: {
-    backgroundColor: '#f8f8f8', // Match items
-    borderRadius: 10,
-    padding: isTablet ? 14 : 12,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    padding: isTablet ? 20 : 15,
     // No marginHorizontal
-    borderLeftWidth: 3,
-    borderLeftColor: '#ff0000',
+    // No borderLeftWidth
+    // No borderLeftColor
   },
   reviewHeader: {
     flexDirection: 'row',
@@ -217,27 +263,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  userImage: {
+    width: isTablet ? 40 : 32,
+    height: isTablet ? 40 : 32,
+    borderRadius: isTablet ? 20 : 16,
+    marginRight: 10,
+    backgroundColor: '#eee',
+  },
   reviewUser: {
     fontSize: isTablet ? 18 : 16,
     fontWeight: '600',
-    color: '#262626',
-    marginLeft: 10,
+    color: '#333', // Matched ChefDetail
+    marginLeft: 10, // Spacing from image/icon
   },
   reviewDate: {
-    fontSize: isTablet ? 14 : 12,
-    color: '#666',
+    fontSize: isTablet ? 12 : 11,
+    color: '#888', // Matched ChefDetail
   },
   starsContainer: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   star: {
     marginRight: 2,
+    // color handled in renderStars
   },
   reviewComment: {
     fontSize: isTablet ? 16 : 14,
-    color: '#666',
-    lineHeight: isTablet ? 24 : 20,
+    color: '#666', // Matched ChefDetail
+    lineHeight: 22,
   },
   loadingContainer: {
     padding: 20,
@@ -254,11 +308,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   emptyTitle: {
-    fontSize: isTablet ? 22 : 18,
-    fontWeight: '700',
+    fontSize: isTablet ? 20 : 16,
+    fontWeight: '600',
     color: '#262626',
-    marginTop: 15,
-    marginBottom: 10,
+    marginTop: 10,
     textAlign: 'center',
   },
   emptyText: {
