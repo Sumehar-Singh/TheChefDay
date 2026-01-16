@@ -24,7 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CenterLoading from '../../components/CenterLoading';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
-import { getStoredChefIds, getUserCoords } from '../../components/utils';
+import { getStoredChefIds, getUserCoords, storeUserCoords } from '../../components/utils';
 import UserFullName from '../../components/strings/users/UserFullName';
 import UserProfileImage from '../../components/strings/users/UserProfileImage';
 import BookingsList from '../../components/BookingsList';
@@ -72,7 +72,27 @@ const UserDashboard = ({ navigation }) => {
     //removeAndFetch();
 
     const getUserId = async () => {
-      const dimensions = await getUserCoords();
+      let dimensions = await getUserCoords();
+
+      // If local storage is empty, try to fetch from Backend (Sync)
+      if (!dimensions && profile?.Id) {
+        try {
+          const response = await axios.get(`${BASE_URL}users/get_user_data.php`, {
+            params: { UserId: profile.Id }
+          });
+          if (response.data.status === "success" && response.data.data && response.data.data[0]) {
+            const user = response.data.data[0];
+            if (user.Lat && user.Lon) {
+              dimensions = { lat: user.Lat, lon: user.Lon };
+              // Restore to local storage
+              storeUserCoords(user.Lat, user.Lon);
+            }
+          }
+        } catch (error) {
+          console.error("Error syncing user coords:", error);
+        }
+      }
+
       console.log('My Corr', dimensions);
       setCoords(dimensions);
     };
