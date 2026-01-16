@@ -95,10 +95,30 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
     }
   };
 
+  // Helper to safely extract data
+  const getField = (item, keys, fallback = '') => {
+    if (!item) return fallback;
+    for (const key of keys) {
+      let val = item[key];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
+      }
+      // Check lowercase key
+      const lowerKey = key.toLowerCase();
+      val = item[lowerKey];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
+      }
+    }
+    return fallback;
+  };
+
   const renderItem = ({ item }) => {
-    // Assuming API follows convention: UserName, UserImage/Image, EventDate, etc.
-    // Fallback image logic same as User side
-    const userImage = item.UserImage || item.Image;
+    // Robust lookup for User Image
+    const userImage = getField(item, ['UserImage', 'userimage', 'Image', 'image', 'ProfileImage', 'profileimage'], null);
+    const userName = getField(item, ['UserName', 'username', 'Name', 'name'], 'Unknown User');
 
     return (
       <TouchableOpacity
@@ -124,7 +144,7 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
             )}
 
             <Text style={styles.bookingTextCustomer}>
-              {item.UserName}
+              {userName}
             </Text>
 
             <View
