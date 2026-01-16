@@ -60,11 +60,11 @@ const ChefsList = ({ navigation, route }) => {
       let result = [...chefs];
 
       // 1. Global Filter: Enforce 200-mile radius if coords exist
-      // Exception: 'Recent', 'Random', and 'All' should bypass this (Global/History view).
+      // Exception: 'Recent' and 'All' should bypass this (Global/History view).
       if (
         coords &&
         filterType !== 'Recent' &&
-        filterType !== 'Random' &&
+        // filterType !== 'Random' && // Random should now respect 200 miles as per user request
         filterType !== 'All'
       ) {
         result = result.filter(

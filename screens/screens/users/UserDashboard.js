@@ -161,7 +161,7 @@ const UserDashboard = ({ navigation }) => {
     },
     {
       title: 'Random Picks',
-      data: shuffleArray(visibleChefs).slice(0, 8),
+      data: shuffleArray(visibleChefs).slice(0, 5),
     },
     {
       title: 'Nearby Chefs',
