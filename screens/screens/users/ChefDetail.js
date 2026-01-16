@@ -90,15 +90,19 @@ const ChefDetail = ({ navigation }) => {
       setRatesLoading(false);
     }
   };
+  const [userCoords, setUserCoords] = useState(null);
+
   const getChefData = async (chefId) => {
     setRatesLoading(true);
 
     const fetchCoords = async (cLat, cLon) => {
       const dimensions = await getUserCoords();
-
-      setDistance(
-        getDistanceInMiles(dimensions.lat, dimensions.lon, cLat, cLon)
-      );
+      setUserCoords(dimensions);
+      if (dimensions) {
+        setDistance(
+          getDistanceInMiles(dimensions.lat, dimensions.lon, cLat, cLon)
+        );
+      }
     };
 
     try {
@@ -575,12 +579,14 @@ const ChefDetail = ({ navigation }) => {
 
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Distance from you</Text>
-                {profile ? (
+                {!profile ? (
+                  <Text style={styles.detailValueRed}>Login Required</Text>
+                ) : !userCoords ? (
+                  <Text style={styles.detailValueRed}>Set Location</Text>
+                ) : (
                   <Text style={styles.detailValue}>
                     ~ {distance.toFixed(2)} miles
                   </Text>
-                ) : (
-                  <Text style={styles.detailValueRed}>Login Required</Text>
                 )}
               </View>
             </View>
