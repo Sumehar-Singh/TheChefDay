@@ -335,9 +335,9 @@ const ChefEditProfile = ({ navigation }) => {
     const formData = new FormData();
     const isRmvd = isOldImageRemoved ? "Yes" : "No";
     formData.append('UserId', profile.Id); // Ensure UserId is included
-    formData.append('FirstName', name);
-    formData.append('MiddleName', middle);
-    formData.append('LastName', last);
+    formData.append('FirstName', name.trim());
+    formData.append('MiddleName', middle.trim());
+    formData.append('LastName', last.trim());
     formData.append('Bio', bio);
     formData.append('Experience', experience);
     formData.append('Phone', phone);

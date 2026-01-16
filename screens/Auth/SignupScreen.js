@@ -166,11 +166,11 @@ const SignupScreen = ({ navigation, route }) => {
     setLoading(true);
     try {
       const response = await axios.post(`${BASE_URL}register.php`, {
-        email: email,
+        email: email.trim(),
         password: password,
-        fname: FirstName,
-        mname: MiddleName,
-        lname: LastName,
+        fname: FirstName.trim(),
+        mname: MiddleName.trim(),
+        lname: LastName.trim(),
         phone: phone,
         role_id: isChef ? 3 : 2,
         terms_accepted: 1,

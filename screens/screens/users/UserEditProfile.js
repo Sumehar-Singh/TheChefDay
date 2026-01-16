@@ -317,9 +317,9 @@ const UserEditProfile = ({ navigation }) => {
     const formData = new FormData();
     const isRmvd = isOldImageRemoved ? "Yes" : "No";
     formData.append('UserId', profile.Id);
-    formData.append('FirstName', name);
-    formData.append('MiddleName', middle);
-    formData.append('LastName', last);
+    formData.append('FirstName', name.trim());
+    formData.append('MiddleName', middle.trim());
+    formData.append('LastName', last.trim());
     formData.append('Email', email);
     formData.append('Address', address);
     formData.append('Phone', phone);
