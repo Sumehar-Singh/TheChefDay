@@ -287,7 +287,7 @@ const BookingDetail = () => {
                       <Ionicons
                         name={star <= rating ? "star" : "star-outline"}
                         size={40}
-                        color="#FFD700" // Gold
+                        color={star <= rating ? "#FFD700" : "#D1D5DB"} // Gold vs Grey
                         style={{ marginHorizontal: 6 }}
                       />
                     </TouchableOpacity>
@@ -333,7 +333,7 @@ const BookingDetail = () => {
                   style={styles.modalCancelBtn}
                   onPress={() => setReviewModalVisible(false)}
                 >
-                  <Text style={styles.modalCancelText}>Skip for now</Text>
+                  <Text style={styles.modalCancelText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
             </View>
