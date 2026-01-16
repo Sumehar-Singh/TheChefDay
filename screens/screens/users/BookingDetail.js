@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, Dimensions, Alert, TouchableOpacity, RefreshControl, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, Dimensions, Alert, TouchableOpacity, RefreshControl, Modal, ActivityIndicator, TextInput } from 'react-native';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
 import { useRoute } from '@react-navigation/native';
@@ -25,6 +25,13 @@ const BookingDetail = () => {
   const [pendingStatus, setPendingStatus] = useState("");
 
   const [modalOnSuccess, setModalOnSuccess] = useState(() => () => { });
+
+  // Review Modal State
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
   const fetchBookingDetail = async () => {
     const form = new FormData();
     form.append('BookingID', BookingID);
@@ -68,6 +75,43 @@ const BookingDetail = () => {
       </View>
     );
   }
+
+  const submitReview = async () => {
+    if (rating === 0) {
+      Alert.alert('Rating Required', 'Please select a star rating.');
+      return;
+    }
+    setSubmittingReview(true);
+    const form = new FormData();
+    form.append('ChefID', booking.ChefID);
+    form.append('UserID', booking.UserID);
+    form.append('Rating', rating);
+    form.append('ReviewText', reviewText);
+
+    // Ideally pass BookingID too if backend supports it, but currently it's Chef/User pair (relaxed).
+
+    try {
+      const response = await axios.post(`${BASE_URL}users/add_review.php`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (response.data.success) {
+        setReviewModalVisible(false);
+        Alert.alert('Thank You!', 'Your review has been submitted.');
+        // clear form
+        setRating(0);
+        setReviewText('');
+      } else {
+        Alert.alert('Error', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      Alert.alert('Error', 'Failed to submit review.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   const updateBookingStatus = async (status, onSuccess = () => { }) => {
     // Configure modal content based on target status
     let title = 'Confirm Action';
@@ -107,8 +151,12 @@ const BookingDetail = () => {
         setBookingStatus(status);
         onSuccess();
 
-        //  Alert.alert('Success', response.data.message);
-        // callback after success (optional)
+        // Trigger Review Modal if Service Completed
+        if (status === 'Service Completed') {
+          setTimeout(() => {
+            setReviewModalVisible(true);
+          }, 500); // Small delay for UX
+        }
       } else {
         Alert.alert('Error', response.data.message);
       }
@@ -203,6 +251,70 @@ const BookingDetail = () => {
 
                 <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)}>
                   <Text style={styles.modalCancelText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Review Modal */}
+        <Modal
+          transparent
+          visible={reviewModalVisible}
+          animationType="slide"
+          onRequestClose={() => setReviewModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={[styles.modalIconContainer, { backgroundColor: '#FFF3E0' }]}>
+                <Ionicons name="star" size={40} color="#FF9800" />
+              </View>
+
+              <Text style={styles.modalTitle}>How was your experience?</Text>
+              <Text style={styles.modalMessage}>Rate your service with Chef {booking.ChefName}</Text>
+
+              {/* Star Rating */}
+              <View style={styles.starsContainer}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                    <Ionicons
+                      name={star <= rating ? "star" : "star-outline"}
+                      size={36}
+                      color="#FF9800"
+                      style={{ marginHorizontal: 4 }}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TextInput
+                style={styles.reviewInput}
+                placeholder="Write a review... (Optional)"
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={3}
+                value={reviewText}
+                onChangeText={setReviewText}
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalConfirmBtn, { backgroundColor: '#2E7D32' }]} // Green for submit
+                  onPress={submitReview}
+                  disabled={submittingReview}
+                >
+                  {submittingReview ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.modalConfirmText}>Submit Review</Text>
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.modalCancelBtn}
+                  onPress={() => setReviewModalVisible(false)}
+                >
+                  <Text style={styles.modalCancelText}>Skip for now</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -580,6 +692,24 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: isTablet ? 18 : 16, // Larger text
     fontWeight: '700',
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    justifyContent: 'center',
+  },
+  reviewInput: {
+    width: '100%',
+    backgroundColor: '#FAFAFA',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: isTablet ? 16 : 14,
+    color: '#333',
+    textAlignVertical: 'top',
+    minHeight: 80,
+    marginBottom: 20,
   },
   loadingContainer: {
     flex: 1,
