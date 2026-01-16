@@ -199,24 +199,15 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    minHeight: 200,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 4,
+    // Removed Card Styling to match User Dashboard
+    marginBottom: 0,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    marginBottom: 15,
+    paddingHorizontal: 15,
   },
   sectionTitleContainer: {
     flexDirection: 'row',
@@ -240,12 +231,18 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   bookingItem: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    padding: isTablet ? 14 : 12,
-    marginBottom: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: isTablet ? 15 : 12,
+    marginBottom: 10,
+    marginHorizontal: 15, // Align with header
     borderLeftWidth: 3,
     borderLeftColor: '#ff0000',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   bookingItemLeft: {
     flex: 1,
