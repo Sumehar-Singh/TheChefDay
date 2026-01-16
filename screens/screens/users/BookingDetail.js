@@ -636,10 +636,10 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0)', // Transparent as requested
+    backgroundColor: 'rgba(0,0,0,0.1)', // Very light overlay
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16, // Reduced padding for wider modal
+    paddingHorizontal: 16,
   },
   modalContent: {
     width: '100%',
