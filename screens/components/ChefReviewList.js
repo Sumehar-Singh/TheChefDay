@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    marginHorizontal: 15, // MATCH User Dashboard
+    marginHorizontal: 20, // Increased to 20
     padding: isTablet ? 20 : 15,
     marginBottom: 20,
     shadowColor: '#000',
