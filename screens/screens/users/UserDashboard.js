@@ -319,23 +319,24 @@ const UserDashboard = ({ navigation }) => {
                         <Text style={styles.chefExperience}>
                           {item.ExperienceYears} yrs
                         </Text>
-                        <Text style={styles.chefDistance}>
-                          {coords &&
-                            getDistanceInMiles(
-                              coords.lat,
-                              coords.lon,
-                              item.Lat,
-                              item.Lon
-                            ) < nearByMiles &&
-                            '~' +
-                            getDistanceInMiles(
-                              coords.lat,
-                              coords.lon,
-                              item.Lat,
-                              item.Lon
-                            ).toFixed(2) +
-                            ' mi'}
-                        </Text>
+                        {coords &&
+                          getDistanceInMiles(
+                            coords.lat,
+                            coords.lon,
+                            item.Lat,
+                            item.Lon
+                          ) < nearByMiles ? (
+                          <Text style={styles.chefDistance}>
+                            {'~' +
+                              getDistanceInMiles(
+                                coords.lat,
+                                coords.lon,
+                                item.Lat,
+                                item.Lon
+                              ).toFixed(2) +
+                              ' mi'}
+                          </Text>
+                        ) : null}
                       </TouchableOpacity>
                     )}
                     showsHorizontalScrollIndicator={false}
