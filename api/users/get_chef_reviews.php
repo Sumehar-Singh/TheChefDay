@@ -9,7 +9,8 @@ $response = array();
 
 // Check if ChefID is provided
 $chefId = isset($_GET['ChefID']) ? $_GET['ChefID'] : (isset($_POST['ChefID']) ? $_POST['ChefID'] : '');
-$limit = isset($_GET['Limit']) ? (int) $_GET['Limit'] : 0; // Check if limit is provided, default is 0 (no limit)
+$limit = isset($_GET['Limit']) ? (int) $_GET['Limit'] : (isset($_POST['Limit']) ? (int) $_POST['Limit'] : 0);
+$offset = isset($_GET['Offset']) ? (int) $_GET['Offset'] : (isset($_POST['Offset']) ? (int) $_POST['Offset'] : 0);
 
 // Check if ChefID is empty
 if (empty($chefId)) {
@@ -35,7 +36,7 @@ ORDER BY r.ReviewID DESC";
 
 // If a limit is provided, append it to the query
 if ($limit > 0) {
-    $query .= " LIMIT ?";
+    $query .= " LIMIT ? OFFSET ?";
 }
 
 $stmt = $connection->prepare($query);
@@ -47,9 +48,9 @@ if (!$stmt) {
 
 // Bind parameters and execute
 if ($limit > 0) {
-    $stmt->bind_param('si', $chefId, $limit); // Binding ChefID and limit if limit is provided
+    $stmt->bind_param('sii', $chefId, $limit, $offset);
 } else {
-    $stmt->bind_param('s', $chefId); // Binding only ChefID if no limit is provided
+    $stmt->bind_param('s', $chefId);
 }
 
 $stmt->execute();

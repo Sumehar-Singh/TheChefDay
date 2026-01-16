@@ -7,55 +7,106 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
-  ScrollView,
-  ImageBackground,
+  ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-const { width, height } = Dimensions.get('window');
-const isTablet = width > 600;
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { formatDate } from './utils';
 
-const ChefReviewList = ({ navigation, userId, limit }) => {
+const { width } = Dimensions.get('window');
+const isTablet = width > 600;
+const PAGE_SIZE = 20;
+
+const ChefReviewList = ({ navigation, userId, limit, showHeader = true, showViewAll = true }) => {
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  const fetchChefReviews = useCallback(async () => {
+  const fetchChefReviews = useCallback(async (pageNum = 1) => {
     if (!userId) return;
 
-    const formData = new FormData();
-    formData.append('ChefID', userId);
-    formData.append('Limit', limit);
+    const form = new FormData();
+    form.append('ChefID', userId);
+
+    // If limit is provided (Dashboard), use it and dont offset (always 1 page).
+    // If no limit (Full Page), use PAGE_SIZE and offset.
+    const currentLimit = limit ? limit : PAGE_SIZE;
+    const currentOffset = limit ? 0 : (pageNum - 1) * PAGE_SIZE;
+
+    form.append('Limit', currentLimit);
+    form.append('Offset', currentOffset);
 
     try {
       const response = await axios.post(
         `${BASE_URL}users/get_chef_reviews.php`,
-        formData,
+        form,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
         }
       );
 
       if (response.data.success) {
-        setReviews(response.data.data || []);
+        const newData = response.data.data || [];
+
+        if (limit) {
+          setReviews(newData);
+        } else {
+          if (pageNum === 1) {
+            setReviews(newData);
+          } else {
+            setReviews(prev => [...prev, ...newData]);
+          }
+
+          if (newData.length < PAGE_SIZE) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
+        }
       } else {
-        console.error('Review fetch error:', response.data.message);
-        setReviews([]);
+        if (pageNum === 1) setReviews([]);
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
-      setReviews([]);
+      if (pageNum === 1) setReviews([]);
     } finally {
       setIsLoading(false);
+      setRefreshing(false);
+      setLoadingMore(false);
     }
   }, [userId, limit]);
 
   useEffect(() => {
     setIsLoading(true);
-    fetchChefReviews();
+    setPage(1);
+    fetchChefReviews(1);
   }, [fetchChefReviews]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setPage(1);
+    setHasMore(true);
+    fetchChefReviews(1);
+  };
+
+  const loadMoreData = () => {
+    if (limit) return;
+    if (loadingMore || isLoading) return;
+    if (!hasMore) return;
+
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchChefReviews(nextPage);
+  };
+
+  const handleSeeAll = () => {
+    navigation.navigate('ChefReviews');
+  };
 
   const EmptyReviews = () => (
     <View style={styles.emptyContainer}>
@@ -69,134 +120,103 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
         Start accepting bookings and delivering great experiences to receive
         reviews from your customers.
       </Text>
-      {/* <TouchableOpacity 
-        style={styles.emptyButton}
-        onPress={() => navigation.navigate('ChefEditProfile')}
-      >
-        <Text style={styles.emptyButtonText}>Complete Profile</Text>
-      </TouchableOpacity> */}
     </View>
   );
 
-  // Helper to safely extract data (Same as ChefBookingList)
-  const getField = (item, keys, fallback = '') => {
-    if (!item) return fallback;
-    for (const key of keys) {
-      let val = item[key];
-      if (val !== undefined && val !== null) {
-        if (typeof val === 'string') val = val.trim();
-        if (val !== '') return val;
-      }
-      const lowerKey = key.toLowerCase();
-      val = item[lowerKey];
-      if (val !== undefined && val !== null) {
-        if (typeof val === 'string') val = val.trim();
-        if (val !== '') return val;
-      }
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <MaterialCommunityIcons
+          key={i}
+          name={i <= rating ? 'star' : 'star-outline'}
+          size={16}
+          color="#ff9900"
+        />
+      );
     }
-    return fallback;
+    return <View style={{ flexDirection: 'row' }}>{stars}</View>;
   };
 
-  const renderStars = (rating) => {
+  const renderItem = ({ item }) => {
+    let userImage = item.Image; // API returns 'Image' directly
+    if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
+      userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
+    }
+
     return (
-      <View style={styles.starsContainer}>
-        {[...Array(5)].map((_, index) => (
-          <MaterialCommunityIcons
-            key={`star-${rating}-${index}`}
-            name={index < rating ? 'star' : 'star-outline'}
-            size={isTablet ? 20 : 16}
-            color="#ff9900" // Updated to Orange (Match User Side)
-            style={styles.star}
-          />
-        ))}
+      <View style={styles.reviewItem}>
+        <View style={styles.reviewHeader}>
+          {userImage ? (
+            <Image
+              source={{ uri: userImage }}
+              style={styles.userImage}
+            />
+          ) : (
+            <View style={styles.userImagePlaceholder}>
+              <MaterialCommunityIcons name="account" size={20} color="#666" />
+            </View>
+          )}
+          <View style={styles.reviewHeaderText}>
+            <Text style={styles.reviewerName}>{item.UserName || 'Unknown User'}</Text>
+            <Text style={styles.reviewDate}>{formatDate(item.CreatedAt)}</Text>
+          </View>
+          <View style={styles.reviewRating}>
+            {renderStars(parseInt(item.Rating))}
+          </View>
+        </View>
+        <Text style={styles.reviewText}>{item.ReviewText}</Text>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.sectionHeader}>
-        <View style={styles.sectionTitleContainer}>
-          <MaterialCommunityIcons
-            name="star"
-            size={isTablet ? 28 : 24}
-            color="#ff0000"
-          />
-          <Text style={styles.sectionTitle}>Customer Reviews</Text>
-        </View>
-        {reviews.length > 0 && limit && (
-          <TouchableOpacity
-            style={styles.seeAllButton}
-            onPress={() => navigation.navigate('ChefReviews')}
-          >
-            <Text style={styles.seeAllText}>View All</Text>
+    <View style={[styles.container, !limit && { flex: 1, marginBottom: 0 }]}>
+      {showHeader && (
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionTitleContainer}>
             <MaterialCommunityIcons
-              name="chevron-right"
-              size={isTablet ? 24 : 20}
+              name="star-check"
+              size={isTablet ? 28 : 24}
               color="#ff0000"
             />
-          </TouchableOpacity>
-        )}
-      </View>
+            <Text style={styles.sectionTitle}>Reviews</Text>
+          </View>
+          {reviews.length > 0 && limit && showViewAll && (
+            <TouchableOpacity
+              style={styles.seeAllButton}
+              onPress={handleSeeAll}
+            >
+              <Text style={styles.seeAllText}>View All</Text>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={isTablet ? 24 : 20}
+                color="#ff0000"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
-      {isLoading ? (
+      {isLoading && page === 1 ? (
         <View style={styles.loadingContainer}>
-          <Text>Loading reviews...</Text>
+          <ActivityIndicator size="large" color="#ff0000" />
         </View>
       ) : reviews.length === 0 ? (
         <EmptyReviews />
       ) : (
-        <View style={styles.reviewsList}>
-          {reviews.map((review, index) => {
-            // Robust lookup for User Image
-            let userImage = getField(review, [
-              'UserImage', 'userimage',
-              'Image', 'image',
-              'ProfileImage', 'profileimage',
-              'ClientImage', 'clientimage',
-              'CustomerImage', 'customerimage',
-              'user_image', 'profile_image'
-            ], null);
-
-            // Nested check
-            if (!userImage && review.User && review.User.Image) userImage = review.User.Image;
-            if (!userImage && review.user && review.user.image) userImage = review.user.image;
-
-            // Relative URL fix
-            if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
-              userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
-            }
-
-            const userName = getField(review, ['UserName', 'username', 'Name', 'name'], 'Valued Customer');
-
-            return (
-              <View
-                key={review.id ?? `review-${index}`}
-                style={styles.reviewItem}
-              >
-                <View style={styles.reviewHeader}>
-                  <View style={styles.reviewerInfo}>
-                    {userImage ? (
-                      <Image source={{ uri: userImage }} style={styles.userImage} />
-                    ) : (
-                      <MaterialCommunityIcons
-                        name="account-circle"
-                        size={isTablet ? 40 : 32}
-                        color="#ccc" // Placeholder icon color
-                      />
-                    )}
-                    <Text style={styles.reviewUser}>{userName}</Text>
-                  </View>
-                  <Text style={styles.reviewDate}>
-                    {formatDate(review.CreatedAt)}
-                  </Text>
-                </View>
-                {renderStars(review.Rating)}
-                <Text style={styles.reviewComment}>{review.ReviewText}</Text>
-              </View>
-            );
-          })}
-        </View>
+        <FlatList
+          scrollEnabled={!limit}
+          data={reviews}
+          keyExtractor={(item) => item.ReviewID ? item.ReviewID.toString() : Math.random().toString()}
+          renderItem={renderItem}
+          refreshing={refreshing}
+          onRefresh={!limit ? onRefresh : null}
+          onEndReached={!limit ? loadMoreData : null}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color="#ff0000" style={{ padding: 10 }} /> : null}
+          showsVerticalScrollIndicator={false}
+        />
       )}
     </View>
   );
@@ -206,14 +226,14 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    marginHorizontal: 15, // Reverted to 15
+    marginHorizontal: 15,
     padding: isTablet ? 20 : 15,
-    marginBottom: 25, // Updated to 25
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -242,76 +262,65 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginRight: 5,
   },
-  reviewsList: {
-    gap: 15,
-  },
   reviewItem: {
     backgroundColor: '#f8f8f8',
     borderRadius: 12,
-    padding: isTablet ? 20 : 15,
-    // No marginHorizontal
-    // No borderLeftWidth
-    // No borderLeftColor
+    padding: 15,
+    marginBottom: 10,
   },
   reviewHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
   },
-  reviewerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   userImage: {
-    width: isTablet ? 40 : 32,
-    height: isTablet ? 40 : 32,
-    borderRadius: isTablet ? 20 : 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 10,
     backgroundColor: '#eee',
   },
-  reviewUser: {
-    fontSize: isTablet ? 18 : 16,
-    fontWeight: '600',
-    color: '#333', // Matched ChefDetail
-    marginLeft: 10, // Spacing from image/icon
-  },
-  reviewDate: {
-    fontSize: isTablet ? 12 : 11,
-    color: '#888', // Matched ChefDetail
-  },
-  starsContainer: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  star: {
-    marginRight: 2,
-    // color handled in renderStars
-  },
-  reviewComment: {
-    fontSize: isTablet ? 16 : 14,
-    color: '#666', // Matched ChefDetail
-    lineHeight: 22,
-  },
-  loadingContainer: {
-    padding: 20,
+  userImagePlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: '#eee',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  reviewHeaderText: {
+    flex: 1,
+  },
+  reviewerName: {
+    fontSize: isTablet ? 16 : 14,
+    fontWeight: '700',
+    color: '#000',
+  },
+  reviewDate: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  reviewRating: {
+    alignItems: 'flex-end',
+  },
+  reviewText: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
   },
   emptyContainer: {
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   emptyTitle: {
-    fontSize: isTablet ? 20 : 16,
-    fontWeight: '600',
+    fontSize: isTablet ? 22 : 18,
+    fontWeight: '700',
     color: '#262626',
-    marginTop: 10,
+    marginTop: 15,
+    marginBottom: 10,
     textAlign: 'center',
   },
   emptyText: {
@@ -321,21 +330,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: isTablet ? 24 : 18,
   },
-  emptyButton: {
-    backgroundColor: '#ff0000',
-    paddingVertical: isTablet ? 12 : 10,
-    paddingHorizontal: isTablet ? 25 : 20,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  emptyButtonText: {
-    color: '#fff',
-    fontSize: isTablet ? 16 : 14,
-    fontWeight: '600',
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
