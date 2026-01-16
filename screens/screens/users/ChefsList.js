@@ -60,12 +60,19 @@ const ChefsList = ({ navigation, route }) => {
       let result = [...chefs];
 
       // 1. Global Filter: Enforce 200-mile radius if coords exist
-      // Exception: If no coords, allow ONLY 'Random' to show freely.
-      if (coords) {
-        result = result.filter(chef =>
-          getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= 200
+      // Exception: 'Recent', 'Random', and 'All' should bypass this (Global/History view).
+      if (
+        coords &&
+        filterType !== 'Recent' &&
+        filterType !== 'Random' &&
+        filterType !== 'All'
+      ) {
+        result = result.filter(
+          (chef) =>
+            getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <=
+            200
         );
-      } else {
+      } else if (!coords) {
         // If no coords:
         // Allow 'Random' AND 'All' to show freely (Global list).
         // Block 'Nearby', 'Popular', 'Recent' (require location or valid history).

@@ -120,7 +120,8 @@ const UserDashboard = ({ navigation }) => {
   }, [allChefs, coords, nearByMiles]);
 
   const getRecentChefs = (count) => {
-    const filteredChefs = visibleChefs.filter((chef) =>
+    // Recent Chefs should show regardless of distance (History)
+    const filteredChefs = allChefs.filter((chef) =>
       safeRecentIds.includes(String(chef.ChefID))
     );
 
