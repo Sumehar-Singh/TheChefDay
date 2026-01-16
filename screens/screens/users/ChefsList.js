@@ -362,7 +362,7 @@ const ChefsList = ({ navigation, route }) => {
             {!coords && filterType !== 'Recent' && filterType !== 'Popular' ? (
               <TouchableOpacity
                 style={styles.emptyStateButton}
-                onPress={() => navigation.navigate('UserSettings')}
+                onPress={() => navigation.navigate('UpdateProfile')}
               >
                 <Text style={styles.emptyStateButtonText}>Set Location</Text>
               </TouchableOpacity>

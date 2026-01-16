@@ -370,7 +370,7 @@ const UserDashboard = ({ navigation }) => {
                     {section.title.includes('Nearby') && !coords ? (
                       <TouchableOpacity
                         style={styles.emptyStateButton}
-                        onPress={() => navigation.navigate('UserSettings')}
+                        onPress={() => navigation.navigate('UpdateProfile')}
                       >
                         <Text style={styles.emptyStateButtonText}>
                           Set Location
