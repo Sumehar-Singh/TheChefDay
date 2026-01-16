@@ -11,6 +11,7 @@ const { width } = Dimensions.get('window');
 const isTablet = width > 600;
 
 const Bookings = ({ navigation }) => {
+  const { profile } = useAuth();
 
   return (
     <SafeAreaView style={styles.container}>
