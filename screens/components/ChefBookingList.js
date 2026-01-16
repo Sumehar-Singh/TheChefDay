@@ -117,7 +117,31 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
 
   const renderItem = ({ item }) => {
     // Robust lookup for User Image
-    const userImage = getField(item, ['UserImage', 'userimage', 'Image', 'image', 'ProfileImage', 'profileimage'], null);
+    let userImage = getField(item, [
+      'UserImage', 'userimage',
+      'Image', 'image',
+      'ProfileImage', 'profileimage',
+      'ClientImage', 'clientimage',
+      'CustomerImage', 'customerimage',
+      'user_image', 'profile_image'
+    ], null);
+
+    // Check nested User object (if API returns joined object)
+    if (!userImage && item.User && item.User.Image) {
+      userImage = item.User.Image;
+    }
+    if (!userImage && item.user && item.user.image) {
+      userImage = item.user.image;
+    }
+
+    // Fix Relative URLs
+    if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
+      // Assume it's relative to the server root if not absolute
+      // BASE_URL is ".../server/chef/api/"
+      // We guess images are at ".../server/"
+      userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
+    }
+
     const userName = getField(item, ['UserName', 'username', 'Name', 'name'], 'Unknown User');
 
     return (
