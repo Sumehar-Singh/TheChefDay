@@ -333,14 +333,15 @@ const ChefsList = ({ navigation, route }) => {
             )}
             contentContainerStyle={styles.allChefsList}
           />
-        ) : (
+        ) : !isLoading ? (
           <View style={styles.emptyStateContainer}>
             <MaterialCommunityIcons
               name={
                 !coords &&
                   filterType !== 'Recent' &&
                   filterType !== 'Popular' &&
-                  filterType !== 'Random'
+                  filterType !== 'Random' &&
+                  filterType !== 'All'
                   ? 'map-marker-alert'
                   : filterType === 'Popular'
                     ? 'trophy-broken'
@@ -355,7 +356,8 @@ const ChefsList = ({ navigation, route }) => {
               {!coords &&
                 filterType !== 'Recent' &&
                 filterType !== 'Popular' &&
-                filterType !== 'Random'
+                filterType !== 'Random' &&
+                filterType !== 'All'
                 ? 'Please set your location to find chefs near you.'
                 : filterType === 'Popular'
                   ? 'There are currently no popular chefs in your region.'
@@ -368,7 +370,8 @@ const ChefsList = ({ navigation, route }) => {
             {!coords &&
               filterType !== 'Recent' &&
               filterType !== 'Popular' &&
-              filterType !== 'Random' ? (
+              filterType !== 'Random' &&
+              filterType !== 'All' ? (
               <TouchableOpacity
                 style={styles.emptyStateButton}
                 onPress={() => navigation.navigate('UserEditProfile')}
@@ -386,7 +389,7 @@ const ChefsList = ({ navigation, route }) => {
               </TouchableOpacity>
             ) : null}
           </View>
-        )}
+        ) : null}
       </ScrollView>
       {isLoading && <CenterLoading />}
     </LinearGradient>
