@@ -19,17 +19,30 @@ import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { formatDate, getEventDayLabel } from './utils';
 
+const PAGE_SIZE = 20;
+
 const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showViewAll = true }) => {
-  const [bookings, setBookings] = useState([]);
+  const [allBookings, setAllBookings] = useState([]);
+  const [displayedBookings, setDisplayedBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
 
   const fetchChefBookings = useCallback(async () => {
     if (!userId) return;
 
     const form = new FormData();
     form.append('ChefID', userId);
-    form.append('Limit', limit);
+    // If limit is set (Dashboard), use it. If not (Full Page), fetch MORE/ALL to enable scrolling.
+    // Assuming backend returns enough data if we don't send limit or send a large one.
+    // If backend doesn't support 'no limit', we might need to send a large number.
+    // For now, passing limit if exists, else 1000? Or just not appending limit?
+    if (limit) {
+      form.append('Limit', limit);
+    } else {
+      form.append('Limit', 1000); // Fetch mostly everything for client-side pagination
+    }
 
     try {
       const response = await axios.post(
@@ -41,13 +54,24 @@ const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showVie
       );
 
       if (response.data.success) {
-        setBookings(response.data.data || []);
+        const data = response.data.data || [];
+        setAllBookings(data);
+
+        if (limit) {
+          setDisplayedBookings(data); // Dashboard: Show what we fetched (limit applied by backend)
+        } else {
+          setDisplayedBookings(data.slice(0, PAGE_SIZE)); // Full Page: First page
+          setPage(1);
+        }
+
       } else {
-        setBookings([]);
+        setAllBookings([]);
+        setDisplayedBookings([]);
       }
     } catch (error) {
       console.error('Error fetching bookings:', error);
-      setBookings([]);
+      setAllBookings([]);
+      setDisplayedBookings([]);
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -58,6 +82,26 @@ const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showVie
     setIsLoading(true);
     fetchChefBookings();
   }, [fetchChefBookings]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchChefBookings();
+  };
+
+  const loadMoreData = () => {
+    if (limit) return; // No loading more on Dashboard
+    if (loadingMore) return;
+    if (displayedBookings.length >= allBookings.length) return;
+
+    setLoadingMore(true);
+    setTimeout(() => {
+      const nextPage = page + 1;
+      const nextBatch = allBookings.slice(0, nextPage * PAGE_SIZE);
+      setDisplayedBookings(nextBatch);
+      setPage(nextPage);
+      setLoadingMore(false);
+    }, 500);
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -298,7 +342,7 @@ return (
           />
           <Text style={styles.sectionTitle}>My Bookings</Text>
         </View>
-        {bookings.length > 0 && limit && showViewAll && (
+        {allBookings.length > 0 && limit && showViewAll && (
           <TouchableOpacity
             style={styles.seeAllButton}
             onPress={handleBookingsList}
@@ -318,16 +362,19 @@ return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#ff0000" />
       </View>
-    ) : bookings.length === 0 ? (
+    ) : displayedBookings.length === 0 ? (
       <EmptyBookings />
     ) : (
       <FlatList
         scrollEnabled={!limit} // Enable scroll only if NOT limited (Full Page)
-        data={bookings}
+        data={displayedBookings} // Use displayed (paged) data
         keyExtractor={(item) => item.BookingID ? item.BookingID.toString() : Math.random().toString()}
         renderItem={renderItem}
-        refreshing={isLoading} // reusing isLoading for refresh spinner or separate state? 
-      // Note: added onRefresh logic in separate edit? No. I need to add onRefresh logic to component body too.
+        refreshing={refreshing}
+        onRefresh={!limit ? onRefresh : null} // Allow pull-to-refresh on full page
+        onEndReached={!limit ? loadMoreData : null}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color="#ff0000" style={{ padding: 10 }} /> : null}
       />
     )}
   </View>
