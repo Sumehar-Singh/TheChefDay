@@ -221,7 +221,10 @@ const AddBooking = ({ navigation }) => {
 
         const user = response.data.data;
 
-        setName(user[0].FirstName + " " + user[0].MiddleName + " " + user[0].LastName);
+        const fullName = [user[0].FirstName, user[0].MiddleName, user[0].LastName]
+          .filter(part => part && part.trim()) // Filter out empty/null/whitespace-only strings
+          .join(' ');
+        setName(fullName);
 
         setAddress(user[0].Address); // Convert number to string for TextInput
         setPhoneNo(user[0].Phone);
