@@ -286,23 +286,29 @@ const ChefsList = ({ navigation, route }) => {
                   style={styles.chefCardImage}
                 />
                 <View style={[styles.chefInfo, !coords && { justifyContent: 'center' }]}>
-                  <Text
-                    style={[
-                      styles.chefCardName,
-                      !coords && { marginBottom: 2, fontSize: isTablet ? 19 : 17 }
-                    ]}
-                  >
-                    {item.FirstName}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: !coords ? 2 : 5 }}>
+                    <Text
+                      style={[
+                        styles.chefCardName,
+                        { marginBottom: 0 }, // Remove bottom margin since container handles it
+                        !coords && { fontSize: isTablet ? 19 : 17 }
+                      ]}
+                    >
+                      {item.FirstName}
+                    </Text>
+                    {item.Popularity ? <Text style={{ fontSize: 14, marginLeft: 5 }}>🔥 {item.Popularity}</Text> : null}
+                  </View>
+
                   <Text
                     style={[
                       styles.chefDetails,
-                      !coords && { marginBottom: 2, fontSize: isTablet ? 16 : 14 }
+                      !coords && { marginBottom: 5, fontSize: isTablet ? 16 : 14 }
                     ]}
                   >
                     {item.Cuisine} • {item.ExperienceYears} yrs
                   </Text>
-                  {/* <Text style={styles.chefRating}>⭐ {item.rating} | 📍 {item.location}</Text> */}
+
+                  {/* Miles (Only show if coords exist) */}
                   <Text style={styles.chefRating}>
                     {coords &&
                       getDistanceInMiles(
@@ -319,7 +325,6 @@ const ChefsList = ({ navigation, route }) => {
                         item.Lon
                       ).toFixed(2) +
                       ' mi'}
-                    {item.Popularity ? ` • 🔥 ${item.Popularity}` : ''}
                   </Text>
                   {item.HourlyRate || item.DayRate ? (
                     <View style={styles.hourDayRateContainer}>
