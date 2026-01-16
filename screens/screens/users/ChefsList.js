@@ -309,23 +309,24 @@ const ChefsList = ({ navigation, route }) => {
                   </Text>
 
                   {/* Miles (Only show if coords exist) */}
-                  <Text style={styles.chefRating}>
-                    {coords &&
-                      getDistanceInMiles(
+                  {coords && (
+                    <Text style={styles.chefRating}>
+                      {getDistanceInMiles(
                         coords.lat,
                         coords.lon,
                         item.Lat,
                         item.Lon
                       ) < radiusMiles &&
-                      '~' +
-                      getDistanceInMiles(
-                        coords.lat,
-                        coords.lon,
-                        item.Lat,
-                        item.Lon
-                      ).toFixed(2) +
-                      ' mi'}
-                  </Text>
+                        '~' +
+                        getDistanceInMiles(
+                          coords.lat,
+                          coords.lon,
+                          item.Lat,
+                          item.Lon
+                        ).toFixed(2) +
+                        ' mi'}
+                    </Text>
+                  )}
                   {item.HourlyRate || item.DayRate ? (
                     <View style={styles.hourDayRateContainer}>
                       <View style={[styles.rateBadge, styles.hourRateBadge]}>
