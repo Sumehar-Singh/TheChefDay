@@ -337,7 +337,10 @@ const ChefsList = ({ navigation, route }) => {
           <View style={styles.emptyStateContainer}>
             <MaterialCommunityIcons
               name={
-                !coords && filterType !== 'Recent' && filterType !== 'Popular'
+                !coords &&
+                  filterType !== 'Recent' &&
+                  filterType !== 'Popular' &&
+                  filterType !== 'Random'
                   ? 'map-marker-alert'
                   : filterType === 'Popular'
                     ? 'trophy-broken'
@@ -349,7 +352,10 @@ const ChefsList = ({ navigation, route }) => {
               color="#999"
             />
             <Text style={styles.emptyStateText}>
-              {!coords && filterType !== 'Recent' && filterType !== 'Popular'
+              {!coords &&
+                filterType !== 'Recent' &&
+                filterType !== 'Popular' &&
+                filterType !== 'Random'
                 ? 'Please set your location to find chefs near you.'
                 : filterType === 'Popular'
                   ? 'There are currently no popular chefs in your region.'
@@ -359,7 +365,10 @@ const ChefsList = ({ navigation, route }) => {
             </Text>
 
             {/* Button Logic */}
-            {!coords && filterType !== 'Recent' && filterType !== 'Popular' ? (
+            {!coords &&
+              filterType !== 'Recent' &&
+              filterType !== 'Popular' &&
+              filterType !== 'Random' ? (
               <TouchableOpacity
                 style={styles.emptyStateButton}
                 onPress={() => navigation.navigate('UpdateProfile')}
