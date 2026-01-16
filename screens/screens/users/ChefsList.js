@@ -66,7 +66,10 @@ const ChefsList = ({ navigation, route }) => {
           getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= 200
         );
       } else {
-        if (filterType !== 'Random') {
+        // If no coords:
+        // Allow 'Random' AND 'All' to show freely (Global list).
+        // Block 'Nearby', 'Popular', 'Recent' (require location or valid history).
+        if (filterType !== 'Random' && filterType !== 'All') {
           result = [];
         }
       }
