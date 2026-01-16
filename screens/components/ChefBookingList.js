@@ -85,19 +85,103 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Confirmed':
-        return '#4CAF50';
-      case 'Declined':
-        return '#F44336';
-      case 'Canceled':
-        return '#FF9800';
-      default:
-        return '#ff0000';
+      case 'Confirmed': return '#4CAF50';
+      case 'Declined': return '#F44336';
+      case 'Canceled': return '#F44336';
+      case 'Cancelled': return '#F44336';
+      case 'Pending': return '#FF9800';
+      case 'Service Completed': return 'gray';
+      default: return '#805500';
     }
+  };
+
+  const renderItem = ({ item }) => {
+    // Assuming API follows convention: UserName, UserImage/Image, EventDate, etc.
+    // Fallback image logic same as User side
+    const userImage = item.UserImage || item.Image;
+
+    return (
+      <TouchableOpacity
+        style={styles.bookingItem}
+        onPress={() =>
+          navigation.navigate('ChefBookingDetail', {
+            BookingID: item.BookingID,
+          })
+        }
+      >
+        <View style={styles.bookingItemLeft}>
+          <View style={styles.bookingHeader}>
+            {/* User Image Area */}
+            {userImage ? (
+              <Image
+                source={{ uri: userImage }}
+                style={styles.userImage}
+              />
+            ) : (
+              <View style={styles.userImagePlaceholder}>
+                <MaterialCommunityIcons name="account" size={20} color="#666" />
+              </View>
+            )}
+
+            <Text style={styles.bookingTextCustomer}>
+              {item.UserName}
+            </Text>
+
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: getStatusColor(item.Status) },
+              ]}
+            >
+              <Text style={styles.statusText}>{item.Status}</Text>
+            </View>
+          </View>
+
+          <View style={styles.bookingDetails}>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons
+                name="calendar"
+                size={16}
+                color="#ff0000"
+              />
+              <Text style={styles.bookingTextEvent}>
+                Event: {formatDate(item.EventDate)}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={16}
+                color="#ff0000"
+              />
+              <Text style={styles.bookingText}>
+                Booked: {formatDate(item.BookingDate)}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons
+                name="food" // Changed from calendar-clock to food (Service) to match User side? Or keep logic but style? 
+                // User side uses 'food' icon for Service Type. 
+                // ChefBookingList originally showed "Day Label" here. user asked for "same booking styling".
+                // I will keep the DATA (Day Label) but style it like the User side's 3rd row. 
+                // Or should I show Service Type? The API response in ChefBooking might not have ServiceType easily? 
+                // I'll stick to Day Label but style it black/bold like User side Service Type.
+                size={16}
+                color="#ff0000"
+              />
+              <Text style={styles.bookingTextService}>
+                {getEventDayLabel(item.EventDate)}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
   };
 
   return (
     <View style={styles.container}>
+      {/* ... Header remains ... */}
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleContainer}>
           <MaterialCommunityIcons
@@ -132,65 +216,8 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
         <FlatList
           scrollEnabled={false}
           data={bookings}
-          keyExtractor={(item) => item.BookingID}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.bookingItem}
-              onPress={() =>
-                navigation.navigate('ChefBookingDetail', {
-                  BookingID: item.BookingID,
-                })
-              }
-            >
-              <View style={styles.bookingItemLeft}>
-                <View style={styles.bookingHeader}>
-                  <Text style={styles.bookingTextCustomer}>
-                    {item.UserName}{' '}
-                  </Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: getStatusColor(item.Status) },
-                    ]}
-                  >
-                    <Text style={styles.statusText}>{item.Status}</Text>
-                  </View>
-                </View>
-                <View style={styles.bookingDetails}>
-                  <View style={styles.detailRow}>
-                    <MaterialCommunityIcons
-                      name="calendar"
-                      size={isTablet ? 20 : 16}
-                      color="#ff0000"
-                    />
-                    <Text style={styles.bookingTextEvent}>
-                      Event: {formatDate(item.EventDate)}
-                    </Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <MaterialCommunityIcons
-                      name="clock-outline"
-                      size={isTablet ? 20 : 16}
-                      color="#ff0000"
-                    />
-                    <Text style={styles.bookingText}>
-                      Booked: {formatDate(item.BookingDate)}
-                    </Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <MaterialCommunityIcons
-                      name="calendar-clock"
-                      size={isTablet ? 20 : 16}
-                      color="#ff0000"
-                    />
-                    <Text style={styles.bookingTextDays}>
-                      {getEventDayLabel(item.EventDate)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
+          keyExtractor={(item) => item.BookingID.toString()}
+          renderItem={renderItem}
         />
       )}
     </View>
@@ -201,7 +228,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    marginHorizontal: 15, // MATCH User Dashboard BookingsList
+    marginHorizontal: 15,
     padding: isTablet ? 20 : 15,
     marginBottom: 20,
     shadowColor: '#000',
@@ -215,7 +242,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
-    // Removed paddingHorizontal because container has padding
   },
   sectionTitleContainer: {
     flexDirection: 'row',
@@ -239,13 +265,11 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   bookingItem: {
-    backgroundColor: '#f8f8f8', // Match BookingsList item bg
+    backgroundColor: '#f8f8f8',
     borderRadius: 12,
     padding: isTablet ? 15 : 12,
     marginBottom: 10,
-    // Removed marginHorizontal because container has padding
-    borderLeftWidth: 3,
-    borderLeftColor: '#ff0000',
+    // No red border
   },
   bookingItemLeft: {
     flex: 1,
@@ -254,17 +278,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
+  },
+  userImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: '#eee',
+  },
+  userImagePlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bookingTextCustomer: {
     fontSize: isTablet ? 18 : 16,
     fontWeight: '700',
-    color: '#262626',
+    color: '#000',
+    flex: 1, // Allow text to take space between image and badge
   },
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
+    marginLeft: 5,
   },
   statusText: {
     color: '#fff',
@@ -272,36 +314,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bookingDetails: {
-    gap: 8,
+    // gap: 8, // Removed to match user side (gap sometimes issues)
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 6,
   },
   bookingTextEvent: {
     fontSize: isTablet ? 16 : 14,
-    color: '#ff0000',
-    marginLeft: 8,
-  },
-  bookingText: {
-    fontSize: isTablet ? 16 : 14,
-    color: '#666',
-    marginLeft: 8,
-  },
-  bookingTextDays: {
-    fontSize: isTablet ? 16 : 14,
-    color: '#4CAF50',
+    color: '#000',
     marginLeft: 8,
     fontWeight: '600',
   },
+  bookingText: {
+    fontSize: isTablet ? 16 : 14,
+    color: '#000',
+    marginLeft: 8,
+    fontWeight: '600',
+  },
+  bookingTextService: {
+    fontSize: isTablet ? 16 : 14,
+    color: '#000', // Black, Bold
+    marginLeft: 8,
+    fontWeight: '600',
+  },
+  // ... empty styles ...
   emptyContainer: {
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   emptyTitle: {
     fontSize: isTablet ? 22 : 18,
@@ -323,10 +365,6 @@ const styles = StyleSheet.create({
     paddingVertical: isTablet ? 12 : 10,
     paddingHorizontal: isTablet ? 25 : 20,
     borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
     elevation: 3,
   },
   emptyButtonText: {
