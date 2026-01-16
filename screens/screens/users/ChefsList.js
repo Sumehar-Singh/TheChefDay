@@ -77,7 +77,9 @@ const ChefsList = ({ navigation, route }) => {
         // If no coords:
         // Allow 'Random' AND 'All' to show freely (Global list).
         // Block 'Nearby', 'Popular', 'Recent' (require location or valid history).
-        if (filterType !== 'Random' && filterType !== 'All') {
+        // Block 'Nearby' and 'Popular' (require location).
+        // 'Recent' is history (Global), so allow it.
+        if (filterType !== 'Random' && filterType !== 'All' && filterType !== 'Recent') {
           result = [];
         }
       }
