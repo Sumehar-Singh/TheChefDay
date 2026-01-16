@@ -148,7 +148,9 @@ const ChefDashboard = ({ navigation }) => {
 
                     {/* Scrollable Content */}
                     <ScrollView
-                        contentContainerStyle={styles.container}
+                        style={styles.container}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 20 }}
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
