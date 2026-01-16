@@ -286,56 +286,61 @@ const ChefsList = ({ navigation, route }) => {
                   style={styles.chefCardImage}
                 />
                 <View style={styles.chefInfo}>
-                  <Text style={styles.chefCardName}>
-                    {`${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()
-                      .length > 25
-                      ? `${`${item.FirstName} ${item.MiddleName} ${item.LastName}`
-                        .trim()
-                        .slice(0, 25)}...`
-                      : `${item.FirstName} ${item.MiddleName} ${item.LastName}`.trim()}
-                  </Text>
-
-                  <Text style={styles.chefDetails}>
-                    Exp -{item.ExperienceYears} Years
-                  </Text>
-                  {/* <Text style={styles.chefRating}>⭐ {item.rating} | 📍 {item.location}</Text> */}
-                  <Text style={styles.chefRating}>
-                    {coords &&
-                      getDistanceInMiles(
-                        coords.lat,
-                        coords.lon,
-                        item.Lat,
-                        item.Lon
-                      ) < radiusMiles &&
-                      '~' +
-                      getDistanceInMiles(
-                        coords.lat,
-                        coords.lon,
-                        item.Lat,
-                        item.Lon
-                      ).toFixed(2) +
-                      ' mi'}
-                    {item.Popularity ? ` • 🔥 ${item.Popularity}` : ''}
-                  </Text>
-                  {item.HourlyRate || item.DayRate ? (
-                    <View style={styles.hourDayRateContainer}>
-                      <View style={[styles.rateBadge, styles.hourRateBadge]}>
-                        <Text style={styles.rateText}>H: ${item.HourlyRate}</Text>
+                  <View style={[styles.chefInfo, !coords && { justifyContent: 'center' }]}>
+                    <Text
+                      style={[
+                        styles.chefCardName,
+                        !coords && { marginBottom: 2, fontSize: isTablet ? 19 : 17 }
+                      ]}
+                    >
+                      {item.FirstName}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.chefDetails,
+                        !coords && { marginBottom: 2, fontSize: isTablet ? 16 : 14 }
+                      ]}
+                    >
+                      {item.Cuisine} • {item.ExperienceYears} yrs
+                    </Text>
+                    {/* <Text style={styles.chefRating}>⭐ {item.rating} | 📍 {item.location}</Text> */}
+                    <Text style={styles.chefRating}>
+                      {coords &&
+                        getDistanceInMiles(
+                          coords.lat,
+                          coords.lon,
+                          item.Lat,
+                          item.Lon
+                        ) < radiusMiles &&
+                        '~' +
+                        getDistanceInMiles(
+                          coords.lat,
+                          coords.lon,
+                          item.Lat,
+                          item.Lon
+                        ).toFixed(2) +
+                        ' mi'}
+                      {item.Popularity ? ` • 🔥 ${item.Popularity}` : ''}
+                    </Text>
+                    {item.HourlyRate || item.DayRate ? (
+                      <View style={styles.hourDayRateContainer}>
+                        <View style={[styles.rateBadge, styles.hourRateBadge]}>
+                          <Text style={styles.rateText}>H: ${item.HourlyRate}</Text>
+                        </View>
+                        <View style={[styles.rateBadge, styles.dayRateBadge]}>
+                          <Text style={styles.rateText}>D: ${item.DayRate}</Text>
+                        </View>
                       </View>
-                      <View style={[styles.rateBadge, styles.dayRateBadge]}>
-                        <Text style={styles.rateText}>D: ${item.DayRate}</Text>
+                    ) : (
+                      <View style={styles.hourDayRateContainer}>
+                        <View style={[styles.rateBadge, styles.dayRateBadge]}>
+                          <Text style={styles.rateText}>
+                            Rates are not mentioned
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  ) : (
-                    <View style={styles.hourDayRateContainer}>
-                      <View style={[styles.rateBadge, styles.dayRateBadge]}>
-                        <Text style={styles.rateText}>
-                          Rates are not mentioned
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-                </View>
+                    )}
+                  </View>
               </TouchableOpacity>
             )}
             contentContainerStyle={styles.allChefsList}
