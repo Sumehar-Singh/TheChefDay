@@ -233,7 +233,7 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
             size={isTablet ? 28 : 24}
             color="#ff0000"
           />
-          <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
+          <Text style={styles.sectionTitle}>My Bookings</Text>
         </View>
         {bookings.length > 0 && limit && (
           <TouchableOpacity
