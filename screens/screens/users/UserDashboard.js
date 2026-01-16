@@ -155,8 +155,8 @@ const UserDashboard = ({ navigation }) => {
   const sections = [
     {
       title: 'Recently Viewed',
-      // Strict: If no coords, show nothing (trigger Empty State with View Chefs button)
-      data: !coords ? [] : getRecentChefs(5),
+      // Show Recent chefs regardless of location (Personal History)
+      data: getRecentChefs(5),
     },
     {
       title: 'Random Picks',
