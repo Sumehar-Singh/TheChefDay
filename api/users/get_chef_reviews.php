@@ -24,7 +24,8 @@ $query = "SELECT
   r.CreatedAt,
   r.UserID,
   r.ReviewID,
-  COALESCE(u.FirstName, 'Deleted User') AS UserName
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.FirstName, NULLIF(u.MiddleName, ''), u.LastName)), ''), 'Deleted User') AS UserName,
+  u.Image
  
 FROM Reviews r
 LEFT JOIN Users u ON r.UserID = u.Id
@@ -54,7 +55,7 @@ if ($limit > 0) {
 $stmt->execute();
 
 // Bind result columns
-$stmt->bind_result($ReviewText, $Rating, $CreatedAt, $UserID,$ReviewID,$UserName);
+$stmt->bind_result($ReviewText, $Rating, $CreatedAt, $UserID, $ReviewID, $UserName, $Image);
 
 // Fetch data
 $reviews = [];
@@ -64,8 +65,9 @@ while ($stmt->fetch()) {
         'Rating' => $Rating,
         'CreatedAt' => $CreatedAt,
         'UserName' => $UserName,
-		  'UserID' => $UserID,
-		'ReviewID'=>$ReviewID
+        'UserImage' => $Image, // Frontend expects UserImage or Image
+        'UserID' => $UserID,
+        'ReviewID' => $ReviewID
     ];
 }
 
