@@ -160,7 +160,7 @@ const ChefDashboard = ({ navigation }) => {
                         }
                     >
                         {/* Add spacing at top so content doesn't start immediately under header edge */}
-                        <View style={{ marginTop: 15 }}>
+                        <View style={{ marginTop: 25 }}>
                             {/* Welcome Section for New Chefs */}
                             {!initialLoad && !isLoading && !isProfileCompleted && !hasBookings && !hasReviews && (
                                 <View style={styles.welcomeContainer}>
@@ -171,14 +171,20 @@ const ChefDashboard = ({ navigation }) => {
                                     </Text>
                                 </View>
                             )}
+
                             {!initialLoad && !isLoading && !isProfileCompleted && (
-                                <ChefProfileCompletionSection navigation={navigation} />
+                                <View style={styles.sectionContainer}>
+                                    <ChefProfileCompletionSection navigation={navigation} />
+                                </View>
                             )}
-                            <View style={styles.section}>
+
+                            <View style={styles.sectionContainer}>
                                 <ChefBookingList navigation={navigation} userId={profile?.Id} limit={5} />
                             </View>
 
-                            <ChefReviewList navigation={navigation} userId={profile?.Id} limit={5} />
+                            <View style={styles.sectionContainer}>
+                                <ChefReviewList navigation={navigation} userId={profile?.Id} limit={5} />
+                            </View>
                         </View>
                     </ScrollView>
                 </React.Fragment>
@@ -190,16 +196,16 @@ const ChefDashboard = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     superContainer: {
-        height: "100%",
+        flex: 1,
         backgroundColor: '#f5f5f5',
     },
     container: {
-        paddingBottom: 20,
+        flex: 1,
     },
     headerGradient: {
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
-        marginBottom: 15,
+        marginBottom: 0,
     },
     headerContainer: {
         paddingTop: isTablet ? 15 : 8,
@@ -236,15 +242,43 @@ const styles = StyleSheet.create({
     editButton: {
         padding: 10,
     },
-    section: {
+    sectionContainer: {
+        marginBottom: 25,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 15,
         marginBottom: 15,
+    },
+    sectionTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    sectionTitle: {
+        fontSize: isTablet ? 22 : 18,
+        fontWeight: '700',
+        color: '#262626',
+        marginLeft: 10,
+    },
+    seeAllButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 5,
+    },
+    seeAllText: {
+        fontSize: isTablet ? 16 : 14,
+        color: '#209E00',
+        fontWeight: '600',
+        marginRight: 5,
     },
     welcomeContainer: {
         backgroundColor: '#fff',
         borderRadius: 15,
         padding: isTablet ? 30 : 20,
         marginHorizontal: 15,
-        marginVertical: 3,
+        marginBottom: 25,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
