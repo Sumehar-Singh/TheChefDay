@@ -342,7 +342,7 @@ return (
           />
           <Text style={styles.sectionTitle}>My Bookings</Text>
         </View>
-        {allBookings.length > 0 && limit && showViewAll && (
+        {bookings.length > 0 && limit && showViewAll && (
           <TouchableOpacity
             style={styles.seeAllButton}
             onPress={handleBookingsList}
@@ -358,16 +358,16 @@ return (
       </View>
     )}
 
-    {isLoading ? (
+    {isLoading && page === 1 ? (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#ff0000" />
       </View>
-    ) : displayedBookings.length === 0 ? (
+    ) : bookings.length === 0 ? (
       <EmptyBookings />
     ) : (
       <FlatList
         scrollEnabled={!limit} // Enable scroll only if NOT limited (Full Page)
-        data={displayedBookings} // Use displayed (paged) data
+        data={bookings} // Use loaded data
         keyExtractor={(item) => item.BookingID ? item.BookingID.toString() : Math.random().toString()}
         renderItem={renderItem}
         refreshing={refreshing}

@@ -10,6 +10,7 @@ $response = array();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChefID'])) {
     $chefId = $_POST['ChefID'];
     $limit = isset($_POST['Limit']) ? intval($_POST['Limit']) : 0;
+    $offset = isset($_POST['Offset']) ? intval($_POST['Offset']) : 0;
 
     // Base query
     $query = "
@@ -26,14 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChefID'])) {
         ORDER BY b.BookingDate DESC
     ";
 
-    // Append LIMIT if applicable
+    // Append LIMIT and OFFSET if applicable
     if ($limit > 0) {
-        $query .= " LIMIT ?";
+        $query .= " LIMIT ? OFFSET ?";
         $stmt = $connection->prepare($query);
-        $stmt->bind_param("si", $chefId, $limit); // "s" for ChefID, "i" for Limit
+        $stmt->bind_param("sii", $chefId, $limit, $offset);
     } else {
         $stmt = $connection->prepare($query);
-        $stmt->bind_param("s", $chefId); // Only ChefID
+        $stmt->bind_param("s", $chefId);
     }
 
     if ($stmt->execute()) {
