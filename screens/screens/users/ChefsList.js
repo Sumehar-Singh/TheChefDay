@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { StackActions } from '@react-navigation/native';
 import {
   View,
   Text,
