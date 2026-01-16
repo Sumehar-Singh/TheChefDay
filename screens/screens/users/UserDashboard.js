@@ -539,6 +539,7 @@ const styles = StyleSheet.create({
     padding: isTablet ? 15 : 12,
     width: isTablet ? 180 : 160,
     height: isTablet ? 250 : 200,
+    justifyContent: 'space-around',
     alignItems: 'center',
     marginHorizontal: isTablet ? 8 : 8,
     marginBottom: isTablet ? 10 : 10,
