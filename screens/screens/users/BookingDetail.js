@@ -87,6 +87,7 @@ const BookingDetail = () => {
     form.append('UserID', booking.UserID);
     form.append('Rating', rating);
     form.append('ReviewText', reviewText);
+    form.append('IsBookingReview', '1');
 
     // Ideally pass BookingID too if backend supports it, but currently it's Chef/User pair (relaxed).
 
