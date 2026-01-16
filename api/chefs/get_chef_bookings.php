@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChefID'])) {
             b.BookingID,
             b.BookingDate,
             b.EventDate,
+            b.Status,
             u.Image AS UserImage,
             CONCAT_WS(' ', u.FirstName, NULLIF(u.MiddleName, ''), u.LastName) AS UserName
         FROM Bookings b
