@@ -635,22 +635,25 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0)', // Transparent as requested
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: 16, // Reduced padding for wider modal
   },
   modalContent: {
     width: '100%',
+    maxWidth: 500, // Cap width on tablets
     backgroundColor: '#FFF',
     borderRadius: 24,
     padding: 24,
-    alignItems: 'center', // Center everything
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 15,
-    elevation: 20,
+    shadowOpacity: 0.15, // Softer shadow since no overlay
+    shadowRadius: 20,
+    elevation: 10,
+    borderWidth: 1, // Subtle border definition
+    borderColor: '#F3F4F6',
   },
   modalIconContainer: {
     width: 70,
