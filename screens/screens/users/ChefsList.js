@@ -60,14 +60,13 @@ const ChefsList = ({ navigation, route }) => {
       let result = [...chefs];
 
       // 1. Global Filter: Enforce 200-mile radius if coords exist
-      // 1. Global Filter: Enforce 200-mile radius.
-      // Exception: If no coords, allow 'Random' and 'Recent' to show freely. Block others.
+      // Exception: If no coords, allow ONLY 'Random' to show freely.
       if (coords) {
         result = result.filter(chef =>
           getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= 200
         );
       } else {
-        if (filterType !== 'Random' && filterType !== 'Recent') {
+        if (filterType !== 'Random') {
           result = [];
         }
       }
@@ -335,23 +334,36 @@ const ChefsList = ({ navigation, route }) => {
           <View style={styles.emptyStateContainer}>
             <MaterialCommunityIcons
               name={
-                filterType === 'Popular'
-                  ? 'trophy-broken'
-                  : filterType === 'Recent'
-                    ? 'clock-time-three-outline'
-                    : 'information-outline'
+                !coords && filterType !== 'Recent' && filterType !== 'Popular'
+                  ? 'map-marker-alert'
+                  : filterType === 'Popular'
+                    ? 'trophy-broken'
+                    : filterType === 'Recent'
+                      ? 'clock-time-three-outline'
+                      : 'information-outline'
               }
               size={40}
               color="#999"
             />
             <Text style={styles.emptyStateText}>
-              {filterType === 'Popular'
-                ? 'There are currently no popular chefs in your region.'
-                : filterType === 'Recent'
-                  ? "You haven't recently viewed any chefs."
-                  : 'No chefs found in this category.'}
+              {!coords && filterType !== 'Recent' && filterType !== 'Popular'
+                ? 'Please set your location to find chefs near you.'
+                : filterType === 'Popular'
+                  ? 'There are currently no popular chefs in your region.'
+                  : filterType === 'Recent'
+                    ? "You haven't recently viewed any chefs."
+                    : 'No chefs found in this category.'}
             </Text>
-            {filterType === 'Recent' && (
+
+            {/* Button Logic */}
+            {!coords && filterType !== 'Recent' && filterType !== 'Popular' ? (
+              <TouchableOpacity
+                style={styles.emptyStateButton}
+                onPress={() => navigation.navigate('UserSettings')}
+              >
+                <Text style={styles.emptyStateButtonText}>Set Location</Text>
+              </TouchableOpacity>
+            ) : filterType === 'Recent' ? (
               <TouchableOpacity
                 style={styles.emptyStateButton}
                 onPress={() =>
@@ -360,7 +372,7 @@ const ChefsList = ({ navigation, route }) => {
               >
                 <Text style={styles.emptyStateButtonText}>View All Chefs</Text>
               </TouchableOpacity>
-            )}
+            ) : null}
           </View>
         )}
       </ScrollView>

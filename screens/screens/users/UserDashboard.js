@@ -154,7 +154,8 @@ const UserDashboard = ({ navigation }) => {
   const sections = [
     {
       title: 'Recently Viewed',
-      data: getRecentChefs(5),
+      // Strict: If no coords, show nothing (trigger Empty State with View Chefs button)
+      data: !coords ? [] : getRecentChefs(5),
     },
     {
       title: 'Random Picks',
@@ -344,23 +345,38 @@ const UserDashboard = ({ navigation }) => {
                   <View style={styles.emptyStateContainer}>
                     <MaterialCommunityIcons
                       name={
-                        section.title.includes('Popular')
-                          ? 'trophy-broken'
-                          : section.title.includes('Recently')
-                            ? 'clock-time-three-outline'
-                            : 'information-outline'
+                        section.title.includes('Nearby') && !coords
+                          ? 'map-marker-alert'
+                          : section.title.includes('Popular')
+                            ? 'trophy-broken'
+                            : section.title.includes('Recently')
+                              ? 'clock-time-three-outline'
+                              : 'information-outline'
                       }
                       size={40}
                       color="#999"
                     />
                     <Text style={styles.emptyStateText}>
-                      {section.title.includes('Popular')
-                        ? 'There are currently no popular chefs in your region.'
-                        : section.title.includes('Recently')
-                          ? "You haven't recently viewed any chefs."
-                          : 'No chefs found in this category.'}
+                      {section.title.includes('Nearby') && !coords
+                        ? 'Please set your location to find chefs near you.'
+                        : section.title.includes('Popular')
+                          ? 'There are currently no popular chefs in your region.'
+                          : section.title.includes('Recently')
+                            ? "You haven't recently viewed any chefs."
+                            : 'No chefs found in this category.'}
                     </Text>
-                    {section.title.includes('Recently') && (
+
+                    {/* Button Logic */}
+                    {section.title.includes('Nearby') && !coords ? (
+                      <TouchableOpacity
+                        style={styles.emptyStateButton}
+                        onPress={() => navigation.navigate('UserSettings')}
+                      >
+                        <Text style={styles.emptyStateButtonText}>
+                          Set Location
+                        </Text>
+                      </TouchableOpacity>
+                    ) : section.title.includes('Recently') ? (
                       <TouchableOpacity
                         style={styles.emptyStateButton}
                         onPress={() =>
@@ -371,7 +387,7 @@ const UserDashboard = ({ navigation }) => {
                           View All Chefs
                         </Text>
                       </TouchableOpacity>
-                    )}
+                    ) : null}
                   </View>
                 )}
               </View>
