@@ -371,7 +371,7 @@ const ChefsList = ({ navigation, route }) => {
               filterType !== 'Random' ? (
               <TouchableOpacity
                 style={styles.emptyStateButton}
-                onPress={() => navigation.navigate('UpdateProfile')}
+                onPress={() => navigation.navigate('UserEditProfile')}
               >
                 <Text style={styles.emptyStateButtonText}>Set Location</Text>
               </TouchableOpacity>
