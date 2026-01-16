@@ -29,7 +29,7 @@ import { BASE_URL } from "../../config";
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
 
-import CountryCodePicker from '../../components/Controls/CountryCodePicker';
+import CountryCodePicker from '../components/Controls/CountryCodePicker';
 
 const SignupScreen = ({ navigation, route }) => {
   const { fromScreen, isChef } = route.params || {};
