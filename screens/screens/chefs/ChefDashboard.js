@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     sectionContainer: {
-        marginBottom: 20,
+        marginBottom: 0,
     },
     sectionHeader: {
         flexDirection: 'row',
