@@ -7,42 +7,36 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
-  ScrollView,
-  ImageBackground,
-  Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-const { width, height } = Dimensions.get('window');
-const isTablet = width > 600;
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { formatDate, getEventDayLabel } from './utils';
 
+const { width } = Dimensions.get('window');
+const isTablet = width > 600;
 const PAGE_SIZE = 20;
 
 const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showViewAll = true }) => {
-  const [allBookings, setAllBookings] = useState([]);
-  const [displayedBookings, setDisplayedBookings] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  const fetchChefBookings = useCallback(async () => {
+  const fetchChefBookings = useCallback(async (pageNum = 1) => {
     if (!userId) return;
 
     const form = new FormData();
     form.append('ChefID', userId);
-    // If limit is set (Dashboard), use it. If not (Full Page), fetch MORE/ALL to enable scrolling.
-    // Assuming backend returns enough data if we don't send limit or send a large one.
-    // If backend doesn't support 'no limit', we might need to send a large number.
-    // For now, passing limit if exists, else 1000? Or just not appending limit?
-    if (limit) {
-      form.append('Limit', limit);
-    } else {
-      form.append('Limit', 1000); // Fetch mostly everything for client-side pagination
-    }
+
+    const currentLimit = limit ? limit : PAGE_SIZE;
+    const currentOffset = limit ? 0 : (pageNum - 1) * PAGE_SIZE;
+
+    form.append('Limit', currentLimit);
+    form.append('Offset', currentOffset);
 
     try {
       const response = await axios.post(
@@ -54,345 +48,267 @@ const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showVie
       );
 
       if (response.data.success) {
-        const data = response.data.data || [];
-        setAllBookings(data);
+        const newData = response.data.data || [];
 
         if (limit) {
-          setDisplayedBookings(data); // Dashboard: Show what we fetched (limit applied by backend)
+          setBookings(newData);
         } else {
-          setDisplayedBookings(data.slice(0, PAGE_SIZE)); // Full Page: First page
-          setPage(1);
-        }
+          if (pageNum === 1) {
+            setBookings(newData);
+          } else {
+            setBookings(prev => [...prev, ...newData]);
+          }
 
+          if (newData.length < PAGE_SIZE) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
+        }
       } else {
-        setAllBookings([]);
-        setDisplayedBookings([]);
+        if (pageNum === 1) setBookings([]);
       }
     } catch (error) {
       console.error('Error fetching bookings:', error);
-      setAllBookings([]);
-      setDisplayedBookings([]);
+      if (pageNum === 1) setBookings([]);
     } finally {
       setIsLoading(false);
       setRefreshing(false);
+      setLoadingMore(false);
     }
   }, [userId, limit]);
 
   useEffect(() => {
     setIsLoading(true);
-    fetchChefBookings();
+    setPage(1);
+    fetchChefBookings(1);
   }, [fetchChefBookings]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchChefBookings();
+    setPage(1);
+    setHasMore(true);
+    fetchChefBookings(1);
   };
 
   const loadMoreData = () => {
-    if (limit) return; // No loading more on Dashboard
-    if (loadingMore) return;
-    if (displayedBookings.length >= allBookings.length) return;
+    if (limit) return;
+    if (loadingMore || isLoading) return;
+    if (!hasMore) return;
 
     setLoadingMore(true);
-    setTimeout(() => {
-      const nextPage = page + 1;
-      const nextBatch = allBookings.slice(0, nextPage * PAGE_SIZE);
-      setDisplayedBookings(nextBatch);
-      setPage(nextPage);
-      setLoadingMore(false);
-    }, 500);
-  };
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchChefBookings();
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchChefBookings(nextPage);
   };
 
   const handleBookingsList = () => {
     navigation.navigate('Bookings');
   };
 
-  // ... (EmptyBookings, getStatusColor, getField, renderItem same as before) 
-  // I must include them or ensure replace_file_content keeps them if I target logic effectively.
-  // Since I am replacing the FUNCTION START, I cannot easily keep helper functions if I rewrite the whole component body.
-  // I will use replace_file_content on the Specific Blocks.
+  const EmptyBookings = () => (
+    <View style={styles.emptyContainer}>
+      <MaterialCommunityIcons
+        name="calendar-clock"
+        size={isTablet ? 80 : 60}
+        color="#ff0000"
+      />
+      <Text style={styles.emptyTitle}>No Booking Requests Yet</Text>
+      <Text style={styles.emptyText}>
+        You haven't received any booking requests yet. We'll let you know as
+        soon as someone reaches out.
+      </Text>
+    </View>
+  );
 
-  // Block 1: Update Signature
-};
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Confirmed': return '#4CAF50';
+      case 'Declined': return '#F44336';
+      case 'Canceled': return '#F44336';
+      case 'Cancelled': return '#F44336';
+      case 'Pending': return '#FF9800';
+      case 'Service Completed': return 'gray';
+      default: return '#805500';
+    }
+  };
 
-// BETTER STRATEGY: Update render return block first.
-// Then update function signature.
-// Then update props usage.
-
-// Wait, I can't update signature easily without context.
-// I will target the Return Block.
-
-const [bookings, setBookings] = useState([]);
-const [isLoading, setIsLoading] = useState(true);
-
-const fetchChefBookings = useCallback(async () => {
-  if (!userId) return;
-
-  const form = new FormData();
-  form.append('ChefID', userId);
-  form.append('Limit', limit);
-
-  try {
-    const response = await axios.post(
-      `${BASE_URL}chefs/get_chef_bookings.php`,
-      form,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
+  const getField = (item, keys, fallback = '') => {
+    if (!item) return fallback;
+    for (const key of keys) {
+      let val = item[key];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
       }
-    );
-
-    if (response.data.success) {
-      setBookings(response.data.data || []);
-    } else {
-      console.error('Error fetching bookings:', response.data.message);
-      setBookings([]);
+      const lowerKey = key.toLowerCase();
+      val = item[lowerKey];
+      if (val !== undefined && val !== null) {
+        if (typeof val === 'string') val = val.trim();
+        if (val !== '') return val;
+      }
     }
-  } catch (error) {
-    console.error('Error fetching bookings:', error);
-    setBookings([]);
-  } finally {
-    setIsLoading(false);
-  }
-}, [userId, limit]);
+    return fallback;
+  };
 
-useEffect(() => {
-  setIsLoading(true);
-  fetchChefBookings();
-}, [fetchChefBookings]);
+  const renderItem = ({ item }) => {
+    let userImage = getField(item, [
+      'UserImage', 'userimage',
+      'Image', 'image',
+      'ProfileImage', 'profileimage',
+      'ClientImage', 'clientimage',
+      'CustomerImage', 'customerimage',
+      'user_image', 'profile_image'
+    ], null);
 
-const handleBookingsList = () => {
-  navigation.navigate('Bookings');
-};
+    if (!userImage && item.User && item.User.Image) {
+      userImage = item.User.Image;
+    }
+    if (!userImage && item.user && item.user.image) {
+      userImage = item.user.image;
+    }
 
-const EmptyBookings = () => (
-  <View style={styles.emptyContainer}>
-    <MaterialCommunityIcons
-      name="calendar-clock"
-      size={isTablet ? 80 : 60}
-      color="#ff0000"
-    />
-    <Text style={styles.emptyTitle}>No Booking Requests Yet</Text>
-    <Text style={styles.emptyText}>
-      You haven't received any booking requests yet. We'll let you know as
-      soon as someone reaches out.
-    </Text>
-    {/* <TouchableOpacity 
-        style={styles.emptyButton}
-        onPress={() => navigation.navigate('ChefEditProfile')}
+    if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
+      userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
+    }
+
+    const userName = getField(item, ['UserName', 'username', 'Name', 'name'], 'Unknown User');
+
+    return (
+      <TouchableOpacity
+        style={styles.bookingItem}
+        onPress={() =>
+          navigation.navigate('ChefBookingDetail', {
+            BookingID: item.BookingID,
+          })
+        }
       >
-        <Text style={styles.emptyButtonText}>Update Profile</Text>
-      </TouchableOpacity> */}
-  </View>
-);
+        <View style={styles.bookingItemLeft}>
+          <View style={styles.bookingHeader}>
+            {userImage ? (
+              <Image
+                source={{ uri: userImage }}
+                style={styles.userImage}
+              />
+            ) : (
+              <View style={styles.userImagePlaceholder}>
+                <MaterialCommunityIcons name="account" size={20} color="#666" />
+              </View>
+            )}
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'Confirmed': return '#4CAF50';
-    case 'Declined': return '#F44336';
-    case 'Canceled': return '#F44336';
-    case 'Cancelled': return '#F44336';
-    case 'Pending': return '#FF9800';
-    case 'Service Completed': return 'gray';
-    default: return '#805500';
-  }
-};
+            <Text style={styles.bookingTextCustomer}>
+              {userName}
+            </Text>
 
-// Helper to safely extract data
-const getField = (item, keys, fallback = '') => {
-  if (!item) return fallback;
-  for (const key of keys) {
-    let val = item[key];
-    if (val !== undefined && val !== null) {
-      if (typeof val === 'string') val = val.trim();
-      if (val !== '') return val;
-    }
-    // Check lowercase key
-    const lowerKey = key.toLowerCase();
-    val = item[lowerKey];
-    if (val !== undefined && val !== null) {
-      if (typeof val === 'string') val = val.trim();
-      if (val !== '') return val;
-    }
-  }
-  return fallback;
-};
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: getStatusColor(item.Status) },
+              ]}
+            >
+              <Text style={styles.statusText}>{item.Status}</Text>
+            </View>
+          </View>
 
-const renderItem = ({ item }) => {
-  // Robust lookup for User Image
-  let userImage = getField(item, [
-    'UserImage', 'userimage',
-    'Image', 'image',
-    'ProfileImage', 'profileimage',
-    'ClientImage', 'clientimage',
-    'CustomerImage', 'customerimage',
-    'user_image', 'profile_image'
-  ], null);
-
-  // Check nested User object (if API returns joined object)
-  if (!userImage && item.User && item.User.Image) {
-    userImage = item.User.Image;
-  }
-  if (!userImage && item.user && item.user.image) {
-    userImage = item.user.image;
-  }
-
-  // Fix Relative URLs
-  if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
-    // Assume it's relative to the server root if not absolute
-    // BASE_URL is ".../server/chef/api/"
-    // We guess images are at ".../server/"
-    userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
-  }
-
-  const userName = getField(item, ['UserName', 'username', 'Name', 'name'], 'Unknown User');
+          <View style={styles.bookingDetails}>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons
+                name="calendar"
+                size={16}
+                color="#ff0000"
+              />
+              <Text style={styles.bookingTextEvent}>
+                Event: {formatDate(item.EventDate)}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={16}
+                color="#ff0000"
+              />
+              <Text style={styles.bookingText}>
+                Booked: {formatDate(item.BookingDate)}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons
+                name="food"
+                size={16}
+                color="#ff0000"
+              />
+              <Text style={styles.bookingTextService}>
+                {getEventDayLabel(item.EventDate)}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <TouchableOpacity
-      style={styles.bookingItem}
-      onPress={() =>
-        navigation.navigate('ChefBookingDetail', {
-          BookingID: item.BookingID,
-        })
-      }
-    >
-      <View style={styles.bookingItemLeft}>
-        <View style={styles.bookingHeader}>
-          {/* User Image Area */}
-          {userImage ? (
-            <Image
-              source={{ uri: userImage }}
-              style={styles.userImage}
+    <View style={showHeader ? styles.container : styles.fullListContainer}>
+      {showHeader && (
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionTitleContainer}>
+            <MaterialCommunityIcons
+              name="calendar-check"
+              size={isTablet ? 28 : 24}
+              color="#ff0000"
             />
-          ) : (
-            <View style={styles.userImagePlaceholder}>
-              <MaterialCommunityIcons name="account" size={20} color="#666" />
-            </View>
+            <Text style={styles.sectionTitle}>My Bookings</Text>
+          </View>
+          {bookings.length > 0 && limit && showViewAll && (
+            <TouchableOpacity
+              style={styles.seeAllButton}
+              onPress={handleBookingsList}
+            >
+              <Text style={styles.seeAllText}>View All</Text>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={isTablet ? 24 : 20}
+                color="#ff0000"
+              />
+            </TouchableOpacity>
           )}
-
-          <Text style={styles.bookingTextCustomer}>
-            {userName}
-          </Text>
-
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(item.Status) },
-            ]}
-          >
-            <Text style={styles.statusText}>{item.Status}</Text>
-          </View>
         </View>
+      )}
 
-        <View style={styles.bookingDetails}>
-          <View style={styles.detailRow}>
-            <MaterialCommunityIcons
-              name="calendar"
-              size={16}
-              color="#ff0000"
-            />
-            <Text style={styles.bookingTextEvent}>
-              Event: {formatDate(item.EventDate)}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <MaterialCommunityIcons
-              name="clock-outline"
-              size={16}
-              color="#ff0000"
-            />
-            <Text style={styles.bookingText}>
-              Booked: {formatDate(item.BookingDate)}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <MaterialCommunityIcons
-              name="food" // Changed from calendar-clock to food (Service) to match User side? Or keep logic but style? 
-              // User side uses 'food' icon for Service Type. 
-              // ChefBookingList originally showed "Day Label" here. user asked for "same booking styling".
-              // I will keep the DATA (Day Label) but style it like the User side's 3rd row. 
-              // Or should I show Service Type? The API response in ChefBooking might not have ServiceType easily? 
-              // I'll stick to Day Label but style it black/bold like User side Service Type.
-              size={16}
-              color="#ff0000"
-            />
-            <Text style={styles.bookingTextService}>
-              {getEventDayLabel(item.EventDate)}
-            </Text>
-          </View>
+      {isLoading && page === 1 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#ff0000" />
         </View>
-      </View>
-    </TouchableOpacity>
+      ) : bookings.length === 0 ? (
+        <EmptyBookings />
+      ) : (
+        <FlatList
+          scrollEnabled={!limit}
+          data={bookings}
+          keyExtractor={(item) => item.BookingID ? item.BookingID.toString() : Math.random().toString()}
+          renderItem={renderItem}
+          refreshing={refreshing}
+          onRefresh={!limit ? onRefresh : null}
+          onEndReached={!limit ? loadMoreData : null}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color="#ff0000" style={{ padding: 10 }} /> : null}
+        />
+      )}
+    </View>
   );
-};
-
-return (
-  <View style={showHeader ? styles.container : styles.fullListContainer}>
-    {showHeader && (
-      <View style={styles.sectionHeader}>
-        <View style={styles.sectionTitleContainer}>
-          <MaterialCommunityIcons
-            name="calendar-check"
-            size={isTablet ? 28 : 24}
-            color="#ff0000"
-          />
-          <Text style={styles.sectionTitle}>My Bookings</Text>
-        </View>
-        {bookings.length > 0 && limit && showViewAll && (
-          <TouchableOpacity
-            style={styles.seeAllButton}
-            onPress={handleBookingsList}
-          >
-            <Text style={styles.seeAllText}>View All</Text>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={isTablet ? 24 : 20}
-              color="#ff0000"
-            />
-          </TouchableOpacity>
-        )}
-      </View>
-    )}
-
-    {isLoading && page === 1 ? (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ff0000" />
-      </View>
-    ) : bookings.length === 0 ? (
-      <EmptyBookings />
-    ) : (
-      <FlatList
-        scrollEnabled={!limit} // Enable scroll only if NOT limited (Full Page)
-        data={bookings} // Use loaded data
-        keyExtractor={(item) => item.BookingID ? item.BookingID.toString() : Math.random().toString()}
-        renderItem={renderItem}
-        refreshing={refreshing}
-        onRefresh={!limit ? onRefresh : null} // Allow pull-to-refresh on full page
-        onEndReached={!limit ? loadMoreData : null}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color="#ff0000" style={{ padding: 10 }} /> : null}
-      />
-    )}
-  </View>
-);
 };
 
 const styles = StyleSheet.create({
   fullListContainer: {
     flex: 1,
-    paddingHorizontal: 0, // Let parent handle padding or match BookingsList
-    // paddingVertical: 10,
+    paddingHorizontal: 0,
   },
   container: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    marginHorizontal: 15, // Reverted to 15
+    marginHorizontal: 15,
     padding: isTablet ? 20 : 15,
-    marginBottom: 25, // Updated to 25 to match top margin
+    marginBottom: 25,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -431,7 +347,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: isTablet ? 15 : 12,
     marginBottom: 10,
-    // No red border
   },
   bookingItemLeft: {
     flex: 1,
@@ -462,7 +377,7 @@ const styles = StyleSheet.create({
     fontSize: isTablet ? 18 : 16,
     fontWeight: '700',
     color: '#000',
-    flex: 1, // Allow text to take space between image and badge
+    flex: 1,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -476,7 +391,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bookingDetails: {
-    // gap: 8, // Removed to match user side (gap sometimes issues)
   },
   detailRow: {
     flexDirection: 'row',
@@ -497,11 +411,10 @@ const styles = StyleSheet.create({
   },
   bookingTextService: {
     fontSize: isTablet ? 16 : 14,
-    color: '#000', // Black, Bold
+    color: '#000',
     marginLeft: 8,
     fontWeight: '600',
   },
-  // ... empty styles ...
   emptyContainer: {
     padding: 20,
     alignItems: 'center',
@@ -522,17 +435,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: isTablet ? 24 : 18,
   },
-  emptyButton: {
-    backgroundColor: '#ff0000',
-    paddingVertical: isTablet ? 12 : 10,
-    paddingHorizontal: isTablet ? 25 : 20,
-    borderRadius: 8,
-    elevation: 3,
-  },
-  emptyButtonText: {
-    color: '#fff',
-    fontSize: isTablet ? 16 : 14,
-    fontWeight: '600',
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
