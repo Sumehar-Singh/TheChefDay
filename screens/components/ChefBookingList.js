@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    marginHorizontal: 20, // Increased to 20 as per user feedback
+    marginHorizontal: 15, // Reverted to 15
     padding: isTablet ? 20 : 15,
     marginBottom: 20,
     shadowColor: '#000',

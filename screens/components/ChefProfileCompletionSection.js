@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 15, // Match others
     padding: isTablet ? 20 : 15,
-    marginHorizontal: 20, // Increased to 20
+    marginHorizontal: 15, // Reverted to 15
     marginBottom: 20,     // Common spacing
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
