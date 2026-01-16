@@ -399,7 +399,7 @@ const ChefsList = ({ navigation, route }) => {
               <TouchableOpacity
                 style={styles.emptyStateButton}
                 onPress={() =>
-                  navigation.navigate('ChefsList', { filterType: 'All' })
+                  navigation.dispatch(StackActions.push('ChefsList', { filterType: 'All' }))
                 }
               >
                 <Text style={styles.emptyStateButtonText}>View All Chefs</Text>
