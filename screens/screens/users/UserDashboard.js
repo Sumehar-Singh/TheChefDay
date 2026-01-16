@@ -315,10 +315,10 @@ const UserDashboard = ({ navigation }) => {
                               ? { uri: item.Image }
                               : require('../../../assets/userImage.jpg')
                           }
-                          style={styles.chefImage}
+                          style={[styles.chefImage, !coords && styles.chefImageLarge]}
                         />
-                        <Text style={styles.chefName}>{item.FirstName}</Text>
-                        <Text style={styles.chefExperience}>
+                        <Text style={[styles.chefName, !coords && styles.chefNameLarge]}>{item.FirstName}</Text>
+                        <Text style={[styles.chefExperience, !coords && styles.chefExperienceLarge]}>
                           {item.ExperienceYears} yrs
                         </Text>
                         {coords &&
@@ -554,26 +554,37 @@ const styles = StyleSheet.create({
     borderColor: '#f0f0f0',
   },
   chefImage: {
-    width: isTablet ? 110 : 100, // Increased size
-    height: isTablet ? 110 : 100,
-    borderRadius: isTablet ? 55 : 50,
-    marginBottom: 0, // Let space-around handle it
+    width: isTablet ? 100 : 90,
+    height: isTablet ? 100 : 90,
+    borderRadius: isTablet ? 50 : 45,
+    marginBottom: isTablet ? 12 : 5, // Reduced margin for space-around
     borderWidth: 2,
     borderColor: '#f8f8f8',
   },
+  chefImageLarge: {
+    width: isTablet ? 110 : 100,
+    height: isTablet ? 110 : 100,
+    borderRadius: isTablet ? 55 : 50,
+  },
   chefName: {
-    fontSize: isTablet ? 19 : 16, // Increased font
+    fontSize: isTablet ? 18 : 15,
     fontWeight: '700',
-    marginTop: 0, // Removed manual margin
+    marginTop: 0,
     color: '#1a1a1a',
     textAlign: 'center',
     numberOfLines: 1,
   },
+  chefNameLarge: {
+    fontSize: isTablet ? 19 : 17, // Larger when empty
+  },
   chefExperience: {
-    fontSize: isTablet ? 15 : 14, // Increased font
+    fontSize: isTablet ? 14 : 12,
     color: '#666',
-    marginTop: 0, // Removed manual margin
+    marginTop: 0,
     fontWeight: '500',
+  },
+  chefExperienceLarge: {
+    fontSize: isTablet ? 15 : 14, // Larger when empty
   },
   chefDistance: {
     fontSize: isTablet ? 13 : 11,
