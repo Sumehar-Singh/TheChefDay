@@ -7,6 +7,7 @@ import { formatDate } from '../../components/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import CustomStatusBar from '../../components/CustomStatusBar';
+import StarRating from '../../components/StarRating';
 
 const { width } = Dimensions.get('window');
 const isTablet = width > 600;
