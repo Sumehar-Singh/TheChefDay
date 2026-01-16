@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginHorizontal: 15, // Reverted to 15
     padding: isTablet ? 20 : 15,
-    marginBottom: 20,
+    marginBottom: 25, // Updated to 25 to match top margin
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

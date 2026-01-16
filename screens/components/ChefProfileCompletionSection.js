@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     borderRadius: 15, // Match others
     padding: isTablet ? 20 : 15,
     marginHorizontal: 15, // Reverted to 15
-    marginBottom: 20,     // Common spacing
+    marginBottom: 25,     // Updated to 25 to match Dashboard Top Margin (25)
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2, // Match others (0.1?) others had 0.1.
