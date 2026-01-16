@@ -248,7 +248,7 @@ const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showVie
   };
 
   return (
-    <View style={showHeader ? styles.container : styles.fullListContainer}>
+    <View style={[styles.container, !limit && { flex: 1, marginBottom: 0 }]}>
       {showHeader && (
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleContainer}>
@@ -299,21 +299,19 @@ const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showVie
 };
 
 const styles = StyleSheet.create({
-  fullListContainer: {
-    flex: 1,
-    paddingHorizontal: 0,
-  },
   container: {
+    // If limit is set (Dashboard style), keep card container style. 
+    // If infinite list (AllBookings), we want it to fill fetching area, but sharing styles is fine.
     backgroundColor: '#fff',
     borderRadius: 15,
     marginHorizontal: 15,
     padding: isTablet ? 20 : 15,
-    marginBottom: 25,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 20, // Add bottom margin for safe spacing
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -347,31 +345,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: isTablet ? 15 : 12,
     marginBottom: 10,
+    // Removed minHeight/justifyContent to let content drive the height naturally
   },
   bookingItemLeft: {
     flex: 1,
   },
   bookingHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  userImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-    backgroundColor: '#eee',
-  },
-  userImagePlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-    backgroundColor: '#eee',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 12, // Explicit separation from details
   },
   bookingTextCustomer: {
     fontSize: isTablet ? 18 : 16,
@@ -383,6 +365,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginLeft: 5,
   },
   statusText: {
@@ -391,11 +375,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bookingDetails: {
+    // Removed 'gap' as it causes overlap in older RN versions
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 6, // Explicit margin between rows
   },
   bookingTextEvent: {
     fontSize: isTablet ? 16 : 14,
@@ -405,20 +390,27 @@ const styles = StyleSheet.create({
   },
   bookingText: {
     fontSize: isTablet ? 16 : 14,
-    color: '#000',
+    color: '#000', // Matches uniform look
     marginLeft: 8,
-    fontWeight: '600',
+    fontWeight: '600', // Match Service weight
   },
   bookingTextService: {
     fontSize: isTablet ? 16 : 14,
-    color: '#000',
+    color: '#4CAF50',
     marginLeft: 8,
     fontWeight: '600',
   },
   emptyContainer: {
-    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: isTablet ? 30 : 20,
+    marginVertical: 15,
     alignItems: 'center',
-    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   emptyTitle: {
     fontSize: isTablet ? 22 : 18,
