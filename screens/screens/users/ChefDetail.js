@@ -146,12 +146,12 @@ const ChefDetail = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if (ChefId && profile) {
-      storeChefId(ChefId); // Store the ChefId in local storage if it's passed (integers)
-    }
+    // Store this chef in "Recently Viewed"
+    // Argument Order: (chefId, userId)
+    storeChefId(ChefId, profile?.Id);
 
     getChefData(ChefId);
-
+    fetchPricing(ChefId);
     // Start flip animation when component mounts
     Animated.timing(flipAnim, {
       toValue: 1,
