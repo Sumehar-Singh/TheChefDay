@@ -20,97 +20,76 @@ const isTablet = width > 600;
 const PAGE_SIZE = 20;
 
 const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAll = true }) => {
-  const [allBookings, setAllBookings] = useState([]); // Store ALL fetched data
-  const [displayedBookings, setDisplayedBookings] = useState([]); // Store currently visible data
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchBookings = useCallback(async (pageNum = 1) => {
+    // If limit is provided (Dashboard), we use it and don't offset (always 1 page).
+    // If no limit (Full Page), we use PAGE_SIZE and offset.
+    const currentLimit = limit ? limit : PAGE_SIZE;
+    const currentOffset = limit ? 0 : (pageNum - 1) * PAGE_SIZE;
+
+    try {
+      let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}&limit=${currentLimit}&offset=${currentOffset}`;
+      console.log('Fetching bookings from:', url);
+      const response = await axios.get(url);
+
+      if (response.data.status === 'success') {
+        const rawData = Array.isArray(response.data.data) ? response.data.data : [];
+
+        // Basic filtering for empty IDs if necessary, though server shouldn't return them
+        const validData = rawData.filter(item => (item.BookingId || item.BookingID));
+
+        if (limit) {
+          setBookings(validData);
+        } else {
+          if (pageNum === 1) {
+            setBookings(validData);
+          } else {
+            setBookings(prev => [...prev, ...validData]);
+          }
+
+          if (validData.length < PAGE_SIZE) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
+        }
+      } else {
+        if (pageNum === 1) setBookings([]);
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      if (pageNum === 1) setBookings([]);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [UserID, limit]);
 
   useFocusEffect(
     useCallback(() => {
-      const fetchBookings = async () => {
-        try {
-          let url = `${BASE_URL}/users/get_bookings.php?UserId=${UserID}`;
-
-          // Strategy: Always fetch a decent number of items (e.g. 50) even if we only need 5 (limit).
-          // This allows us to sort client-side and ensure purely "Newest" items are shown, 
-          // preventing the server from hiding Pending items if it uses a weird sort.
-          // If it's "All Bookings" (no limit prop), we don't send limit param (fetch all).
-          if (limit) {
-            url += `&limit=50`;
-          }
-
-          console.log('Fetching bookings from:', url);
-          const response = await axios.get(url);
-
-          if (response.data.status === 'success') {
-            const rawData = Array.isArray(response.data.data) ? response.data.data : [];
-
-            // Filter valid items immediately
-            const validData = rawData.filter(item => {
-              const id = item.bookingid || item.BookingId || item.id || item.ID;
-              return id !== undefined && id !== null && id !== '';
-            });
-
-            // Sort by Booking ID Descending (Newest First)
-            // This ensures newly created 'Pending' bookings are at the top
-            validData.sort((a, b) => {
-              const idA = parseInt(a.bookingid || a.BookingId || a.id || a.ID || 0);
-              const idB = parseInt(b.bookingid || b.BookingId || b.id || b.ID || 0);
-              return idB - idA;
-            });
-
-            setAllBookings(validData);
-
-            // Initial Load: If limit is set (Dashboard), slice to that limit (5).
-            // If 'All Bookings', show first PAGE_SIZE.
-            if (limit) {
-              setDisplayedBookings(validData.slice(0, limit));
-            } else {
-              setDisplayedBookings(validData.slice(0, PAGE_SIZE));
-              setPage(1);
-            }
-
-          } else {
-            setAllBookings([]);
-            setDisplayedBookings([]);
-          }
-        } catch (error) {
-          console.error('Error fetching bookings:', error);
-          setAllBookings([]);
-          setDisplayedBookings([]);
-        } finally {
-          setLoading(false);
-        }
-      };
-
       if (UserID) {
-        // Optional: Set loading to true if you want the spinner to show on every focus
-        // setLoading(true); 
-        fetchBookings();
+        setLoading(true);
+        setPage(1);
+        fetchBookings(1);
       }
-
-      // Cleanup function if needed (not needed for simple fetch)
-      return () => { };
-    }, [UserID, limit])
+    }, [UserID, limit, fetchBookings])
   );
 
   const loadMoreData = () => {
-    // Only load more if we are NOT in "Dashboard Mode" (limit exists) and we have more data
     if (limit) return;
-    if (loadingMore) return;
-    if (displayedBookings.length >= allBookings.length) return;
+    if (loadingMore || loading) return;
+    if (!hasMore) return;
 
     setLoadingMore(true);
-
-    // Simulate network delay for effect (optional, enables 'loading' spinner at bottom)
-    setTimeout(() => {
-      const nextPage = page + 1;
-      const nextBatch = allBookings.slice(0, nextPage * PAGE_SIZE);
-      setDisplayedBookings(nextBatch);
-      setPage(nextPage);
-      setLoadingMore(false);
-    }, 500);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchBookings(nextPage);
   };
 
   // Direct helper to safely extract data regardless of casing and missing values
@@ -229,8 +208,6 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
     return <ActivityIndicator size="large" color="#ff0000" />;
   }
 
-  const hasBookings = displayedBookings && displayedBookings.length > 0;
-
   return (
     <View style={[styles.container, !limit && { flex: 1, marginBottom: 0 }]}>
       {showHeader && (
@@ -239,7 +216,7 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
             <MaterialCommunityIcons name="calendar-check" size={24} color="#ff0000" />
             <Text style={styles.sectionTitle}>Your Bookings</Text>
           </View>
-          {hasBookings && showViewAll && (
+          {bookings.length > 0 && showViewAll && (
             <TouchableOpacity
               style={styles.seeAllButton}
               onPress={() => navigation.navigate('AllBookings')}
@@ -251,20 +228,20 @@ const BookingsList = ({ UserID, navigation, limit, showHeader = true, showViewAl
         </View>
       )}
 
-      {!hasBookings ? (
+      {!loading && bookings.length === 0 ? (
         <EmptyBookings />
       ) : (
         <FlatList
-          data={displayedBookings}
+          data={bookings}
           renderItem={renderItem}
           keyExtractor={(item, index) => {
-            const id = item.bookingid || item.BookingId || item.id || item.ID;
-            return id ? id.toString() : `booking-${index}`;
+            const id = item.BookingId || item.BookingID || item.id || index.toString();
+            return id.toString();
           }}
           // If limit is set (UserDashboard), disable scroll because parent scrolls.
           // If limit is NOT set (AllBookings), enable scroll and pagination.
           scrollEnabled={!limit}
-          onEndReached={loadMoreData}
+          onEndReached={!limit ? loadMoreData : null}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
           showsVerticalScrollIndicator={false}

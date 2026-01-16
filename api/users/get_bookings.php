@@ -7,12 +7,9 @@ require_once '../config.php';
 // Check if UserId is provided
 $UserId = isset($_GET['UserId']) ? $_GET['UserId'] : (isset($_POST['UserId']) ? $_POST['UserId'] : '');
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 0; // Check if limit is provided, default is 0 (no limit)
+$offset = isset($_GET['offset']) ? (int) $_GET['offset'] : 0; // Check if offset is provided, default is 0
 
-// Check if UserId is empty
-if (empty($UserId)) {
-    echo json_encode(['status' => 'error', 'message' => 'UserId is required.']);
-    exit();
-}
+// ... Validation ...
 
 // Prepare the SQL query to fetch bookings and chef details
 $query = "
@@ -32,7 +29,7 @@ ORDER BY b.BookingID DESC
 
 // If a limit is provided, append it to the query
 if ($limit > 0) {
-    $query .= " LIMIT ?";
+    $query .= " LIMIT ? OFFSET ?";
 }
 
 $stmt = $connection->prepare($query);
@@ -44,7 +41,7 @@ if (!$stmt) {
 
 // Bind parameters and execute
 if ($limit > 0) {
-    $stmt->bind_param('si', $UserId, $limit); // Binding UserId and limit if limit is provided
+    $stmt->bind_param('sii', $UserId, $limit, $offset); // Binding UserId, limit, offset
 } else {
     $stmt->bind_param('s', $UserId); // Binding only UserId if no limit is provided
 }
