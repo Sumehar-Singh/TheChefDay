@@ -158,14 +158,22 @@ const ChefReviewList = ({ navigation, userId, limit }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 0,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    marginHorizontal: 15, // MATCH User Dashboard
+    padding: isTablet ? 20 : 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
-    paddingHorizontal: 15,
   },
   sectionTitleContainer: {
     flexDirection: 'row',
@@ -192,18 +200,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   reviewItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: isTablet ? 15 : 12,
-    marginBottom: 10,
-    marginHorizontal: 15,
+    backgroundColor: '#f8f8f8', // Match items
+    borderRadius: 10,
+    padding: isTablet ? 14 : 12,
+    // No marginHorizontal
     borderLeftWidth: 3,
     borderLeftColor: '#ff0000',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
   },
   reviewHeader: {
     flexDirection: 'row',

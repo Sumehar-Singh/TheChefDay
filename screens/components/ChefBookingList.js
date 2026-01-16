@@ -199,15 +199,23 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // Removed Card Styling to match User Dashboard
-    marginBottom: 0,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    marginHorizontal: 15, // MATCH User Dashboard BookingsList
+    padding: isTablet ? 20 : 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
-    paddingHorizontal: 15,
+    // Removed paddingHorizontal because container has padding
   },
   sectionTitleContainer: {
     flexDirection: 'row',
@@ -231,18 +239,13 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   bookingItem: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f8f8', // Match BookingsList item bg
     borderRadius: 12,
     padding: isTablet ? 15 : 12,
     marginBottom: 10,
-    marginHorizontal: 15, // Align with header
+    // Removed marginHorizontal because container has padding
     borderLeftWidth: 3,
     borderLeftColor: '#ff0000',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
   },
   bookingItemLeft: {
     flex: 1,
