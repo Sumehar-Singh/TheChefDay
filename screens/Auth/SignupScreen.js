@@ -29,6 +29,8 @@ import { BASE_URL } from "../../config";
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 600;
 
+import CountryCodePicker from '../../components/Controls/CountryCodePicker';
+
 const SignupScreen = ({ navigation, route }) => {
   const { fromScreen, isChef } = route.params || {};
   // Removed internal isChef state since it's passed via params now.
@@ -42,6 +44,7 @@ const SignupScreen = ({ navigation, route }) => {
   const [LastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -171,7 +174,7 @@ const SignupScreen = ({ navigation, route }) => {
         fname: FirstName.trim(),
         mname: MiddleName.trim(),
         lname: LastName.trim(),
-        phone: phone,
+        phone: `${countryCode} ${phone}`,
         role_id: isChef ? 3 : 2,
         terms_accepted: 1,
         terms_accepted_at: new Date().toISOString(),
@@ -367,18 +370,28 @@ const SignupScreen = ({ navigation, route }) => {
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Phone</Text>
               {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your phone number"
-                placeholderTextColor="#8c8c8c"
-                keyboardType="phone-pad"
-                value={phone}
-                onChangeText={(text) => {
-                  setPhone(text);
-                  if (errors.phone) setErrors({ ...errors, phone: null });
-                }}
-                maxLength={15}
-              />
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CountryCodePicker
+                  selectedCode={countryCode}
+                  onSelect={setCountryCode}
+                />
+                <TextInput
+                  style={[styles.input, { flex: 1, marginBottom: 0 }]} // Remove bottom margin since container handles it
+                  placeholder="10-digit Phone Number"
+                  placeholderTextColor="#8c8c8c"
+                  keyboardType="phone-pad"
+                  value={phone}
+                  onChangeText={(text) => {
+                    // Allow only numbers
+                    const cleaned = text.replace(/[^0-9]/g, '');
+                    setPhone(cleaned);
+                    if (errors.phone) setErrors({ ...errors, phone: null });
+                  }}
+                  maxLength={10}
+                />
+              </View>
+              {/* Add spacing matching other inputs manually since we removed marginBottom from input */}
+              <View style={{ height: isTablet ? 25 : 15 }} />
             </View>
 
 

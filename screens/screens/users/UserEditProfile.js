@@ -12,6 +12,7 @@ const isTablet = width > 600;
 import { BASE_URL } from '../../../config';
 import { storeUserCoords } from '../../components/utils';
 import { useAuth } from '../../../components/contexts/AuthContext';
+import CountryCodePicker from '../../components/Controls/CountryCodePicker';
 
 
 
@@ -27,6 +28,8 @@ const UserEditProfile = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState(0);
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+
   const [pinCode, setPinCode] = useState('');
   const [lat, setLat] = useState('');
   const [lon, setLon] = useState('');
@@ -185,7 +188,28 @@ const UserEditProfile = ({ navigation }) => {
         setLast(user[0].LastName);
         setEmail(user[0].Email);
         setAddress(user[0].Address); // Convert number to string for TextInput
-        setPhone(user[0].Phone);
+
+        // Parse Phone Number
+        // Expected formats: "+91 9876543210" or "9876543210"
+        let rawPhone = user[0].Phone || '';
+        if (rawPhone.includes(' ')) {
+          const parts = rawPhone.split(' ');
+          if (parts[0].startsWith('+')) {
+            setCountryCode(parts[0]);
+            setPhone(parts.slice(1).join(' ')); // Join rest as number
+          } else {
+            setPhone(rawPhone);
+          }
+        } else if (rawPhone.startsWith('+')) {
+          // No space but starts with +? Maybe "+91987..."
+          // Heuristic: +91 is 3 chars. 
+          // Simple approach: Assume standard lengths provided by picker (+91, +1 etc).
+          // For now, if no space, treat as just phone unless we want complex parsing.
+          setPhone(rawPhone);
+        } else {
+          setPhone(rawPhone);
+        }
+
         setOldProfileImage(user[0].Image);
         setPinCode(user[0].PinCode);
         setLat(user[0].Lat);
@@ -322,7 +346,7 @@ const UserEditProfile = ({ navigation }) => {
     formData.append('LastName', last.trim());
     formData.append('Email', email);
     formData.append('Address', address);
-    formData.append('Phone', phone);
+    formData.append('Phone', `${countryCode} ${phone}`);
     formData.append('IsImageRemoved', isRmvd);
     formData.append('PinCode', pinCode);
     formData.append('Lat', lat);
@@ -563,13 +587,21 @@ const UserEditProfile = ({ navigation }) => {
         </View>
         <View style={styles.section}>
           <Text style={styles.label}>Phone</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Phone"
-            value={phone}
-            onChangeText={setPhone}
-
-          />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <CountryCodePicker
+              selectedCode={countryCode}
+              onSelect={setCountryCode}
+            />
+            <TextInput
+              style={[styles.input, { flex: 1, marginBottom: 0 }]}
+              placeholder="10-digit Phone"
+              value={phone}
+              onChangeText={(text) => setPhone(text.replace(/[^0-9]/g, ''))}
+              maxLength={10}
+              keyboardType="phone-pad"
+            />
+          </View>
+          <View style={{ height: 15 }} />
         </View>
 
         <View style={styles.section}>

@@ -13,6 +13,7 @@ const isTablet = width > 600;
 const isSmallDevice = height < 700;
 import { BASE_URL } from '../../../config';
 import { useAuth } from '../../../components/contexts/AuthContext';
+import CountryCodePicker from '../../components/Controls/CountryCodePicker';
 
 const ChefEditProfile = ({ navigation }) => {
   const { profile } = useAuth();
@@ -24,6 +25,7 @@ const ChefEditProfile = ({ navigation }) => {
   const [bio, setBio] = useState('');
   const [experience, setExperience] = useState(0);
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
   const [address, setAddress] = useState('');
   const [lat, setLat] = useState('');
   const [lon, setLon] = useState('');
@@ -211,7 +213,25 @@ const ChefEditProfile = ({ navigation }) => {
 
         setBio(chef[0].Bio);
         setExperience(chef[0].ExperienceYears); // Convert number to string for TextInput
-        setPhone(chef[0].Phone);
+        setExperience(chef[0].ExperienceYears); // Convert number to string for TextInput
+
+        // Parse Phone Number
+        let rawPhone = chef[0].Phone || '';
+        if (rawPhone.includes(' ')) {
+          const parts = rawPhone.split(' ');
+          if (parts[0].startsWith('+')) {
+            setCountryCode(parts[0]);
+            setPhone(parts.slice(1).join(' '));
+          } else {
+            setPhone(rawPhone);
+          }
+        } else if (rawPhone.startsWith('+')) {
+          setPhone(rawPhone);
+        } else {
+          setPhone(rawPhone);
+        }
+
+        setAddress(chef[0].Address);
         setAddress(chef[0].Address);
         setLat(chef[0].Lat);
         setLon(chef[0].Lon);
@@ -340,7 +360,7 @@ const ChefEditProfile = ({ navigation }) => {
     formData.append('LastName', last.trim());
     formData.append('Bio', bio);
     formData.append('Experience', experience);
-    formData.append('Phone', phone);
+    formData.append('Phone', `${countryCode} ${phone}`);
     formData.append('IsImageRemoved', isRmvd);
     formData.append('Address', address);
     formData.append('Lat', lat);
@@ -586,12 +606,21 @@ const ChefEditProfile = ({ navigation }) => {
 
         <View style={styles.section}>
           <Text style={styles.label}>Phone</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Phone"
-            value={phone}
-            onChangeText={setPhone}
-          />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <CountryCodePicker
+              selectedCode={countryCode}
+              onSelect={setCountryCode}
+            />
+            <TextInput
+              style={[styles.input, { flex: 1, marginBottom: 0 }]}
+              placeholder="10-digit Phone"
+              value={phone}
+              onChangeText={(text) => setPhone(text.replace(/[^0-9]/g, ''))}
+              maxLength={10}
+              keyboardType="phone-pad"
+            />
+          </View>
+          <View style={{ height: 15 }} />
         </View>
 
         <View style={styles.section}>
