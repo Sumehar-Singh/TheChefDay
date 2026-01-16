@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
     padding: isTablet ? 15 : 12,
     width: isTablet ? 180 : 160,
     height: isTablet ? 250 : 200,
-    justifyContent: 'space-around',
+    justifyContent: 'space-around', // Distribute evenly
     alignItems: 'center',
     marginHorizontal: isTablet ? 8 : 8,
     marginBottom: isTablet ? 10 : 10,
@@ -554,25 +554,25 @@ const styles = StyleSheet.create({
     borderColor: '#f0f0f0',
   },
   chefImage: {
-    width: isTablet ? 100 : 90,
-    height: isTablet ? 100 : 90,
-    borderRadius: isTablet ? 50 : 45,
-    marginBottom: isTablet ? 12 : 10,
+    width: isTablet ? 110 : 100, // Increased size
+    height: isTablet ? 110 : 100,
+    borderRadius: isTablet ? 55 : 50,
+    marginBottom: 0, // Let space-around handle it
     borderWidth: 2,
     borderColor: '#f8f8f8',
   },
   chefName: {
-    fontSize: isTablet ? 18 : 15,
+    fontSize: isTablet ? 19 : 16, // Increased font
     fontWeight: '700',
-    marginTop: 4,
+    marginTop: 0, // Removed manual margin
     color: '#1a1a1a',
     textAlign: 'center',
     numberOfLines: 1,
   },
   chefExperience: {
-    fontSize: isTablet ? 14 : 12,
+    fontSize: isTablet ? 15 : 14, // Increased font
     color: '#666',
-    marginTop: 4,
+    marginTop: 0, // Removed manual margin
     fontWeight: '500',
   },
   chefDistance: {
