@@ -53,16 +53,17 @@ const UserDashboard = ({ navigation }) => {
     }
   };
 
-  const fetchRecentChefIds = async () => {
-    const storedIds = await getStoredChefIds(profile?.Id); // Pass UserId for user-specific storage
-    console.log('all Stored', storedIds);
+  const fetchRecentChefIds = React.useCallback(async () => {
+    if (profile?.Id) {
+      const storedIds = await getStoredChefIds(profile.Id);
+      setRecentChefIds(storedIds);
+    }
+  }, [profile?.Id]);
 
-    setRecentChefIds(storedIds);
-  };
   useFocusEffect(
     React.useCallback(() => {
       fetchRecentChefIds();
-    }, [])
+    }, [fetchRecentChefIds])
   );
   useEffect(() => {
     const removeAndFetch = async () => {
