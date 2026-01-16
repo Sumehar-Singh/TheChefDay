@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: isTablet ? 12 : 15, // Match User side padding
     paddingTop: 10,
   },
 });

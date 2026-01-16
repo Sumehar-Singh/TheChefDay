@@ -292,6 +292,7 @@ const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showVie
           onEndReached={!limit ? loadMoreData : null}
           onEndReachedThreshold={0.5}
           ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color="#ff0000" style={{ padding: 10 }} /> : null}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </View>
@@ -354,6 +355,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12, // Explicit separation from details
+  },
+  userImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: '#eee',
+  },
+  userImagePlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bookingTextCustomer: {
     fontSize: isTablet ? 18 : 16,
