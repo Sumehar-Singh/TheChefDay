@@ -111,7 +111,7 @@ const UserDashboard = ({ navigation }) => {
   // Optimize: Memoize visibleChefs to prevent expensive filtering on every render
   const visibleChefs = React.useMemo(() => {
     return allChefs.filter((chef) => {
-      if (!coords) return true; // detailed location not yet found, show all
+      if (!coords) return false; // Location required to calculate distance
       // Safety check for coordinates
       if (!chef.Lat || !chef.Lon) return false;
       return getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= nearByMiles;
