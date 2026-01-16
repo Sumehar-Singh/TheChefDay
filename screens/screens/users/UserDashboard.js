@@ -111,7 +111,7 @@ const UserDashboard = ({ navigation }) => {
   // Optimize: Memoize visibleChefs to prevent expensive filtering on every render
   const visibleChefs = React.useMemo(() => {
     return allChefs.filter((chef) => {
-      if (!coords) return false; // Location required to calculate distance
+      if (!coords) return true; // detailed location not yet found, show all
       // Safety check for coordinates
       if (!chef.Lat || !chef.Lon) return false;
       return getDistanceInMiles(coords.lat, coords.lon, chef.Lat, chef.Lon) <= nearByMiles;
@@ -162,9 +162,8 @@ const UserDashboard = ({ navigation }) => {
     },
     {
       title: 'Nearby Chefs',
-      // Sort by distance
-      data: [...visibleChefs].sort((a, b) => {
-        if (!coords) return 0;
+      // Sort by distance; Strict: If no coords, show nothing (trigger Set Location)
+      data: !coords ? [] : [...visibleChefs].sort((a, b) => {
         const distA = getDistanceInMiles(coords.lat, coords.lon, a.Lat, a.Lon);
         const distB = getDistanceInMiles(coords.lat, coords.lon, b.Lat, b.Lon);
         return distA - distB;
@@ -172,7 +171,8 @@ const UserDashboard = ({ navigation }) => {
     },
     {
       title: 'Popular Chefs',
-      data: getPopularChefs(2),
+      // Strict: If no coords, show nothing (trigger Set Location)
+      data: !coords ? [] : getPopularChefs(2),
     },
   ];
 
