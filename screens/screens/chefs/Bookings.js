@@ -10,43 +10,14 @@ import { useAuth } from '../../../components/contexts/AuthContext';
 const { width } = Dimensions.get('window');
 const isTablet = width > 600;
 
-const Bookings = ({navigation}) => {
+const Bookings = ({ navigation }) => {
 
-  const [refreshing, setRefreshing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-const {profile}=useAuth();
- 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    setIsLoading(true);
-    try {
-      await fetchChefReviews();
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-    } finally {
-      setRefreshing(false);
-      setIsLoading(false);
-    }
-  }, [profile.Id]);
-
- 
   return (
     <SafeAreaView style={styles.container}>
       <CustomStatusBar title="My Bookings" includeTopInset={false} />
-      <ScrollView 
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#805500']}
-            tintColor="#805500"
-          />
-        }
-      >
-        <ChefBookingList navigation={navigation} userId={profile.Id}/>
-        {isLoading && <CenterLoading />}
-      </ScrollView>
+      <View style={styles.content}>
+        <ChefBookingList navigation={navigation} userId={profile.Id} showHeader={false} limit={null} />
+      </View>
     </SafeAreaView>
   );
 };
@@ -56,10 +27,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
-  scrollView: {
+  content: {
     flex: 1,
-    paddingHorizontal: isTablet ? 12 : 8,
-    paddingVertical: '2%',
+    paddingHorizontal: isTablet ? 12 : 15, // Match User side padding
+    paddingTop: 10,
   },
 });
 

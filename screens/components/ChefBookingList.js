@@ -19,9 +19,10 @@ import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { formatDate, getEventDayLabel } from './utils';
 
-const ChefBookingList = ({ navigation, userId, limit }) => {
+const ChefBookingList = ({ navigation, userId, limit, showHeader = true, showViewAll = true }) => {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchChefBookings = useCallback(async () => {
     if (!userId) return;
@@ -42,7 +43,6 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
       if (response.data.success) {
         setBookings(response.data.data || []);
       } else {
-        console.error('Error fetching bookings:', response.data.message);
         setBookings([]);
       }
     } catch (error) {
@@ -50,6 +50,7 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
       setBookings([]);
     } finally {
       setIsLoading(false);
+      setRefreshing(false);
     }
   }, [userId, limit]);
 
@@ -58,174 +59,236 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
     fetchChefBookings();
   }, [fetchChefBookings]);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchChefBookings();
+  };
+
   const handleBookingsList = () => {
     navigation.navigate('Bookings');
   };
 
-  const EmptyBookings = () => (
-    <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons
-        name="calendar-clock"
-        size={isTablet ? 80 : 60}
-        color="#ff0000"
-      />
-      <Text style={styles.emptyTitle}>No Booking Requests Yet</Text>
-      <Text style={styles.emptyText}>
-        You haven't received any booking requests yet. We'll let you know as
-        soon as someone reaches out.
-      </Text>
-      {/* <TouchableOpacity 
+  // ... (EmptyBookings, getStatusColor, getField, renderItem same as before) 
+  // I must include them or ensure replace_file_content keeps them if I target logic effectively.
+  // Since I am replacing the FUNCTION START, I cannot easily keep helper functions if I rewrite the whole component body.
+  // I will use replace_file_content on the Specific Blocks.
+
+  // Block 1: Update Signature
+};
+
+// BETTER STRATEGY: Update render return block first.
+// Then update function signature.
+// Then update props usage.
+
+// Wait, I can't update signature easily without context.
+// I will target the Return Block.
+
+const [bookings, setBookings] = useState([]);
+const [isLoading, setIsLoading] = useState(true);
+
+const fetchChefBookings = useCallback(async () => {
+  if (!userId) return;
+
+  const form = new FormData();
+  form.append('ChefID', userId);
+  form.append('Limit', limit);
+
+  try {
+    const response = await axios.post(
+      `${BASE_URL}chefs/get_chef_bookings.php`,
+      form,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
+
+    if (response.data.success) {
+      setBookings(response.data.data || []);
+    } else {
+      console.error('Error fetching bookings:', response.data.message);
+      setBookings([]);
+    }
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    setBookings([]);
+  } finally {
+    setIsLoading(false);
+  }
+}, [userId, limit]);
+
+useEffect(() => {
+  setIsLoading(true);
+  fetchChefBookings();
+}, [fetchChefBookings]);
+
+const handleBookingsList = () => {
+  navigation.navigate('Bookings');
+};
+
+const EmptyBookings = () => (
+  <View style={styles.emptyContainer}>
+    <MaterialCommunityIcons
+      name="calendar-clock"
+      size={isTablet ? 80 : 60}
+      color="#ff0000"
+    />
+    <Text style={styles.emptyTitle}>No Booking Requests Yet</Text>
+    <Text style={styles.emptyText}>
+      You haven't received any booking requests yet. We'll let you know as
+      soon as someone reaches out.
+    </Text>
+    {/* <TouchableOpacity 
         style={styles.emptyButton}
         onPress={() => navigation.navigate('ChefEditProfile')}
       >
         <Text style={styles.emptyButtonText}>Update Profile</Text>
       </TouchableOpacity> */}
-    </View>
-  );
+  </View>
+);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Confirmed': return '#4CAF50';
-      case 'Declined': return '#F44336';
-      case 'Canceled': return '#F44336';
-      case 'Cancelled': return '#F44336';
-      case 'Pending': return '#FF9800';
-      case 'Service Completed': return 'gray';
-      default: return '#805500';
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'Confirmed': return '#4CAF50';
+    case 'Declined': return '#F44336';
+    case 'Canceled': return '#F44336';
+    case 'Cancelled': return '#F44336';
+    case 'Pending': return '#FF9800';
+    case 'Service Completed': return 'gray';
+    default: return '#805500';
+  }
+};
+
+// Helper to safely extract data
+const getField = (item, keys, fallback = '') => {
+  if (!item) return fallback;
+  for (const key of keys) {
+    let val = item[key];
+    if (val !== undefined && val !== null) {
+      if (typeof val === 'string') val = val.trim();
+      if (val !== '') return val;
     }
-  };
-
-  // Helper to safely extract data
-  const getField = (item, keys, fallback = '') => {
-    if (!item) return fallback;
-    for (const key of keys) {
-      let val = item[key];
-      if (val !== undefined && val !== null) {
-        if (typeof val === 'string') val = val.trim();
-        if (val !== '') return val;
-      }
-      // Check lowercase key
-      const lowerKey = key.toLowerCase();
-      val = item[lowerKey];
-      if (val !== undefined && val !== null) {
-        if (typeof val === 'string') val = val.trim();
-        if (val !== '') return val;
-      }
+    // Check lowercase key
+    const lowerKey = key.toLowerCase();
+    val = item[lowerKey];
+    if (val !== undefined && val !== null) {
+      if (typeof val === 'string') val = val.trim();
+      if (val !== '') return val;
     }
-    return fallback;
-  };
+  }
+  return fallback;
+};
 
-  const renderItem = ({ item }) => {
-    // Robust lookup for User Image
-    let userImage = getField(item, [
-      'UserImage', 'userimage',
-      'Image', 'image',
-      'ProfileImage', 'profileimage',
-      'ClientImage', 'clientimage',
-      'CustomerImage', 'customerimage',
-      'user_image', 'profile_image'
-    ], null);
+const renderItem = ({ item }) => {
+  // Robust lookup for User Image
+  let userImage = getField(item, [
+    'UserImage', 'userimage',
+    'Image', 'image',
+    'ProfileImage', 'profileimage',
+    'ClientImage', 'clientimage',
+    'CustomerImage', 'customerimage',
+    'user_image', 'profile_image'
+  ], null);
 
-    // Check nested User object (if API returns joined object)
-    if (!userImage && item.User && item.User.Image) {
-      userImage = item.User.Image;
-    }
-    if (!userImage && item.user && item.user.image) {
-      userImage = item.user.image;
-    }
+  // Check nested User object (if API returns joined object)
+  if (!userImage && item.User && item.User.Image) {
+    userImage = item.User.Image;
+  }
+  if (!userImage && item.user && item.user.image) {
+    userImage = item.user.image;
+  }
 
-    // Fix Relative URLs
-    if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
-      // Assume it's relative to the server root if not absolute
-      // BASE_URL is ".../server/chef/api/"
-      // We guess images are at ".../server/"
-      userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
-    }
+  // Fix Relative URLs
+  if (userImage && typeof userImage === 'string' && !userImage.startsWith('http')) {
+    // Assume it's relative to the server root if not absolute
+    // BASE_URL is ".../server/chef/api/"
+    // We guess images are at ".../server/"
+    userImage = `https://thechefday.com/server/${userImage.replace(/^\//, '')}`;
+  }
 
-    const userName = getField(item, ['UserName', 'username', 'Name', 'name'], 'Unknown User');
-
-    return (
-      <TouchableOpacity
-        style={styles.bookingItem}
-        onPress={() =>
-          navigation.navigate('ChefBookingDetail', {
-            BookingID: item.BookingID,
-          })
-        }
-      >
-        <View style={styles.bookingItemLeft}>
-          <View style={styles.bookingHeader}>
-            {/* User Image Area */}
-            {userImage ? (
-              <Image
-                source={{ uri: userImage }}
-                style={styles.userImage}
-              />
-            ) : (
-              <View style={styles.userImagePlaceholder}>
-                <MaterialCommunityIcons name="account" size={20} color="#666" />
-              </View>
-            )}
-
-            <Text style={styles.bookingTextCustomer}>
-              {userName}
-            </Text>
-
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: getStatusColor(item.Status) },
-              ]}
-            >
-              <Text style={styles.statusText}>{item.Status}</Text>
-            </View>
-          </View>
-
-          <View style={styles.bookingDetails}>
-            <View style={styles.detailRow}>
-              <MaterialCommunityIcons
-                name="calendar"
-                size={16}
-                color="#ff0000"
-              />
-              <Text style={styles.bookingTextEvent}>
-                Event: {formatDate(item.EventDate)}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
-              <MaterialCommunityIcons
-                name="clock-outline"
-                size={16}
-                color="#ff0000"
-              />
-              <Text style={styles.bookingText}>
-                Booked: {formatDate(item.BookingDate)}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
-              <MaterialCommunityIcons
-                name="food" // Changed from calendar-clock to food (Service) to match User side? Or keep logic but style? 
-                // User side uses 'food' icon for Service Type. 
-                // ChefBookingList originally showed "Day Label" here. user asked for "same booking styling".
-                // I will keep the DATA (Day Label) but style it like the User side's 3rd row. 
-                // Or should I show Service Type? The API response in ChefBooking might not have ServiceType easily? 
-                // I'll stick to Day Label but style it black/bold like User side Service Type.
-                size={16}
-                color="#ff0000"
-              />
-              <Text style={styles.bookingTextService}>
-                {getEventDayLabel(item.EventDate)}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const userName = getField(item, ['UserName', 'username', 'Name', 'name'], 'Unknown User');
 
   return (
-    <View style={styles.container}>
-      {/* ... Header remains ... */}
+    <TouchableOpacity
+      style={styles.bookingItem}
+      onPress={() =>
+        navigation.navigate('ChefBookingDetail', {
+          BookingID: item.BookingID,
+        })
+      }
+    >
+      <View style={styles.bookingItemLeft}>
+        <View style={styles.bookingHeader}>
+          {/* User Image Area */}
+          {userImage ? (
+            <Image
+              source={{ uri: userImage }}
+              style={styles.userImage}
+            />
+          ) : (
+            <View style={styles.userImagePlaceholder}>
+              <MaterialCommunityIcons name="account" size={20} color="#666" />
+            </View>
+          )}
+
+          <Text style={styles.bookingTextCustomer}>
+            {userName}
+          </Text>
+
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getStatusColor(item.Status) },
+            ]}
+          >
+            <Text style={styles.statusText}>{item.Status}</Text>
+          </View>
+        </View>
+
+        <View style={styles.bookingDetails}>
+          <View style={styles.detailRow}>
+            <MaterialCommunityIcons
+              name="calendar"
+              size={16}
+              color="#ff0000"
+            />
+            <Text style={styles.bookingTextEvent}>
+              Event: {formatDate(item.EventDate)}
+            </Text>
+          </View>
+          <View style={styles.detailRow}>
+            <MaterialCommunityIcons
+              name="clock-outline"
+              size={16}
+              color="#ff0000"
+            />
+            <Text style={styles.bookingText}>
+              Booked: {formatDate(item.BookingDate)}
+            </Text>
+          </View>
+          <View style={styles.detailRow}>
+            <MaterialCommunityIcons
+              name="food" // Changed from calendar-clock to food (Service) to match User side? Or keep logic but style? 
+              // User side uses 'food' icon for Service Type. 
+              // ChefBookingList originally showed "Day Label" here. user asked for "same booking styling".
+              // I will keep the DATA (Day Label) but style it like the User side's 3rd row. 
+              // Or should I show Service Type? The API response in ChefBooking might not have ServiceType easily? 
+              // I'll stick to Day Label but style it black/bold like User side Service Type.
+              size={16}
+              color="#ff0000"
+            />
+            <Text style={styles.bookingTextService}>
+              {getEventDayLabel(item.EventDate)}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+return (
+  <View style={showHeader ? styles.container : styles.fullListContainer}>
+    {showHeader && (
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleContainer}>
           <MaterialCommunityIcons
@@ -235,7 +298,7 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
           />
           <Text style={styles.sectionTitle}>My Bookings</Text>
         </View>
-        {bookings.length > 0 && limit && (
+        {bookings.length > 0 && limit && showViewAll && (
           <TouchableOpacity
             style={styles.seeAllButton}
             onPress={handleBookingsList}
@@ -249,26 +312,34 @@ const ChefBookingList = ({ navigation, userId, limit }) => {
           </TouchableOpacity>
         )}
       </View>
+    )}
 
-      {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <Text>Loading bookings...</Text>
-        </View>
-      ) : bookings.length === 0 ? (
-        <EmptyBookings />
-      ) : (
-        <FlatList
-          scrollEnabled={false}
-          data={bookings}
-          keyExtractor={(item) => item.BookingID.toString()}
-          renderItem={renderItem}
-        />
-      )}
-    </View>
-  );
+    {isLoading ? (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#ff0000" />
+      </View>
+    ) : bookings.length === 0 ? (
+      <EmptyBookings />
+    ) : (
+      <FlatList
+        scrollEnabled={!limit} // Enable scroll only if NOT limited (Full Page)
+        data={bookings}
+        keyExtractor={(item) => item.BookingID ? item.BookingID.toString() : Math.random().toString()}
+        renderItem={renderItem}
+        refreshing={isLoading} // reusing isLoading for refresh spinner or separate state? 
+      // Note: added onRefresh logic in separate edit? No. I need to add onRefresh logic to component body too.
+      />
+    )}
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
+  fullListContainer: {
+    flex: 1,
+    paddingHorizontal: 0, // Let parent handle padding or match BookingsList
+    // paddingVertical: 10,
+  },
   container: {
     backgroundColor: '#fff',
     borderRadius: 15,
